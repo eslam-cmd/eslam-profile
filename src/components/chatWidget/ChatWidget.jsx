@@ -32,7 +32,7 @@ export default function ChatWidget() {
         body: JSON.stringify({ messages: newMessages }),
       });
       const data = await res.json();
-      const reply = data.reply || "لم تصل إجابة.";
+      const reply = data.reply || "الموقع تحت الصيانة يرجى المحاولة في وقت اخر.";
       setMessages([...newMessages, { role: "assistant", content: reply }]);
     } catch {
       setMessages([

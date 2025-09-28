@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Box, Fab, Modal } from "@mui/material";
+import { Box, Fab } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 
 import Homepage from "./(pages)/home/page.js";
@@ -44,6 +45,8 @@ export default function Home() {
   const [openChat, setOpenChat] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
   const [step, setStep] = useState(0);
+
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   const introMessages = [
     "🎬 Welcome to Islam's Portfolio",
@@ -154,7 +157,7 @@ export default function Home() {
                 sx={{
                   position: "fixed",
                   bottom: 20,
-                  right: 30,
+                  right: 20,
                   backgroundColor: buttonBg,
                   color: "#fff",
                   fontWeight: "bold",
@@ -169,23 +172,26 @@ export default function Home() {
                 <ChatIcon />
               </Fab>
 
-              <Modal open={openChat} onClose={() => setOpenChat(false)}>
+              {openChat && (
                 <Box
                   sx={{
-                    position: "absolute",
-                    bottom: 80,
-                    right: 30,
-                    width: 350,
+                    position: "fixed",
+                    bottom: isMobile ? "10%" : 80,
+                    right: isMobile ? "5%" : 30,
+                    width: isMobile ? "90vw" : 350,
+                    height: isMobile ? "80vh" : "auto",
                     bgcolor: theme.palette.background.paper,
                     color: theme.palette.text.primary,
                     borderRadius: 2,
-                    boxShadow: 24,
+                    boxShadow: "0 0 20px rgba(0,0,0,0.4)",
                     p: 2,
+                    overflowY: "auto",
+                    zIndex: 1300,
                   }}
                 >
                   <ChatWidget />
                 </Box>
-              </Modal>
+              )}
             </>
           )}
         </Box>
