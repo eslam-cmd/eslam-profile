@@ -9,7 +9,6 @@ import ChatIcon from "@mui/icons-material/Chat";
 
 import Homepage from "./(pages)/home/page.js";
 import LoadingScreen from "../../components/Ultimits/loading.jsx";
-import ChatWidget from "../../components/chatWidget/ChatWidget.jsx";
 
 function TypingMessage({ text, delay = 40 }) {
   const [displayed, setDisplayed] = useState("");
@@ -67,7 +66,7 @@ export default function Home() {
           },
           text: {
             primary: darkMode ? "#ddd" : "#282828",
-            secondary: darkMode ? "#ccc" : "#555",
+            secondary: darkMode ? "#ccc" : "#000000ff",
           },
           primary: {
             main: "#D4AF37",
@@ -107,6 +106,14 @@ export default function Home() {
       setTimeout(() => setShowOverlay(false), 2000);
     }
   }, [step, showOverlay]);
+
+  // ⏱ إخفاء رسالة الصيانة بعد ثانيتين
+  useEffect(() => {
+    if (openChat) {
+      const timer = setTimeout(() => setOpenChat(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [openChat]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -179,17 +186,29 @@ export default function Home() {
                     bottom: isMobile ? "10%" : 80,
                     right: isMobile ? "5%" : 30,
                     width: isMobile ? "90vw" : 350,
-                    height: isMobile ? "80vh" : "auto",
+                    height: "auto",
                     bgcolor: theme.palette.background.paper,
                     color: theme.palette.text.primary,
                     borderRadius: 2,
                     boxShadow: "0 0 20px rgba(0,0,0,0.4)",
                     p: 2,
-                    overflowY: "auto",
                     zIndex: 1300,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
                   }}
                 >
-                  <ChatWidget />
+                  <Box sx={{ fontSize: 18, fontWeight: "bold", mb: 1 }}>
+                    🛠 Section Under Maintenance
+                  </Box>
+                  <Box
+                    sx={{ fontSize: 14, color: theme.palette.text.secondary }}
+                  >
+                    This chat feature is currently being updated to serve you
+                    better. Please check back soon!
+                  </Box>
                 </Box>
               )}
             </>
