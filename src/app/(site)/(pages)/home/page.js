@@ -8,6 +8,8 @@ import ToolsSection from "../../../../components/toolsSection/toolsSection";
 import SkillsRatingSection from "../../../../components/serversSection/serverssection";
 import ExpandSdservices from "../../../../components/expandsdservices/expandsdservices";
 import ContactSection from "../../../../components/contactsection/contactsection";
+import FeedbackForm from "@/components/feedback/feedbackForm";
+import FeedbackList from "@/components/feedback/feedbackList";
 
 export default function HomePage({ toggleTheme, darkMode }) {
   return (
@@ -18,6 +20,8 @@ export default function HomePage({ toggleTheme, darkMode }) {
       <SkillsRatingSection toggleTheme={toggleTheme} darkMode={darkMode} />
       <ExpandSdservices toggleTheme={toggleTheme} darkMode={darkMode} />
       <ContactSection toggleTheme={toggleTheme} darkMode={darkMode} />
+      <FeedbackForm toggleTheme={toggleTheme} darkMode={darkMode}/>
+      <FeedbackList toggleTheme={toggleTheme} darkMode={darkMode}/>
       <Footer />
     </>
   );

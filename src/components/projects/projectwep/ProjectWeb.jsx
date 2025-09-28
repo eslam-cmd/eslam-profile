@@ -15,6 +15,7 @@ import {
   useMediaQuery,
   Divider,
   Link,
+  Container,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -29,6 +30,7 @@ export default function ProjectWeb({
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [selectedTech, setSelectedTech] = React.useState("all");
 
@@ -63,6 +65,26 @@ export default function ProjectWeb({
       const prevIndexValue = prevIndex - 1;
       return prevIndexValue < 0 ? filteredProjects.length - 1 : prevIndexValue;
     });
+  };
+
+  // عدد البطاقات المعروضة في الشاشات الكبيرة
+  const getVisibleCardsCount = () => {
+    if (isMobile) return 1;
+    if (isTablet) return 2;
+    return 3; // شاشات كبيرة
+  };
+
+  // الحصول على البطاقات المرئية الحالية
+  const getVisibleProjects = () => {
+    const visibleCount = getVisibleCardsCount();
+    const visibleProjects = [];
+
+    for (let i = 0; i < visibleCount; i++) {
+      const index = (currentIndex + i) % filteredProjects.length;
+      visibleProjects.push(filteredProjects[index]);
+    }
+
+    return visibleProjects;
   };
 
   const NavigationDots = ({ count, activeIndex, onDotClick }) => (
@@ -184,117 +206,243 @@ export default function ProjectWeb({
         flexDirection: "column",
       }}
     >
-      <Typography
-        variant="h3"
-        gutterBottom
-        sx={{
-          textAlign: "center",
-          color: "#D4AF37",
-          fontWeight: "700",
-          letterSpacing: "1px",
-          fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
-          textTransform: "uppercase",
-          mb: { xs: 2, sm: 3 },
-        }}
-      >
-        Projects Website
-      </Typography>
-
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          flexWrap: "wrap",
-          gap: { xs: 1, sm: 1.5 },
-          mb: { xs: 2, sm: 3 },
-          px: { xs: 1, sm: 0 },
-        }}
-      >
-        {["all", "htmlcss", "react", "htmlcssjs", "next"].map((category) => (
-          <Button
-            key={category}
-            variant={selectedTech === category ? "contained" : "outlined"}
-            onClick={() => {
-              setSelectedTech(category);
-              setCurrentIndex(0);
-            }}
-            sx={{
-              textTransform: "none",
-              padding: { xs: "4px 8px", sm: "6px 12px", md: "8px 16px" },
-              fontSize: { xs: "0.7rem", sm: "0.8rem", md: "0.9rem" },
-              borderRadius: "6px",
-              backgroundColor:
-                selectedTech === category ? "#D4AF37" : "#0A1F44",
-              color: selectedTech === category ? "#000" : "#fff",
-              border: selectedTech === category ? "none" : "1px solid #D4AF37",
-              whiteSpace: "nowrap",
-              minWidth: "max-content",
-              "&:hover": { backgroundColor: "#D4AF37", color: "#000" },
-            }}
-          >
-            {category === "all"
-              ? "All"
-              : category === "htmlcss"
-              ? "HTML/CSS"
-              : category === "react"
-              ? "React"
-              : category === "next"
-              ? "Next"
-              : "JS"}
-          </Button>
-        ))}
-      </Box>
-
-      {filteredProjects.length === 0 ? (
+      <Container maxWidth="xl">
         <Typography
-          variant="h6"
+          variant="h3"
+          gutterBottom
           sx={{
-            color: "#ff5555",
             textAlign: "center",
-            mt: 3,
-            fontSize: { xs: "0.9rem", sm: "1rem" },
+            color: "#D4AF37",
+            fontWeight: "700",
+            letterSpacing: "1px",
+            fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
+            textTransform: "uppercase",
+            mb: { xs: 2, sm: 3 },
           }}
         >
-          There are no projects for this section. Projects will be uploaded
-          soon.
+          Projects Website
         </Typography>
-      ) : isMobile ? (
+
         <Box
           sx={{
             display: "flex",
             justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            minHeight: "50vh", // أو "100vh" حسب ما تريد
-            textAlign: "center",
-            overflow: "hidden",
-            flexDirection: "column",
+            flexWrap: "wrap",
+            gap: { xs: 1, sm: 1.5 },
+            mb: { xs: 2, sm: 3 },
+            px: { xs: 1, sm: 0 },
           }}
         >
-          <ProjectCard project={filteredProjects[currentIndex]} onOpenModal={onOpenModal}/>
-
-          <EnhancedNavigationButtons
-            onPrev={handlePrev}
-            onNext={handleNext}
-            disabledPrev={filteredProjects.length <= 1}
-            disabledNext={filteredProjects.length <= 1}
-          />
-
-          <NavigationDots
-            count={filteredProjects.length}
-            activeIndex={currentIndex}
-            onDotClick={(index) => setCurrentIndex(index)}
-          />
-        </Box>
-      ) : (
-        <Grid container spacing={2} justifyContent="center">
-          {filteredProjects.map((project) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={project.id}>
-              <ProjectCard project={project} onOpenModal={onOpenModal}/>
-            </Grid>
+          {["all", "htmlcss", "react", "htmlcssjs", "next"].map((category) => (
+            <Button
+              key={category}
+              variant={selectedTech === category ? "contained" : "outlined"}
+              onClick={() => {
+                setSelectedTech(category);
+                setCurrentIndex(0);
+              }}
+              sx={{
+                textTransform: "none",
+                padding: { xs: "4px 8px", sm: "6px 12px", md: "8px 16px" },
+                fontSize: { xs: "0.7rem", sm: "0.8rem", md: "0.9rem" },
+                borderRadius: "6px",
+                backgroundColor:
+                  selectedTech === category ? "#D4AF37" : "#0A1F44",
+                color: selectedTech === category ? "#000" : "#fff",
+                border:
+                  selectedTech === category ? "none" : "1px solid #D4AF37",
+                whiteSpace: "nowrap",
+                minWidth: "max-content",
+                "&:hover": { backgroundColor: "#D4AF37", color: "#000" },
+              }}
+            >
+              {category === "all"
+                ? "All"
+                : category === "htmlcss"
+                ? "HTML/CSS"
+                : category === "react"
+                ? "React"
+                : category === "next"
+                ? "Next"
+                : "JS"}
+            </Button>
           ))}
-        </Grid>
-      )}
+        </Box>
+
+        {filteredProjects.length === 0 ? (
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#ff5555",
+              textAlign: "center",
+              mt: 3,
+              fontSize: { xs: "0.9rem", sm: "1rem" },
+            }}
+          >
+            There are no projects for this section. Projects will be uploaded
+            soon.
+          </Typography>
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            {/* عرض البطاقات مع التقليب الأفقي */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: { xs: 2, sm: 3, md: 4 },
+                width: "100%",
+                position: "relative",
+                minHeight: "400px",
+              }}
+            >
+              {/* زر السابق - يظهر في الشاشات المتوسطة والكبيرة */}
+              {!isMobile && (
+                <IconButton
+                  onClick={handlePrev}
+                  disabled={filteredProjects.length <= 1}
+                  sx={{
+                    position: "absolute",
+                    left: { sm: 10, md: 20, lg: 40 },
+                    zIndex: 10,
+                    backgroundColor: "#0A1F44",
+                    color: "#D4AF37",
+                    border: "2px solid #D4AF37",
+                    padding: { sm: "12px", md: "16px" },
+                    "&:hover": {
+                      backgroundColor: "#D4AF37",
+                      color: "#000",
+                      transform: "scale(1.1)",
+                    },
+                    "&:disabled": {
+                      opacity: 0.3,
+                      cursor: "not-allowed",
+                    },
+                    transition: "all 0.3s ease",
+                    boxShadow: "0px 4px 15px rgba(212, 175, 55, 0.3)",
+                  }}
+                >
+                  <ArrowBackIosIcon
+                    sx={{ fontSize: { sm: "20px", md: "24px" } }}
+                  />
+                </IconButton>
+              )}
+
+              {/* عرض البطاقات */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: { xs: 2, sm: 3, md: 0 },
+                  width: "100%",
+                  maxWidth: "1200px",
+                  overflow: "hidden",
+                }}
+              >
+                {getVisibleProjects().map((project, index) => (
+                  <Box
+                    key={project.id}
+                    sx={{
+                      flex: isMobile
+                        ? "0 0 100%"
+                        : `0 0 ${100 / getVisibleCardsCount()}%`,
+                      maxWidth: isMobile ? "280px" : "none",
+                      transition: "all 0.5s ease",
+                      transform: `scale(${index === 0 ? 1 : 0.95})`,
+                      opacity: index === 0 ? 1 : 0.8,
+                    }}
+                  >
+                    <ProjectCard project={project} onOpenModal={onOpenModal} />
+                  </Box>
+                ))}
+              </Box>
+
+              {/* زر التالي - يظهر في الشاشات المتوسطة والكبيرة */}
+              {!isMobile && (
+                <IconButton
+                  onClick={handleNext}
+                  disabled={filteredProjects.length <= 1}
+                  sx={{
+                    position: "absolute",
+                    right: { sm: 10, md: 20, lg: 40 },
+                    zIndex: 10,
+                    backgroundColor: "#0A1F44",
+                    color: "#D4AF37",
+                    border: "2px solid #D4AF37",
+                    padding: { sm: "12px", md: "16px" },
+                    "&:hover": {
+                      backgroundColor: "#D4AF37",
+                      color: "#000",
+                      transform: "scale(1.1)",
+                    },
+                    "&:disabled": {
+                      opacity: 0.3,
+                      cursor: "not-allowed",
+                    },
+                    transition: "all 0.3s ease",
+                    boxShadow: "0px 4px 15px rgba(212, 175, 55, 0.3)",
+                  }}
+                >
+                  <ArrowForwardIosIcon
+                    sx={{ fontSize: { sm: "20px", md: "24px" } }}
+                  />
+                </IconButton>
+              )}
+            </Box>
+
+            {/* أزرار التنقل للنقال والأرقام */}
+            {isMobile ? (
+              <>
+                <EnhancedNavigationButtons
+                  onPrev={handlePrev}
+                  onNext={handleNext}
+                  disabledPrev={filteredProjects.length <= 1}
+                  disabledNext={filteredProjects.length <= 1}
+                />
+                <NavigationDots
+                  count={filteredProjects.length}
+                  activeIndex={currentIndex}
+                  onDotClick={(index) => setCurrentIndex(index)}
+                />
+              </>
+            ) : (
+              // مؤشر التقدم للشاشات الكبيرة
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  mt: 3,
+                  gap: 2,
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: "#D4AF37",
+                    fontWeight: "600",
+                  }}
+                >
+                  {currentIndex + 1} of {filteredProjects.length}
+                </Typography>
+                <NavigationDots
+                  count={filteredProjects.length}
+                  activeIndex={currentIndex}
+                  onDotClick={(index) => setCurrentIndex(index)}
+                />
+              </Box>
+            )}
+          </Box>
+        )}
+      </Container>
     </section>
   );
 }
@@ -351,10 +499,10 @@ function ProjectCard({ project, onOpenModal }) {
               fontSize: { xs: "0.8rem", sm: "0.9rem" },
               color: "#ccc",
               lineHeight: 1.4,
-              overflow:"hidden",
-              whiteSpace:"nowrap",
-              textOverflow:"ellipsis",
-              WebkitLineClamp:2
+              overflow: "hidden",
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
             }}
           >
             {project.description}

@@ -1,28 +1,54 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, Suspense, lazy } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box, Fab, Modal } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 
-const Homepage = lazy(() => import("./(pages)/home/page.js"));
+import Homepage from "./(pages)/home/page.js";
 import LoadingScreen from "../../components/Ultimits/loading.jsx";
 import ChatWidget from "../../components/chatWidget/ChatWidget.jsx";
+
+function TypingMessage({ text, delay = 40 }) {
+  const [displayed, setDisplayed] = useState("");
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setDisplayed((prev) => prev + text[i]);
+      i++;
+      if (i >= text.length) clearInterval(interval);
+    }, delay);
+    return () => clearInterval(interval);
+  }, [text, delay]);
+
+  return (
+    <Box
+      sx={{
+        m: 1,
+        fontSize: 22,
+        fontFamily: "monospace",
+        textAlign: "center",
+        maxWidth: "90%",
+      }}
+    >
+      {displayed}
+    </Box>
+  );
+}
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(true);
   const [loading, setLoading] = useState(true);
   const [openChat, setOpenChat] = useState(false);
-
-  // Intro overlay
   const [showOverlay, setShowOverlay] = useState(false);
   const [step, setStep] = useState(0);
 
   const introMessages = [
     "🎬 Welcome to Islam's Portfolio",
     "💡 Explore his skills and projects",
-    "🤝 Let's start the conversation!"
+    "🤝 Let's start the conversation!",
   ];
 
   const toggleTheme = () => setDarkMode((prev) => !prev);
@@ -33,8 +59,8 @@ export default function Home() {
         palette: {
           mode: darkMode ? "dark" : "light",
           background: {
-            default: darkMode ? "#000" : "#cbe4f0ff",
-            paper: darkMode ? "#030d1dff" : "#186e96ff",
+            default: darkMode ? "#000" : "#cbe4f0",
+            paper: darkMode ? "#030d1d" : "#186e96",
           },
           text: {
             primary: darkMode ? "#ddd" : "#282828",
@@ -51,30 +77,31 @@ export default function Home() {
     [darkMode]
   );
 
-  // Handle loading
+  const buttonBg = darkMode ? "#947824" : "#186e96";
+  const buttonHover = darkMode ? "#967103" : "#12465e";
+
   useEffect(() => {
-    const handleLoad = () => {
+    const hasSeenIntro = localStorage.getItem("seenIntro");
+    if (hasSeenIntro) {
       setLoading(false);
-      setShowOverlay(true);
-    };
-
-    if (document.readyState === "complete") {
-      handleLoad();
+      setShowOverlay(false);
     } else {
-      window.addEventListener("load", handleLoad);
+      const timer = setTimeout(() => {
+        setLoading(false);
+        setShowOverlay(true);
+        localStorage.setItem("seenIntro", "true");
+      }, 2000);
+      return () => clearTimeout(timer);
     }
-
-    return () => window.removeEventListener("load", handleLoad);
   }, []);
 
-  // Control overlay messages
   useEffect(() => {
     if (showOverlay && step < introMessages.length) {
       const timer = setTimeout(() => setStep(step + 1), 2000);
       return () => clearTimeout(timer);
     }
     if (step === introMessages.length) {
-      setTimeout(() => setShowOverlay(false), 1500);
+      setTimeout(() => setShowOverlay(false), 2000);
     }
   }, [step, showOverlay]);
 
@@ -96,77 +123,53 @@ export default function Home() {
             color: theme.palette.text.primary,
           }}
         >
-          {/* Overlay intro */}
           {showOverlay && (
             <Box
               sx={{
                 position: "fixed",
                 inset: 0,
-                bgcolor: "rgba(0,0,0,0.8)", // أسود شفاف
+                background:
+                  "linear-gradient(135deg, rgba(0,0,0,0.9), rgba(10,31,68,0.85))",
                 color: "#fff",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                fontSize: 22,
-                fontFamily: "monospace",
                 zIndex: 9999,
+                padding: 2,
               }}
             >
               {introMessages.slice(0, step).map((msg, i) => (
-                <Box
-                  key={i}
-                  sx={{
-                    m: 1,
-                    opacity: 0,
-                    animation: "fadeIn 1s forwards",
-                    animationDelay: `${i * 0.5}s`,
-                  }}
-                >
-                  {msg}
-                </Box>
+                <TypingMessage key={i} text={msg} delay={40} />
               ))}
-              <style jsx global>{`
-                @keyframes fadeIn {
-                  to {
-                    opacity: 1;
-                  }
-                }
-              `}</style>
             </Box>
           )}
 
-          {/* Main content */}
           {!showOverlay && (
             <>
-              <Suspense fallback={<LoadingScreen />}>
-                <Homepage toggleTheme={toggleTheme} darkMode={darkMode} />
-              </Suspense>
+              <Homepage toggleTheme={toggleTheme} darkMode={darkMode} />
 
-              {/* Floating chat button */}
               <Fab
-                color="primary"
-                aria-label="chat"
                 onClick={() => setOpenChat(true)}
                 sx={{
                   position: "fixed",
                   bottom: 20,
                   right: 30,
-                  backgroundColor: "#b8962f",
-                  color: "#000",
-                  "&:hover": { backgroundColor: "#b8962f" },
+                  backgroundColor: buttonBg,
+                  color: "#fff",
+                  fontWeight: "bold",
+                  boxShadow: "0 0 10px rgba(0,0,0,0.3)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: buttonHover,
+                    transform: "scale(1.05)",
+                  },
                 }}
               >
                 <ChatIcon />
               </Fab>
 
-              {/* Chat modal */}
-              <Modal
-                open={openChat}
-                onClose={() => setOpenChat(false)}
-                aria-labelledby="chat-modal"
-                aria-describedby="chat-with-ai"
-              >
+              <Modal open={openChat} onClose={() => setOpenChat(false)}>
                 <Box
                   sx={{
                     position: "absolute",

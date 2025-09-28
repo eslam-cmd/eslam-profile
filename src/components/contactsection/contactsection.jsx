@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Link from "next/link";
 import { useTheme } from "@emotion/react";
+import { Divider } from "@mui/material";
 export default function ContactSection({ toggleTheme, darkMode }) {
   const theme = useTheme();
   const colors = {
@@ -17,7 +18,10 @@ export default function ContactSection({ toggleTheme, darkMode }) {
     barColor: darkMode ? "#D4AF37" : "#186e96",
   };
   return (
-    <section id="contact" style={{ margin: "70px 0",fontFamily: "'Parisienne', cursive", }}>
+    <section
+      id="contact"
+      style={{ margin: "70px 0", fontFamily: "'Parisienne', cursive" }}
+    >
       <Box
         sx={{
           maxWidth: "700px",
@@ -79,18 +83,29 @@ export default function ContactSection({ toggleTheme, darkMode }) {
           Check out{" "}
           <Link
             href="/project"
-            style={{ color: "#D4AF37", textDecoration: "none",fontFamily: "'Parisienne', cursive", }}
+            style={{
+              color: "#D4AF37",
+              textDecoration: "none",
+              fontFamily: "'Parisienne', cursive",
+            }}
           >
             my projects
           </Link>{" "}
           to learn more about each service I offer.
         </Typography>
 
-        <Typography variant="body1" sx={{ marginBottom: "32px",fontFamily: "'Parisienne', cursive", }}>
+        <Typography
+          variant="body1"
+          sx={{ marginBottom: "32px", fontFamily: "'Parisienne', cursive" }}
+        >
           Have something in mind?{" "}
           <Link
             href="/contact"
-            style={{ color: "#D4AF37", textDecoration: "none",fontFamily: "'Parisienne', cursive",}}
+            style={{
+              color: "#D4AF37",
+              textDecoration: "none",
+              fontFamily: "'Parisienne', cursive",
+            }}
           >
             Reach out{" "}
           </Link>
@@ -101,7 +116,6 @@ export default function ContactSection({ toggleTheme, darkMode }) {
           variant="contained"
           sx={{
             backgroundColor: colors.buttonBg,
-
             paddingX: 4,
             paddingY: 1.5,
             borderRadius: "25px",
@@ -119,6 +133,9 @@ export default function ContactSection({ toggleTheme, darkMode }) {
           </Link>
         </Button>
       </Box>
+      <Divider
+        sx={{ backgroundColor: colors.borderColor, marginTop: "60px" }}
+      />
     </section>
   );
 }

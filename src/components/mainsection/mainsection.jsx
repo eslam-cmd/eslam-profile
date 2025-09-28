@@ -14,7 +14,6 @@ import AppsIcon from "@mui/icons-material/Apps";
 import { useTheme } from "@mui/material/styles";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import PersonIcon from '@mui/icons-material/Person';
 export default function MainSection({ toggleTheme, darkMode }) {
   const theme = useTheme();
   const colors = {
@@ -177,7 +176,6 @@ export default function MainSection({ toggleTheme, darkMode }) {
                 VIEW PROJECTS
               </Link>
             </Button>
-           
           </Box>
 
           <Box sx={{ display: "flex", gap: 2, marginTop: 4 }}>
