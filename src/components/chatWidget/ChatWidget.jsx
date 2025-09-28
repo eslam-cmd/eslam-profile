@@ -5,12 +5,10 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content:
-        "أهلًا! أنا مساعد موقع إسلام. اسألني أي شيء عن مهاراته، مشاريعه، أو أسلوب عمله.",
+      content: "أهلًا! 👋 أنا مساعد موقع إسلام. اسألني عن مهاراته، مشاريعه أو أسلوب عمله.",
     },
   ]);
   const [input, setInput] = useState("");
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const listRef = useRef(null);
 
@@ -18,7 +16,7 @@ export default function ChatWidget() {
     if (listRef.current) {
       listRef.current.scrollTop = listRef.current.scrollHeight;
     }
-  }, [messages, open]);
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
@@ -39,7 +37,7 @@ export default function ChatWidget() {
     } catch {
       setMessages([
         ...newMessages,
-        { role: "assistant", content: "حدث خطأ، حاول مجددًا." },
+        { role: "assistant", content: "⚠ حدث خطأ، حاول مجددًا." },
       ]);
     } finally {
       setLoading(false);
@@ -54,130 +52,120 @@ export default function ChatWidget() {
   };
 
   return (
-    <>
-      <button
-        onClick={() => setOpen((v) => !v)}
+    <div
+      id="islam-chat"
+      style={{
+        position: "fixed",
+        bottom: 20,
+        right: 20,
+        width: 360,
+        background: "#fff",
+        color: "#222",
+        borderRadius: 12,
+        boxShadow: "0 12px 30px rgba(0,0,0,0.2)",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        fontFamily: "sans-serif",
+      }}
+    >
+      {/* رأس المحادثة */}
+      <div
         style={{
-          position: "fixed",
-          bottom: 20,
-          right: 20,
-          padding: "12px 16px",
-          borderRadius: 999,
+          padding: "14px 16px",
           background: "#0A1F44",
           color: "#fff",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.25)",
-          border: "none",
-          cursor: "pointer",
+          fontWeight: "bold",
+          fontSize: 15,
         }}
-        aria-expanded={open}
-        aria-controls="islam-chat"
       >
-        {open ? "إغلاق المحادثة" : "محادثة إسلام"}
-      </button>
+        💬 مساعد موقع إسلام
+        <div style={{ fontSize: 12, opacity: 0.8, fontWeight: 400 }}>
+          اسأل عن المهارات، المشاريع أو أسلوب العمل
+        </div>
+      </div>
 
-      {open && (
-        <div
-          id="islam-chat"
-          style={{
-            position: "fixed",
-            bottom: 80,
-            right: 20,
-            width: 340,
-            background: "#0A1F44",
-            color: "#fff",
-            borderRadius: 12,
-            boxShadow: "0 12px 30px rgba(0,0,0,0.3)",
-            overflow: "hidden",
-          }}
-        >
+      {/* الرسائل */}
+      <div
+        ref={listRef}
+        style={{
+          flex: 1,
+          maxHeight: 320,
+          overflowY: "auto",
+          padding: 12,
+          background: "#f9f9f9",
+        }}
+      >
+        {messages.map((m, i) => (
           <div
+            key={i}
             style={{
-              padding: 12,
-              borderBottom: "1px solid rgba(255,255,255,0.15)",
+              margin: "8px 0",
+              textAlign: m.role === "user" ? "right" : "left",
             }}
           >
-            <strong>مساعد موقع إسلام</strong>
-            <div style={{ fontSize: 12, opacity: 0.8 }}>
-              اسأل عن المهارات، المشاريع، أو أسلوب العمل.
-            </div>
-          </div>
-
-          <div
-            ref={listRef}
-            style={{ maxHeight: 280, overflowY: "auto", padding: 12 }}
-          >
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                style={{
-                  margin: "8px 0",
-                  textAlign: m.role === "user" ? "right" : "left",
-                }}
-              >
-                <div
-                  style={{
-                    display: "inline-block",
-                    background:
-                      m.role === "user"
-                        ? "rgba(255,255,255,0.1)"
-                        : "rgba(255,255,255,0.08)",
-                    padding: "8px 10px",
-                    borderRadius: 10,
-                    maxWidth: "85%",
-                  }}
-                >
-                  <b style={{ opacity: 0.9 }}>
-                    {m.role === "user" ? "أنت" : "المساعد"}:
-                  </b>{" "}
-                  {m.content}
-                </div>
-              </div>
-            ))}
-            {loading && (
-              <div style={{ opacity: 0.8, fontSize: 13 }}>…جارٍ توليد الرد</div>
-            )}
-          </div>
-
-          <div
-            style={{
-              padding: 12,
-              borderTop: "1px solid rgba(255,255,255,0.15)",
-              display: "flex",
-              gap: 8,
-            }}
-          >
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={onKey}
-              placeholder="اكتب سؤالك واضغط Enter…"
-              rows={2}
+            <div
               style={{
-                flex: 1,
-                resize: "none",
-                padding: 8,
-                borderRadius: 8,
-                border: "none",
-              }}
-            />
-            <button
-              onClick={sendMessage}
-              disabled={loading}
-              style={{
-                padding: "8px 12px",
-                borderRadius: 8,
-                background: "#3FBF7F",
-                color: "#041022",
-                border: "none",
-                cursor: "pointer",
-                fontWeight: 600,
+                display: "inline-block",
+                background: m.role === "user" ? "#0A1F44" : "#e5e5ea",
+                color: m.role === "user" ? "#fff" : "#000",
+                padding: "10px 14px",
+                borderRadius: 16,
+                maxWidth: "75%",
+                lineHeight: 1.4,
               }}
             >
-              إرسال
-            </button>
+              {m.content}
+            </div>
           </div>
-        </div>
-      )}
-    </>
+        ))}
+        {loading && (
+          <div style={{ fontSize: 13, opacity: 0.7 }}>…جارٍ توليد الرد</div>
+        )}
+      </div>
+
+      {/* إدخال الرسالة */}
+      <div
+        style={{
+          padding: 10,
+          borderTop: "1px solid #ddd",
+          display: "flex",
+          gap: 8,
+          background: "#fff",
+        }}
+      >
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={onKey}
+          placeholder="اكتب سؤالك واضغط Enter…"
+          rows={1}
+          style={{
+            flex: 1,
+            resize: "none",
+            padding: "10px",
+            borderRadius: 20,
+            border: "1px solid #ccc",
+            outline: "none",
+            fontSize: 14,
+          }}
+        />
+        <button
+          onClick={sendMessage}
+          disabled={loading}
+          style={{
+            padding: "0 16px",
+            borderRadius: 20,
+            background: "#0A1F44",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+            fontWeight: 600,
+          }}
+        >
+          ➤
+        </button>
+      </div>
+    </div>
   );
 }

@@ -8,14 +8,22 @@ import ChatIcon from "@mui/icons-material/Chat";
 
 const Homepage = lazy(() => import("./(pages)/home/page.js"));
 import LoadingScreen from "../../components/Ultimits/loading.jsx";
-
-// استورد المساعد الذكي
 import ChatWidget from "../../components/chatWidget/ChatWidget.jsx";
 
 export default function Home() {
   const [darkMode, setDarkMode] = useState(true);
   const [loading, setLoading] = useState(true);
   const [openChat, setOpenChat] = useState(false);
+
+  // Intro overlay
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [step, setStep] = useState(0);
+
+  const introMessages = [
+    "🎬 Welcome to Islam's Portfolio",
+    "💡 Explore his skills and projects",
+    "🤝 Let's start the conversation!"
+  ];
 
   const toggleTheme = () => setDarkMode((prev) => !prev);
 
@@ -43,17 +51,32 @@ export default function Home() {
     [darkMode]
   );
 
+  // Handle loading
   useEffect(() => {
-    const handleLoad = () => setLoading(false);
+    const handleLoad = () => {
+      setLoading(false);
+      setShowOverlay(true);
+    };
 
     if (document.readyState === "complete") {
-      setLoading(false);
+      handleLoad();
     } else {
       window.addEventListener("load", handleLoad);
     }
 
     return () => window.removeEventListener("load", handleLoad);
   }, []);
+
+  // Control overlay messages
+  useEffect(() => {
+    if (showOverlay && step < introMessages.length) {
+      const timer = setTimeout(() => setStep(step + 1), 2000);
+      return () => clearTimeout(timer);
+    }
+    if (step === introMessages.length) {
+      setTimeout(() => setShowOverlay(false), 1500);
+    }
+  }, [step, showOverlay]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -73,50 +96,95 @@ export default function Home() {
             color: theme.palette.text.primary,
           }}
         >
-          <Suspense fallback={<LoadingScreen />}>
-            <Homepage toggleTheme={toggleTheme} darkMode={darkMode} />
-          </Suspense>
-
-          {/* زر المحادثة العائم */}
-          <Fab
-            color="primary"
-            aria-label="chat"
-            onClick={() => setOpenChat(true)}
-            sx={{
-              position: "fixed",
-              bottom: 20,
-              right: 20,
-              backgroundColor: "#000000ff",
-              color: "#000",
-              "&:hover": { backgroundColor: "#b8962f" },
-            }}
-          >
-            <ChatIcon />
-          </Fab>
-
-          {/* المودال */}
-          <Modal
-            open={openChat}
-            onClose={() => setOpenChat(false)}
-            aria-labelledby="chat-modal"
-            aria-describedby="chat-with-ai"
-          >
+          {/* Overlay intro */}
+          {showOverlay && (
             <Box
               sx={{
-                position: "absolute",
-                bottom: 80,
-                right: 20,
-                width: 350,
-                bgcolor: theme.palette.background.paper,
-                color: theme.palette.text.primary,
-                borderRadius: 2,
-                boxShadow: 24,
-                p: 2,
+                position: "fixed",
+                inset: 0,
+                bgcolor: "rgba(0,0,0,0.8)", // أسود شفاف
+                color: "#fff",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                fontSize: 22,
+                fontFamily: "monospace",
+                zIndex: 9999,
               }}
             >
-              <ChatWidget />
+              {introMessages.slice(0, step).map((msg, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    m: 1,
+                    opacity: 0,
+                    animation: "fadeIn 1s forwards",
+                    animationDelay: `${i * 0.5}s`,
+                  }}
+                >
+                  {msg}
+                </Box>
+              ))}
+              <style jsx global>{`
+                @keyframes fadeIn {
+                  to {
+                    opacity: 1;
+                  }
+                }
+              `}</style>
             </Box>
-          </Modal>
+          )}
+
+          {/* Main content */}
+          {!showOverlay && (
+            <>
+              <Suspense fallback={<LoadingScreen />}>
+                <Homepage toggleTheme={toggleTheme} darkMode={darkMode} />
+              </Suspense>
+
+              {/* Floating chat button */}
+              <Fab
+                color="primary"
+                aria-label="chat"
+                onClick={() => setOpenChat(true)}
+                sx={{
+                  position: "fixed",
+                  bottom: 20,
+                  right: 30,
+                  backgroundColor: "#b8962f",
+                  color: "#000",
+                  "&:hover": { backgroundColor: "#b8962f" },
+                }}
+              >
+                <ChatIcon />
+              </Fab>
+
+              {/* Chat modal */}
+              <Modal
+                open={openChat}
+                onClose={() => setOpenChat(false)}
+                aria-labelledby="chat-modal"
+                aria-describedby="chat-with-ai"
+              >
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: 80,
+                    right: 30,
+                    width: 350,
+                    bgcolor: theme.palette.background.paper,
+                    color: theme.palette.text.primary,
+                    borderRadius: 2,
+                    boxShadow: 24,
+                    p: 2,
+                  }}
+                >
+                  <ChatWidget />
+                </Box>
+              </Modal>
+            </>
+          )}
         </Box>
       )}
     </ThemeProvider>
