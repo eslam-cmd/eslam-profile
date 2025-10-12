@@ -343,7 +343,7 @@ export default function ProjectWeb({
                   alignItems: "center",
                   gap: { xs: 2, sm: 3, md: 0 },
                   width: "100%",
-                  maxWidth: "1200px",
+                  maxWidth: "1050px",
                   overflow: "hidden",
                 }}
               >

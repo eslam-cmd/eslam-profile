@@ -52,7 +52,7 @@ export default function MainSection({ toggleTheme, darkMode }) {
           <Box sx={{ position: "relative", display: "inline-block" }}>
             <Avatar
               alt="Islam Hadaya"
-              src="/logo/my-photo2.jpg"
+              src="/logo/photo2.jpg"
               sx={{
                 width: 230,
                 height: 230,
