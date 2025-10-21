@@ -341,9 +341,9 @@ export default function ProjectWeb({
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  gap: { xs: 2, sm: 3, md: 0 },
+                  gap: { xs: 0, sm: 3, md: 0 },
                   width: "100%",
-                  maxWidth: "1050px",
+                  maxWidth: { xs: "100%", sm: "900px", md: "1050px" },
                   overflow: "hidden",
                 }}
               >
@@ -352,12 +352,17 @@ export default function ProjectWeb({
                     key={project.id}
                     sx={{
                       flex: isMobile
-                        ? "0 0 100%"
-                        : `0 0 ${100 / getVisibleCardsCount()}%`,
-                      maxWidth: isMobile ? "280px" : "none",
+                        ? "1 1 100%"
+                        : `1 1 ${100 / getVisibleCardsCount()}%`,
+                      maxWidth: isMobile ? "100%" : "none",
+                      minWidth: isMobile ? "100%" : undefined,
                       transition: "all 0.5s ease",
-                      transform: `scale(${index === 0 ? 1 : 0.95})`,
-                      opacity: index === 0 ? 1 : 0.8,
+                      transform: isMobile
+                        ? "scale(1)"
+                        : `scale(${index === 0 ? 1 : 0.95})`,
+                      opacity: isMobile ? 1 : index === 0 ? 1 : 0.8,
+                      display: "flex",
+                      justifyContent: "center",
                     }}
                   >
                     <ProjectCard project={project} onOpenModal={onOpenModal} />

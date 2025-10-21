@@ -237,19 +237,25 @@ function ProjectCard({ project, onOpenModal }) {
   return (
     <Card
       sx={{
-        maxWidth: { xs: "280px", sm: "300px", md: "320px" },
-        width: "100%",
-        minWidth: "260px",
+        maxWidth: { xs: "340px", sm: "300px", md: "320px" },
+        width: { xs: "90vw", sm: "100%" },
+        minWidth: { xs: "80vw", sm: "260px" },
         height: "100%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         transition: "all 0.3s ease",
-        padding: "8px",
-        background: "rgba(10, 31, 68, 0.7)",
-        borderRadius: "16px",
-        boxShadow: "0px 4px 10px rgba(212, 175, 55, 0.3)",
-        border: "1px solid #D4AF37",
+        padding: { xs: "12px 10px", sm: "12px" },
+        background: "rgba(10, 31, 68, 0.85)",
+        borderRadius: { xs: "16px", sm: "20px" },
+        boxShadow: {
+          xs: "0px 2px 12px rgba(212,175,55,0.25)",
+          sm: "0px 4px 10px rgba(212, 175, 55, 0.3)",
+        },
+        border: "2px solid #D4AF37",
+        margin: { xs: "0 auto 18px auto", sm: 0 },
+        position: "relative",
+        zIndex: 1,
         "&:hover": {
           transform: "translateY(-5px) scale(1.02)",
           boxShadow: "0px 8px 20px rgba(212, 175, 55, 0.4)",
@@ -284,10 +290,10 @@ function ProjectCard({ project, onOpenModal }) {
               fontSize: { xs: "0.8rem", sm: "0.9rem" },
               color: "#ccc",
               lineHeight: 1.4,
-               overflow:"hidden",
-              whiteSpace:"nowrap",
-              textOverflow:"ellipsis",
-              WebkitLineClamp:2
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+              WebkitLineClamp: 2,
             }}
           >
             {project.description}

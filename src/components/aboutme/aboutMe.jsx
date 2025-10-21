@@ -176,7 +176,7 @@ export default function AboutPage() {
               }}
             >
               <Avatar
-                src="/logo/my-photo2.jpg"
+                src="/logo/my-photo-2.jpg"
                 sx={{
                   width: { xs: 120, sm: 150, md: 180 },
                   height: { xs: 120, sm: 150, md: 180 },
