@@ -11,6 +11,29 @@ import { useTheme } from "@emotion/react";
 
 export default function ToolsSection({ toggleTheme, darkMode }) {
   const theme = useTheme();
+  const [inView, setInView] = React.useState(false);
+  const sectionRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setInView(true);
+          observer.disconnect(); // نشغلها مرة واحدة فقط
+        }
+      },
+      { threshold: 0.2 } // يبدأ الأنيميشن لما 20% من القسم يظهر
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) observer.unobserve(sectionRef.current);
+    };
+  }, []);
+
   const colors = {
     buttonBg: darkMode ? "#0A1F44" : "#186e96",
     buttonText: darkMode ? "#D4AF37" : "#ffff",
@@ -19,9 +42,10 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
     nameColor: darkMode ? "#D4AF37" : "#186e96",
     glowColor: "#3f51b5",
   };
+
   return (
     <>
-      <section id="skills">
+      <section id="skills" ref={sectionRef}>
         <Divider
           sx={{ backgroundColor: colors.buttonBg, marginTop: "230px" }}
         />
@@ -55,7 +79,7 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
           justifyContent="center"
           sx={{ marginTop: "50px" }}
         >
-          {cards.map((card) => (
+          {cards.map((card, index) => (
             <Grid xs={6} sm={4} lg={2} key={card.id}>
               <Card
                 sx={{
@@ -67,24 +91,17 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
                   width: "150px",
                   position: "relative",
                   overflow: "hidden",
-                  borderRadius: "8px",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    transform: "translateY(-5px)",
-                    boxShadow: darkMode
-                      ? "0px 6px 15px rgba(212, 175, 55, 0.35)"
-                      : "0px 6px 20px rgba(0, 0, 0, 0.25)",
-                  },
+                  borderRadius: "12px",
+                  opacity: inView ? 1 : 0,
+                  transform: inView ? "translateY(0)" : "translateY(40px)",
+                  transition: "all 0.6s ease",
+                  transitionDelay: `${index * 0.1}s`, // تأخير تدريجي لكل بطاقة
                 }}
               >
                 <CardActionArea>
-                  <CardContent
-                    className="card-tools"
-                    sx={{ textAlign: "center" }}
-                  >
+                  <CardContent sx={{ textAlign: "center" }}>
                     {card.icon}
                     <Typography
-                      className="title-card"
                       variant="body1"
                       sx={{ color: "#ddd", marginTop: "10px" }}
                     >

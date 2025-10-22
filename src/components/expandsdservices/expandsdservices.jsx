@@ -2,13 +2,36 @@
 import * as React from "react";
 import { Card, Grid, Typography, Box, Divider, useTheme } from "@mui/material";
 
-// ✅ استيراد الأيقونات من MUI
+// ✅ استيراد الأيقونات
 import { MdOutlineSettings } from "react-icons/md";
 import { MdLightbulbOutline } from "react-icons/md";
 import { MdOutlineAnalytics } from "react-icons/md";
 
 export default function ExpandSdservices({ toggleTheme, darkMode }) {
   const theme = useTheme();
+  const [inView, setInView] = React.useState(false);
+  const sectionRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setInView(true);
+          observer.disconnect(); // تشغيل مرة واحدة فقط
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) observer.unobserve(sectionRef.current);
+    };
+  }, []);
+
   const colors = {
     buttonBg: darkMode ? "#0A1F44" : "#186e96",
     buttonText: darkMode ? "#D4AF37" : "#ffff",
@@ -17,6 +40,7 @@ export default function ExpandSdservices({ toggleTheme, darkMode }) {
     nameColor: darkMode ? "#D4AF37" : "#186e96",
     glowColor: "#3f51b5",
   };
+
   const services = [
     {
       id: 1,
@@ -44,6 +68,7 @@ export default function ExpandSdservices({ toggleTheme, darkMode }) {
   return (
     <section
       id="Expand Sdservices"
+      ref={sectionRef}
       style={{
         padding: "0px 20px",
       }}
@@ -77,7 +102,7 @@ export default function ExpandSdservices({ toggleTheme, darkMode }) {
       </Typography>
 
       <Grid mt={10} container spacing={4} justifyContent="center">
-        {services.map((service) => (
+        {services.map((service, index) => (
           <Grid item xs={12} sm={6} md={4} key={service.id}>
             <Card
               sx={{
@@ -87,7 +112,6 @@ export default function ExpandSdservices({ toggleTheme, darkMode }) {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                transition: ".5s",
                 padding: "40px",
                 background: "rgba(10, 31, 68, 0.7)",
                 borderRadius: "24px",
@@ -95,6 +119,10 @@ export default function ExpandSdservices({ toggleTheme, darkMode }) {
                 border: "1px solid ",
                 borderColor: colors.buttonBg,
                 textAlign: "center",
+                opacity: inView ? 1 : 0,
+                transform: inView ? "translateY(0)" : "translateY(40px)",
+                transition: "all 0.6s ease",
+                transitionDelay: `${index * 0.15}s`, // تأخير تدريجي
                 "&:hover": {
                   transform: "translateY(-8px)",
                   boxShadow: darkMode
@@ -108,12 +136,13 @@ export default function ExpandSdservices({ toggleTheme, darkMode }) {
               </Box>
 
               <Typography
-                variant="h6"
                 sx={{
-                  fontWeight: "bold",
+                  fontWeight: "800",
                   color: colors.buttonText,
                   mb: 1,
-                  fontFamily: "'Parisienne', cursive",
+                  fontFamily: "Arail",
+                  letterSpacing: "2px",
+                  fontSize: "1.4rem",
                 }}
               >
                 {service.title}
@@ -122,11 +151,13 @@ export default function ExpandSdservices({ toggleTheme, darkMode }) {
               <Typography
                 variant="body2"
                 sx={{
-                  fontFamily: "'Parisienne', cursive",
-                  fontSize: "0.9rem",
+                  fontFamily: "Arail",
+                  fontSize: "1.1rem",
                   lineHeight: 1.6,
                   maxWidth: "270px",
                   color: "#ccc",
+                  letterSpacing: "1px",
+                  fontWeight: "600",
                 }}
               >
                 {service.description}

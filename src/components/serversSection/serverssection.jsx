@@ -21,6 +21,28 @@ import {
 
 export default function SkillsRatingBars({ toggleTheme, darkMode }) {
   const theme = useTheme();
+  const [inView, setInView] = React.useState(false);
+  const sectionRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setInView(true);
+          observer.disconnect(); // تشغيل مرة واحدة فقط
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) observer.unobserve(sectionRef.current);
+    };
+  }, []);
 
   const colors = {
     cardBg: darkMode ? "rgba(10, 31, 68, 0.7)" : "#f5f5f5",
@@ -32,18 +54,18 @@ export default function SkillsRatingBars({ toggleTheme, darkMode }) {
   const skills = [
     { id: 1, name: "React.js", icon: <FaReact />, level: 95 },
     { id: 2, name: "Next.js", icon: <SiNextdotjs />, level: 95 },
-    { id: 2, name: "React-Native", icon: <SiReact />, level: 95 },
-    { id: 3, name: "JavaScript", icon: <FaJsSquare />, level: 85 },
-    { id: 4, name: "TypeScript", icon: <SiTypescript />, level: 80 },
-    { id: 5, name: "Express.js", icon: <SiExpress />, level: 90 },
-    { id: 6, name: "PostgreSQL", icon: <SiPostgresql />, level: 87 },
+    { id: 3, name: "React-Native", icon: <SiReact />, level: 95 },
+    { id: 4, name: "JavaScript", icon: <FaJsSquare />, level: 85 },
+    { id: 5, name: "TypeScript", icon: <SiTypescript />, level: 80 },
+    { id: 6, name: "Express.js", icon: <SiExpress />, level: 90 },
+    { id: 7, name: "PostgreSQL", icon: <SiPostgresql />, level: 87 },
   ];
 
   return (
-    <section id="skills" style={{ padding: "80px 20px" }}>
+    <section id="skills" ref={sectionRef} style={{ padding: "80px 20px" }}>
       <Grid container spacing={4} justifyContent="center">
-        {skills.map((skill) => (
-          <Grid item xs={12}>
+        {skills.map((skill, index) => (
+          <Grid item xs={12} key={skill.id}>
             <Card
               sx={{
                 width: { xs: "280px", md: "350px", sm: "450px" },
@@ -55,14 +77,11 @@ export default function SkillsRatingBars({ toggleTheme, darkMode }) {
                 background: colors.cardBg,
                 borderRadius: "16px",
                 border: `1px solid ${colors.borderColor}`,
-                transition: ".5s",
                 mx: "auto",
-                "&:hover": {
-                  transform: "translateY(-5px)",
-                  boxShadow: darkMode
-                    ? "0px 6px 15px rgba(212, 175, 55, 0.35)"
-                    : "0px 6px 20px rgba(0, 0, 0, 0.25)",
-                },
+                opacity: inView ? 1 : 0,
+                transform: inView ? "translateY(0)" : "translateY(40px)",
+                transition: "all 0.6s ease",
+                transitionDelay: `${index * 0.1}s`, // تأخير تدريجي
               }}
             >
               <Box sx={{ fontSize: "3rem", color: colors.textColor }}>
@@ -79,13 +98,14 @@ export default function SkillsRatingBars({ toggleTheme, darkMode }) {
 
                 <LinearProgress
                   variant="determinate"
-                  value={skill.level}
+                  value={inView ? skill.level : 0} // يبدأ من 0 ثم يمتلئ
                   sx={{
                     height: 8,
                     borderRadius: 5,
                     backgroundColor: darkMode ? "#333" : "#ccc",
                     "& .MuiLinearProgress-bar": {
                       backgroundColor: colors.barColor,
+                      transition: "width 1.5s ease", // حركة تعبئة الشريط
                     },
                   }}
                 />

@@ -87,7 +87,7 @@ export default function Header({ toggleTheme, darkMode }) {
           anchorEl={anchorElNav}
           open={Boolean(anchorElNav)}
           onClose={handleCloseNavMenu}
-          sx={{ display: { xs: "block", md: "none" } }}
+          sx={{ display: { xs: "block", md: "none" } } }
         >
           {pages.map((page) => (
             <MenuItem key={page.name} onClick={() => handleNavigate(page.link)}>
@@ -95,7 +95,7 @@ export default function Header({ toggleTheme, darkMode }) {
                 sx={{
                   color: "inherit",
                   fontWeight: "600",
-                  fontFamily: "'Parisienne', cursive",
+                  fontFamily: "Arail",
                 }}
               >
                 {page.name}
@@ -114,7 +114,7 @@ export default function Header({ toggleTheme, darkMode }) {
                 marginX: 2,
                 transition: ".5s",
                 textDecoration: "none",
-                fontFamily: "'Parisienne', cursive",
+                fontFamily: "Arail",
                 fontWeight: "600",
                 "&:hover": {
                   color: "#D4AF37",

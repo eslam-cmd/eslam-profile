@@ -14,6 +14,7 @@ import {
   useMediaQuery,
   Divider,
   Link,
+  CircularProgress,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -25,6 +26,7 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [loadingImages, setLoadingImages] = React.useState({});
 
   if (!projectAppData || !Array.isArray(projectAppData)) {
     return (
@@ -33,6 +35,19 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
       </Typography>
     );
   }
+
+  // معالجة تحميل الصور
+  const handleImageLoad = React.useCallback((projectId) => {
+    setLoadingImages((prev) => ({ ...prev, [projectId]: false }));
+  }, []);
+
+  const handleImageError = React.useCallback((projectId) => {
+    setLoadingImages((prev) => ({ ...prev, [projectId]: false }));
+  }, []);
+
+  const handleImageStartLoad = React.useCallback((projectId) => {
+    setLoadingImages((prev) => ({ ...prev, [projectId]: true }));
+  }, []);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => {
@@ -205,6 +220,16 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
           <ProjectCard
             project={projectAppData[currentIndex]}
             onOpenModal={onOpenModal}
+            loading={loadingImages[projectAppData[currentIndex]?.id]}
+            onImageLoad={() =>
+              handleImageLoad(projectAppData[currentIndex]?.id)
+            }
+            onImageError={() =>
+              handleImageError(projectAppData[currentIndex]?.id)
+            }
+            onImageStartLoad={() =>
+              handleImageStartLoad(projectAppData[currentIndex]?.id)
+            }
           />
 
           <EnhancedNavigationButtons
@@ -224,7 +249,14 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
         <Grid container spacing={2} justifyContent="center">
           {projectAppData.map((project) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={project.id}>
-              <ProjectCard project={project} onOpenModal={onOpenModal} />
+              <ProjectCard
+                project={project}
+                onOpenModal={onOpenModal}
+                loading={loadingImages[project.id]}
+                onImageLoad={() => handleImageLoad(project.id)}
+                onImageError={() => handleImageError(project.id)}
+                onImageStartLoad={() => handleImageStartLoad(project.id)}
+              />
             </Grid>
           ))}
         </Grid>
@@ -233,7 +265,31 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
   );
 }
 
-function ProjectCard({ project, onOpenModal }) {
+function ProjectCard({
+  project,
+  onOpenModal,
+  loading,
+  onImageLoad,
+  onImageError,
+  onImageStartLoad,
+}) {
+  const [imageLoaded, setImageLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    if (project.photo) {
+      onImageStartLoad();
+      const img = new Image();
+      img.src = project.photo;
+      img.onload = () => {
+        setImageLoaded(true);
+        onImageLoad();
+      };
+      img.onerror = () => {
+        onImageError();
+      };
+    }
+  }, [project.photo, onImageLoad, onImageError, onImageStartLoad]);
+
   return (
     <Card
       sx={{
@@ -263,13 +319,64 @@ function ProjectCard({ project, onOpenModal }) {
       }}
     >
       <CardActionArea>
-        <CardMedia
-          component="img"
-          height="180"
-          image={project.photo}
-          alt={project.title}
-          sx={{ objectFit: "cover", borderRadius: "12px" }}
-        />
+        <Box
+          sx={{
+            position: "relative",
+            height: "180px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            borderRadius: "12px",
+            overflow: "hidden",
+          }}
+        >
+          {/* مؤشر التحميل */}
+          {(loading || !imageLoaded) && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                zIndex: 2,
+              }}
+            >
+              <CircularProgress
+                sx={{
+                  color: "#D4AF37",
+                  width: "40px !important",
+                  height: "40px !important",
+                }}
+              />
+            </Box>
+          )}
+
+          {/* الصورة */}
+          <CardMedia
+            component="img"
+            height="180"
+            image={project.photo}
+            alt={project.title}
+            sx={{
+              objectFit: "cover",
+              borderRadius: "12px",
+              width: "100%",
+              transition: "opacity 0.3s ease",
+              opacity: imageLoaded ? 1 : 0,
+              position: "relative",
+              zIndex: 1,
+            }}
+            onLoad={() => setImageLoaded(true)}
+            onError={onImageError}
+          />
+        </Box>
+
         <Divider sx={{ backgroundColor: "#D4AF37", marginTop: "8px", my: 1 }} />
         <CardContent sx={{ flexGrow: 1, p: 2 }}>
           <Typography

@@ -68,8 +68,7 @@ export default function ContactPage() {
             boxShadow: 4,
             width: "100%",
             maxWidth: 600,
-            backgroundColor: "rgba(10, 31, 68, 0.7)",
-            border: "1px solid #D4AF37",
+            background: "linear-gradient(135deg, #000000, #0A1F44)",
             borderRadius: 3,
             backdropFilter: "blur(6px)",
             padding: 3,
@@ -107,7 +106,7 @@ export default function ContactPage() {
                   InputProps={{
                     style: {
                       color: "#fff",
-                      borderColor: "#D4AF37",
+                      borderColor: "#fff",
                     },
                   }}
                 />
@@ -120,7 +119,7 @@ export default function ContactPage() {
                   InputProps={{
                     style: {
                       color: "#fff",
-                      borderColor: "#D4AF37",
+                      borderColor: "#fff",
                     },
                   }}
                 />
@@ -135,7 +134,7 @@ export default function ContactPage() {
                   InputProps={{
                     style: {
                       color: "#fff",
-                      borderColor: "#D4AF37",
+                      borderColor: "#fff",
                     },
                   }}
                 />

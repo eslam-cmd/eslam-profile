@@ -41,7 +41,7 @@ export default function ContactSection({ toggleTheme, darkMode }) {
             fontWeight: "bold",
             color: colors.nameColor,
             marginBottom: "30px",
-            fontFamily: "'Parisienne', cursive",
+            fontFamily: "Arail",
             fontSize: { xs: "1.6rem", sm: "1.8rem", md: "2rem" },
           }}
         >
@@ -54,7 +54,7 @@ export default function ContactSection({ toggleTheme, darkMode }) {
             marginBottom: "24px",
             lineHeight: 1.8,
             fontSize: { xs: "1.3rem", sm: "1.4rem", md: "1.6rem" },
-            fontFamily: "'Parisienne', cursive",
+            fontFamily: "Arail",
           }}
         >
           I'm <strong>Islam Hadaya</strong>, a freelance developer focused on
@@ -67,7 +67,7 @@ export default function ContactSection({ toggleTheme, darkMode }) {
           sx={{
             marginBottom: "16px",
             fontSize: { xs: "1.1rem", sm: "1.4rem", md: "1.4rem" },
-            fontFamily: "'Parisienne', cursive",
+            fontFamily: "Arail",
           }}
         >
           Ready to level up your digital presence? 🚀
@@ -76,7 +76,7 @@ export default function ContactSection({ toggleTheme, darkMode }) {
         <Typography
           sx={{
             marginBottom: "16px",
-            fontFamily: "'Parisienne', cursive",
+            fontFamily: "Arail",
             fontSize: { xs: "1.1rem", sm: "1.4rem", md: "1.4rem" },
           }}
         >
@@ -86,7 +86,7 @@ export default function ContactSection({ toggleTheme, darkMode }) {
             style={{
               color: "#D4AF37",
               textDecoration: "none",
-              fontFamily: "'Parisienne', cursive",
+              fontFamily: "Arail",
             }}
           >
             my projects
@@ -95,8 +95,8 @@ export default function ContactSection({ toggleTheme, darkMode }) {
         </Typography>
 
         <Typography
-          variant="body1"
-          sx={{ marginBottom: "32px", fontFamily: "'Parisienne', cursive" }}
+
+          sx={{ marginBottom: "32px", fontFamily: "Arail", fontSize:"20px",fontWeight:"700" }}
         >
           Have something in mind?{" "}
           <Link
@@ -104,7 +104,7 @@ export default function ContactSection({ toggleTheme, darkMode }) {
             style={{
               color: "#D4AF37",
               textDecoration: "none",
-              fontFamily: "'Parisienne', cursive",
+              fontFamily: "Arail",
             }}
           >
             Reach out{" "}
@@ -126,7 +126,9 @@ export default function ContactSection({ toggleTheme, darkMode }) {
             style={{
               color: colors.buttonText,
               textDecoration: "none",
-              fontFamily: "'Parisienne', cursive",
+              fontFamily: "Arail",
+              fontWeight:"700",
+
             }}
           >
             Contact me ..

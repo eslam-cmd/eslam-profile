@@ -176,6 +176,7 @@ export default function MainSection({ toggleTheme, darkMode }) {
                 VIEW PROJECTS
               </Link>
             </Button>
+            
           </Box>
 
           <Box sx={{ display: "flex", gap: 2, marginTop: 4 }}>

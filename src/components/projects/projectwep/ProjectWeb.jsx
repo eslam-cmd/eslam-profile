@@ -8,7 +8,6 @@ import {
   Button,
   CardActionArea,
   CardActions,
-  Grid,
   Typography,
   IconButton,
   Box,
@@ -16,66 +15,51 @@ import {
   Divider,
   Link,
   Container,
+  CircularProgress,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-export default function ProjectWeb({
-  toggleTheme,
-  darkMode,
-  projects,
-  onOpenModal,
-}) {
+export default function ProjectWeb({ projects, onOpenModal }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [selectedTech, setSelectedTech] = React.useState("all");
+  const [loadingImages, setLoadingImages] = React.useState({});
 
-  if (!projects || !Array.isArray(projects)) {
-    return (
-      <Typography
-        sx={{
-          color: "red",
-          textAlign: "center",
-          marginTop: "20px",
-          fontSize: { xs: "0.9rem", sm: "1rem" },
-        }}
-      >
-        Projects data is missing or invalid.
-      </Typography>
+  const filteredProjects = React.useMemo(() => {
+    if (!projects || !Array.isArray(projects)) return [];
+    return projects.filter(
+      (project) => selectedTech === "all" || project.tech === selectedTech
     );
-  }
+  }, [projects, selectedTech]);
 
-  const filteredProjects = projects.filter(
-    (project) => selectedTech === "all" || project.tech === selectedTech
-  );
+  // عدد البطاقات المعروضة في كل مرة
+  const getVisibleCardsCount = React.useCallback(() => {
+    if (isMobile) return 1;
+    if (isTablet) return 2;
+    return 3;
+  }, [isMobile, isTablet]);
 
-  const handleNext = () => {
+  const handleNext = React.useCallback(() => {
     setCurrentIndex((prevIndex) => {
       const nextIndex = prevIndex + 1;
       return nextIndex >= filteredProjects.length ? 0 : nextIndex;
     });
-  };
+  }, [filteredProjects.length]);
 
-  const handlePrev = () => {
+  const handlePrev = React.useCallback(() => {
     setCurrentIndex((prevIndex) => {
       const prevIndexValue = prevIndex - 1;
       return prevIndexValue < 0 ? filteredProjects.length - 1 : prevIndexValue;
     });
-  };
-
-  // عدد البطاقات المعروضة في الشاشات الكبيرة
-  const getVisibleCardsCount = () => {
-    if (isMobile) return 1;
-    if (isTablet) return 2;
-    return 3; // شاشات كبيرة
-  };
+  }, [filteredProjects.length]);
 
   // الحصول على البطاقات المرئية الحالية
-  const getVisibleProjects = () => {
+  const getVisibleProjects = React.useCallback(() => {
     const visibleCount = getVisibleCardsCount();
     const visibleProjects = [];
 
@@ -85,7 +69,20 @@ export default function ProjectWeb({
     }
 
     return visibleProjects;
-  };
+  }, [currentIndex, filteredProjects, getVisibleCardsCount]);
+
+  // معالجة تحميل الصور
+  const handleImageLoad = React.useCallback((projectId) => {
+    setLoadingImages((prev) => ({ ...prev, [projectId]: false }));
+  }, []);
+
+  const handleImageError = React.useCallback((projectId) => {
+    setLoadingImages((prev) => ({ ...prev, [projectId]: false }));
+  }, []);
+
+  const handleImageStartLoad = React.useCallback((projectId) => {
+    setLoadingImages((prev) => ({ ...prev, [projectId]: true }));
+  }, []);
 
   const NavigationDots = ({ count, activeIndex, onDotClick }) => (
     <Box
@@ -195,10 +192,31 @@ export default function ProjectWeb({
     </Box>
   );
 
+  // إعادة تعيين الفهرس عند تغيير التصنيف
+  React.useEffect(() => {
+    setCurrentIndex(0);
+  }, [selectedTech]);
+
+  if (!projects || !Array.isArray(projects)) {
+    return (
+      <Typography
+        sx={{
+          color: "red",
+          textAlign: "center",
+          marginTop: "20px",
+          fontSize: { xs: "0.9rem", sm: "1rem" },
+        }}
+      >
+        Projects data is missing or invalid.
+      </Typography>
+    );
+  }
+
   return (
-    <section
+    <Box
+      component="section"
       id="project"
-      style={{
+      sx={{
         minHeight: "100vh",
         background: "linear-gradient(135deg, #000000, #0A1F44)",
         padding: { xs: "20px 12px", sm: "30px 16px", md: "40px 20px" },
@@ -239,7 +257,6 @@ export default function ProjectWeb({
               variant={selectedTech === category ? "contained" : "outlined"}
               onClick={() => {
                 setSelectedTech(category);
-                setCurrentIndex(0);
               }}
               sx={{
                 textTransform: "none",
@@ -247,13 +264,15 @@ export default function ProjectWeb({
                 fontSize: { xs: "0.7rem", sm: "0.8rem", md: "0.9rem" },
                 borderRadius: "6px",
                 backgroundColor:
-                  selectedTech === category ? "#D4AF37" : "#0A1F44",
-                color: selectedTech === category ? "#000" : "#fff",
-                border:
-                  selectedTech === category ? "none" : "1px solid #D4AF37",
+                  selectedTech === category ? "#D4AF37" : "transparent",
+                color: selectedTech === category ? "#000" : "#D4AF37",
+                border: "1px solid #D4AF37",
                 whiteSpace: "nowrap",
                 minWidth: "max-content",
-                "&:hover": { backgroundColor: "#D4AF37", color: "#000" },
+                "&:hover": {
+                  backgroundColor: "#D4AF37",
+                  color: "#000",
+                },
               }}
             >
               {category === "all"
@@ -291,23 +310,21 @@ export default function ProjectWeb({
               width: "100%",
             }}
           >
-            {/* عرض البطاقات مع التقليب الأفقي */}
+            {/* عرض البطاقات */}
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                gap: { xs: 2, sm: 3, md: 4 },
                 width: "100%",
                 position: "relative",
                 minHeight: "400px",
               }}
             >
-              {/* زر السابق - يظهر في الشاشات المتوسطة والكبيرة */}
-              {!isMobile && (
+              {/* زر السابق */}
+              {!isMobile && filteredProjects.length > 1 && (
                 <IconButton
                   onClick={handlePrev}
-                  disabled={filteredProjects.length <= 1}
                   sx={{
                     position: "absolute",
                     left: { sm: 10, md: 20, lg: 40 },
@@ -321,10 +338,6 @@ export default function ProjectWeb({
                       color: "#000",
                       transform: "scale(1.1)",
                     },
-                    "&:disabled": {
-                      opacity: 0.3,
-                      cursor: "not-allowed",
-                    },
                     transition: "all 0.3s ease",
                     boxShadow: "0px 4px 15px rgba(212, 175, 55, 0.3)",
                   }}
@@ -335,46 +348,48 @@ export default function ProjectWeb({
                 </IconButton>
               )}
 
-              {/* عرض البطاقات */}
+              {/* حاوية البطاقات */}
               <Box
                 sx={{
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  gap: { xs: 0, sm: 3, md: 0 },
+                  gap: { xs: 2, sm: 3, md: 4 },
                   width: "100%",
-                  maxWidth: { xs: "100%", sm: "900px", md: "1050px" },
-                  overflow: "hidden",
+                  maxWidth: { xs: "100%", sm: "600px", md: "1200px" },
                 }}
               >
                 {getVisibleProjects().map((project, index) => (
                   <Box
                     key={project.id}
                     sx={{
-                      flex: isMobile
-                        ? "1 1 100%"
-                        : `1 1 ${100 / getVisibleCardsCount()}%`,
-                      maxWidth: isMobile ? "100%" : "none",
-                      minWidth: isMobile ? "100%" : undefined,
-                      transition: "all 0.5s ease",
-                      transform: isMobile
-                        ? "scale(1)"
-                        : `scale(${index === 0 ? 1 : 0.95})`,
-                      opacity: isMobile ? 1 : index === 0 ? 1 : 0.8,
+                      flex: {
+                        xs: "0 0 280px",
+                        sm: "0 0 calc(50% - 12px)",
+                        md: "0 0 calc(33.333% - 22px)",
+                      },
                       display: "flex",
                       justifyContent: "center",
+                      transition: "all 0.5s ease",
+                      opacity: 1,
                     }}
                   >
-                    <ProjectCard project={project} onOpenModal={onOpenModal} />
+                    <ProjectCard
+                      project={project}
+                      onOpenModal={onOpenModal}
+                      loading={loadingImages[project.id]}
+                      onImageLoad={() => handleImageLoad(project.id)}
+                      onImageError={() => handleImageError(project.id)}
+                      onImageStartLoad={() => handleImageStartLoad(project.id)}
+                    />
                   </Box>
                 ))}
               </Box>
 
-              {/* زر التالي - يظهر في الشاشات المتوسطة والكبيرة */}
-              {!isMobile && (
+              {/* زر التالي */}
+              {!isMobile && filteredProjects.length > 1 && (
                 <IconButton
                   onClick={handleNext}
-                  disabled={filteredProjects.length <= 1}
                   sx={{
                     position: "absolute",
                     right: { sm: 10, md: 20, lg: 40 },
@@ -388,10 +403,6 @@ export default function ProjectWeb({
                       color: "#000",
                       transform: "scale(1.1)",
                     },
-                    "&:disabled": {
-                      opacity: 0.3,
-                      cursor: "not-allowed",
-                    },
                     transition: "all 0.3s ease",
                     boxShadow: "0px 4px 15px rgba(212, 175, 55, 0.3)",
                   }}
@@ -403,7 +414,7 @@ export default function ProjectWeb({
               )}
             </Box>
 
-            {/* أزرار التنقل للنقال والأرقام */}
+            {/* أدوات التنقل */}
             {isMobile ? (
               <>
                 <EnhancedNavigationButtons
@@ -419,7 +430,6 @@ export default function ProjectWeb({
                 />
               </>
             ) : (
-              // مؤشر التقدم للشاشات الكبيرة
               <Box
                 sx={{
                   display: "flex",
@@ -448,105 +458,204 @@ export default function ProjectWeb({
           </Box>
         )}
       </Container>
-    </section>
+    </Box>
   );
 }
 
-function ProjectCard({ project, onOpenModal }) {
-  return (
-    <Card
-      sx={{
-        maxWidth: { xs: 280, sm: 300, md: 320 },
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        transition: "all 0.3s ease",
-        padding: { xs: "8px", sm: "12px" },
-        background: "rgba(10, 31, 68, 0.7)",
-        borderRadius: { xs: "16px", sm: "20px" },
-        boxShadow: "0px 4px 10px rgba(212, 175, 55, 0.3)",
-        border: "1px solid #D4AF37",
-        "&:hover": {
-          transform: "translateY(-4px)",
-          boxShadow: "0px 8px 20px rgba(212, 175, 55, 0.4)",
-        },
-      }}
-    >
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          height={180}
-          image={project.photo}
-          alt={project.title}
-          sx={{ objectFit: "cover", borderRadius: { xs: "12px", sm: "16px" } }}
-        />
-        <Divider sx={{ backgroundColor: "#D4AF37", my: { xs: 1, sm: 1.5 } }} />
-        <CardContent
-          sx={{ flexGrow: 1, p: { xs: 1, sm: 2 }, pb: { xs: 1, sm: 2 } }}
-        >
-          <Typography
-            gutterBottom
-            variant="h6"
+const ProjectCard = React.memo(
+  ({
+    project,
+    onOpenModal,
+    loading,
+    onImageLoad,
+    onImageError,
+    onImageStartLoad,
+  }) => {
+    const [imageLoaded, setImageLoaded] = React.useState(false);
+
+    React.useEffect(() => {
+      if (project.photo) {
+        onImageStartLoad();
+        const img = new Image();
+        img.src = project.photo;
+        img.onload = () => {
+          setImageLoaded(true);
+          onImageLoad();
+        };
+        img.onerror = () => {
+          onImageError();
+        };
+      }
+    }, [project.photo, onImageLoad, onImageError, onImageStartLoad]);
+
+    return (
+      <Card
+        sx={{
+          width: { xs: 280, sm: 280, md: 300 },
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          transition: "all 0.3s ease",
+          padding: { xs: "8px", sm: "12px" },
+          background: "rgba(10, 31, 68, 0.7)",
+          borderRadius: { xs: "16px", sm: "20px" },
+          boxShadow: "0px 4px 10px rgba(212, 175, 55, 0.3)",
+          border: "1px solid #D4AF37",
+          "&:hover": {
+            transform: "translateY(-4px)",
+            boxShadow: "0px 8px 20px rgba(212, 175, 55, 0.4)",
+          },
+        }}
+      >
+        <CardActionArea>
+          <Box
             sx={{
-              color: "#D4AF37",
-              fontWeight: "600",
-              fontSize: { xs: "1rem", sm: "1.1rem", md: "1.2rem" },
-              mb: { xs: 0.5, sm: 1 },
-            }}
-          >
-            {project.title}
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              fontSize: { xs: "0.8rem", sm: "0.9rem" },
-              color: "#ccc",
-              lineHeight: 1.4,
+              position: "relative",
+              height: 180,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.3)",
+              borderRadius: { xs: "12px", sm: "16px" },
               overflow: "hidden",
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
             }}
           >
-            {project.description}
-          </Typography>
-          {project.more && (
+            {/* مؤشر التحميل */}
+            {(loading || !imageLoaded) && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  zIndex: 2,
+                }}
+              >
+                <CircularProgress
+                  sx={{
+                    color: "#D4AF37",
+                    width: "40px !important",
+                    height: "40px !important",
+                  }}
+                />
+              </Box>
+            )}
+
+            {/* الصورة */}
+            <CardMedia
+              component="img"
+              height={180}
+              image={project.photo}
+              alt={project.title}
+              sx={{
+                objectFit: "cover",
+                borderRadius: { xs: "12px", sm: "16px" },
+                width: "100%",
+                transition: "opacity 0.3s ease",
+                opacity: imageLoaded ? 1 : 0,
+                position: "relative",
+                zIndex: 1,
+              }}
+              onLoad={() => setImageLoaded(true)}
+              onError={onImageError}
+            />
+          </Box>
+
+          <Divider
+            sx={{ backgroundColor: "#D4AF37", my: { xs: 1, sm: 1.5 } }}
+          />
+          <CardContent
+            sx={{ flexGrow: 1, p: { xs: 1, sm: 2 }, pb: { xs: 1, sm: 2 } }}
+          >
+            <Typography
+              gutterBottom
+              variant="h6"
+              sx={{
+                color: "#D4AF37",
+                fontWeight: "600",
+                fontSize: { xs: "1rem", sm: "1.1rem", md: "1.2rem" },
+                mb: { xs: 0.5, sm: 1 },
+              }}
+            >
+              {project.title}
+            </Typography>
             <Typography
               variant="body2"
               sx={{
-                fontSize: { xs: "0.75rem", sm: "0.8rem" },
-                color: "#db1515ff",
-                mt: { xs: 0.5, sm: 1 },
+                fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                color: "#ccc",
+                lineHeight: 1.4,
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
               }}
             >
-              {project.more}
+              {project.description}
             </Typography>
-          )}
-        </CardContent>
-      </CardActionArea>
+            {project.more && (
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: { xs: "0.75rem", sm: "0.8rem" },
+                  color: "#db1515ff",
+                  mt: { xs: 0.5, sm: 1 },
+                }}
+              >
+                {project.more}
+              </Typography>
+            )}
+          </CardContent>
+        </CardActionArea>
 
-      <CardActions
-        sx={{
-          justifyContent: "center",
-          p: { xs: "4px", sm: "8px" },
-          gap: { xs: 1, sm: 2 },
-        }}
-      >
-        <Link href={project.linkview} target="_blank" rel="noopener">
-          <IconButton size="small">
-            <VisibilityIcon
+        <CardActions
+          sx={{
+            justifyContent: "center",
+            p: { xs: "4px", sm: "8px" },
+            gap: { xs: 1, sm: 2 },
+          }}
+        >
+          <Link
+            href={project.linkview}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconButton
+              size="small"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "rgba(212, 175, 55, 0.1)",
+                },
+              }}
+            >
+              <VisibilityIcon
+                sx={{ color: "#D4AF37", fontSize: { xs: "20px", sm: "24px" } }}
+              />
+            </IconButton>
+          </Link>
+          <IconButton
+            size="small"
+            onClick={() => onOpenModal(project)}
+            sx={{
+              "&:hover": {
+                backgroundColor: "rgba(212, 175, 55, 0.1)",
+              },
+            }}
+          >
+            <MoreHorizIcon
               sx={{ color: "#D4AF37", fontSize: { xs: "20px", sm: "24px" } }}
             />
           </IconButton>
-        </Link>
-        <IconButton size="small" onClick={() => onOpenModal(project)}>
-          <MoreHorizIcon
-            sx={{ color: "#D4AF37", fontSize: { xs: "20px", sm: "24px" } }}
-          />
-        </IconButton>
-      </CardActions>
-    </Card>
-  );
-}
+        </CardActions>
+      </Card>
+    );
+  }
+);
+
+ProjectCard.displayName = "ProjectCard";
