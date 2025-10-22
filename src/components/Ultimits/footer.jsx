@@ -41,7 +41,7 @@ export default function Footer() {
         {/* الاسم بخط فرنسي */}
         <Typography
           sx={{
-            fontFamily: "'Parisienne', cursive",
+            fontFamily: "Arail",
             fontSize: { xs: "1rem", sm: "1.3rem", md: "1.5rem" },
             fontWeight: "bold",
             color: "#D4AF37",
@@ -53,7 +53,7 @@ export default function Footer() {
 
         <Typography
           variant="body2"
-          sx={{ lineHeight: 1.6, fontFamily: "'Parisienne', cursive" }}
+          sx={{ lineHeight: 1.6, fontFamily: "Arail" }}
         >
           software engineer specialized in building secure and scalable web and
           mobile systems, with a passion for creating innovative software
@@ -73,7 +73,7 @@ export default function Footer() {
             variant="contained"
             href="mailto:hdayaaslam34@gmail.com"
             sx={{
-              fontFamily: "'Parisienne', cursive",
+              fontFamily: "Arail",
               backgroundColor: "#186e96",
               color: "#fff",
               textTransform: "none",
