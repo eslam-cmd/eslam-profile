@@ -15,6 +15,7 @@ import {
   Divider,
   Link,
   CircularProgress,
+  Container,
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -25,12 +26,20 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [loadingImages, setLoadingImages] = React.useState({});
 
   if (!projectAppData || !Array.isArray(projectAppData)) {
     return (
-      <Typography sx={{ color: "red", textAlign: "center", marginTop: "20px" }}>
+      <Typography
+        sx={{
+          color: "red",
+          textAlign: "center",
+          marginTop: "20px",
+          fontSize: { xs: "0.9rem", sm: "1rem" },
+        }}
+      >
         Projects data is missing or invalid.
       </Typography>
     );
@@ -107,7 +116,7 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        gap: 1,
+        gap: { xs: 1, sm: 2 },
         mt: 2,
       }}
     >
@@ -118,26 +127,29 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
           backgroundColor: "#0A1F44",
           color: "#D4AF37",
           border: "2px solid #D4AF37",
-          padding: "8px",
+          padding: { xs: "6px", sm: "8px" },
           "&:hover": {
             backgroundColor: "#D4AF37",
             color: "#000",
             transform: "scale(1.1)",
           },
-          "&:disabled": { opacity: 0.5, cursor: "not-allowed" },
+          "&:disabled": {
+            opacity: 0.5,
+            cursor: "not-allowed",
+          },
           transition: "all 0.3s ease",
         }}
       >
-        <ArrowBackIosIcon sx={{ fontSize: "16px" }} />
+        <ArrowBackIosIcon sx={{ fontSize: { xs: "14px", sm: "16px" } }} />
       </IconButton>
 
       <Typography
         variant="body2"
         sx={{
           color: "#D4AF37",
-          minWidth: "60px",
+          minWidth: { xs: "50px", sm: "60px" },
           textAlign: "center",
-          fontSize: "12px",
+          fontSize: { xs: "0.7rem", sm: "0.8rem" },
         }}
       >
         {currentIndex + 1} / {projectAppData.length}
@@ -150,118 +162,139 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
           backgroundColor: "#0A1F44",
           color: "#D4AF37",
           border: "2px solid #D4AF37",
-          padding: "8px",
+          padding: { xs: "6px", sm: "8px" },
           "&:hover": {
             backgroundColor: "#D4AF37",
             color: "#000",
             transform: "scale(1.1)",
           },
-          "&:disabled": { opacity: 0.5, cursor: "not-allowed" },
+          "&:disabled": {
+            opacity: 0.5,
+            cursor: "not-allowed",
+          },
           transition: "all 0.3s ease",
         }}
       >
-        <ArrowForwardIosIcon sx={{ fontSize: "16px" }} />
+        <ArrowForwardIosIcon sx={{ fontSize: { xs: "14px", sm: "16px" } }} />
       </IconButton>
     </Box>
   );
 
   return (
-    <section
+    <Box
+      component="section"
       id="project"
-      style={{
+      sx={{
         minHeight: "100vh",
         background: "linear-gradient(135deg, #000000, #0A1F44)",
-        padding: "20px 16px",
+        padding: { xs: "20px 12px", sm: "30px 16px", md: "40px 20px" },
         display: "flex",
         flexDirection: "column",
       }}
     >
-      <Typography
-        variant="h3"
-        gutterBottom
-        sx={{
-          textAlign: "center",
-          color: "#D4AF37",
-          fontWeight: "700",
-          letterSpacing: "1px",
-          fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
-          textTransform: "uppercase",
-          mb: 3,
-        }}
-      >
-        Projects Mobile App
-      </Typography>
-
-      {projectAppData.length === 0 ? (
+      <Container maxWidth="xl">
         <Typography
-          variant="h6"
+          variant="h3"
+          gutterBottom
           sx={{
-            color: "#ff5555",
             textAlign: "center",
-            marginTop: "20px",
-            fontSize: { xs: "0.9rem", sm: "1rem" },
+            color: "#D4AF37",
+            fontWeight: "700",
+            letterSpacing: "1px",
+            fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
+            textTransform: "uppercase",
+            mb: { xs: 2, sm: 3 },
           }}
         >
-          There are no projects available. Projects will be uploaded soon.
+          Projects Mobile App
         </Typography>
-      ) : isMobile ? (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
-            width: "100%",
-            minHeight: "60vh", // ارتفاع كافٍ لتوسيط الكرت عموديًا
-            textAlign: "center",
-            overflow: "hidden",
-          }}
-        >
-          <ProjectCard
-            project={projectAppData[currentIndex]}
-            onOpenModal={onOpenModal}
-            loading={loadingImages[projectAppData[currentIndex]?.id]}
-            onImageLoad={() =>
-              handleImageLoad(projectAppData[currentIndex]?.id)
-            }
-            onImageError={() =>
-              handleImageError(projectAppData[currentIndex]?.id)
-            }
-            onImageStartLoad={() =>
-              handleImageStartLoad(projectAppData[currentIndex]?.id)
-            }
-          />
 
-          <EnhancedNavigationButtons
-            onPrev={handlePrev}
-            onNext={handleNext}
-            disabledPrev={projectAppData.length <= 1}
-            disabledNext={projectAppData.length <= 1}
-          />
+        {projectAppData.length === 0 ? (
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#ff5555",
+              textAlign: "center",
+              mt: 3,
+              fontSize: { xs: "0.9rem", sm: "1rem" },
+            }}
+          >
+            There are no projects available. Projects will be uploaded soon.
+          </Typography>
+        ) : isMobile ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              width: "100%",
+              minHeight: "50vh",
+              textAlign: "center",
+            }}
+          >
+            <ProjectCard
+              project={projectAppData[currentIndex]}
+              onOpenModal={onOpenModal}
+              loading={loadingImages[projectAppData[currentIndex]?.id]}
+              onImageLoad={() =>
+                handleImageLoad(projectAppData[currentIndex]?.id)
+              }
+              onImageError={() =>
+                handleImageError(projectAppData[currentIndex]?.id)
+              }
+              onImageStartLoad={() =>
+                handleImageStartLoad(projectAppData[currentIndex]?.id)
+              }
+            />
 
-          <NavigationDots
-            count={projectAppData.length}
-            activeIndex={currentIndex}
-            onDotClick={(index) => setCurrentIndex(index)}
-          />
-        </Box>
-      ) : (
-        <Grid container spacing={2} justifyContent="center">
-          {projectAppData.map((project) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={project.id}>
-              <ProjectCard
-                project={project}
-                onOpenModal={onOpenModal}
-                loading={loadingImages[project.id]}
-                onImageLoad={() => handleImageLoad(project.id)}
-                onImageError={() => handleImageError(project.id)}
-                onImageStartLoad={() => handleImageStartLoad(project.id)}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      )}
-    </section>
+            <EnhancedNavigationButtons
+              onPrev={handlePrev}
+              onNext={handleNext}
+              disabledPrev={projectAppData.length <= 1}
+              disabledNext={projectAppData.length <= 1}
+            />
+
+            <NavigationDots
+              count={projectAppData.length}
+              activeIndex={currentIndex}
+              onDotClick={(index) => setCurrentIndex(index)}
+            />
+          </Box>
+        ) : (
+          <Grid
+            container
+            spacing={{ xs: 2, sm: 3, md: 4 }}
+            justifyContent="center"
+            sx={{ px: { xs: 1, sm: 0 } }}
+          >
+            {projectAppData.map((project) => (
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={4}
+                lg={3}
+                key={project.id}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <ProjectCard
+                  project={project}
+                  onOpenModal={onOpenModal}
+                  loading={loadingImages[project.id]}
+                  onImageLoad={() => handleImageLoad(project.id)}
+                  onImageError={() => handleImageError(project.id)}
+                  onImageStartLoad={() => handleImageStartLoad(project.id)}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Container>
+    </Box>
   );
 }
 
@@ -293,28 +326,25 @@ function ProjectCard({
   return (
     <Card
       sx={{
-        maxWidth: { xs: "340px", sm: "300px", md: "320px" },
-        width: { xs: "90vw", sm: "100%" },
-        minWidth: { xs: "80vw", sm: "260px" },
+        width: { xs: 280, sm: 300, md: 320 },
+        maxWidth: "100%",
         height: "100%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         transition: "all 0.3s ease",
-        padding: { xs: "12px 10px", sm: "12px" },
+        padding: { xs: "8px", sm: "12px" },
         background: "rgba(10, 31, 68, 0.85)",
         borderRadius: { xs: "16px", sm: "20px" },
-        boxShadow: {
-          xs: "0px 2px 12px rgba(212,175,55,0.25)",
-          sm: "0px 4px 10px rgba(212, 175, 55, 0.3)",
-        },
+        boxShadow: "0px 4px 10px rgba(212, 175, 55, 0.3)",
         border: "2px solid #D4AF37",
-        margin: { xs: "0 auto 18px auto", sm: 0 },
-        position: "relative",
-        zIndex: 1,
+        margin: { xs: "0 auto", sm: 0 },
         "&:hover": {
-          transform: "translateY(-5px) scale(1.02)",
-          boxShadow: "0px 8px 20px rgba(212, 175, 55, 0.4)",
+          transform: { xs: "none", sm: "translateY(-5px) scale(1.02)" },
+          boxShadow: {
+            xs: "0px 4px 10px rgba(212, 175, 55, 0.3)",
+            sm: "0px 8px 20px rgba(212, 175, 55, 0.4)",
+          },
         },
       }}
     >
@@ -322,12 +352,12 @@ function ProjectCard({
         <Box
           sx={{
             position: "relative",
-            height: "180px",
+            height: { xs: 160, sm: 180 },
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             backgroundColor: "rgba(0, 0, 0, 0.3)",
-            borderRadius: "12px",
+            borderRadius: { xs: "12px", sm: "12px" },
             overflow: "hidden",
           }}
         >
@@ -350,8 +380,8 @@ function ProjectCard({
               <CircularProgress
                 sx={{
                   color: "#D4AF37",
-                  width: "40px !important",
-                  height: "40px !important",
+                  width: { xs: "30px !important", sm: "40px !important" },
+                  height: { xs: "30px !important", sm: "40px !important" },
                 }}
               />
             </Box>
@@ -360,13 +390,13 @@ function ProjectCard({
           {/* الصورة */}
           <CardMedia
             component="img"
-            height="180"
             image={project.photo}
             alt={project.title}
             sx={{
               objectFit: "cover",
-              borderRadius: "12px",
+              borderRadius: { xs: "12px", sm: "12px" },
               width: "100%",
+              height: "100%",
               transition: "opacity 0.3s ease",
               opacity: imageLoaded ? 1 : 0,
               position: "relative",
@@ -377,16 +407,29 @@ function ProjectCard({
           />
         </Box>
 
-        <Divider sx={{ backgroundColor: "#D4AF37", marginTop: "8px", my: 1 }} />
-        <CardContent sx={{ flexGrow: 1, p: 2 }}>
+        <Divider
+          sx={{
+            backgroundColor: "#D4AF37",
+            my: { xs: 1, sm: 1.5 },
+          }}
+        />
+
+        <CardContent
+          sx={{
+            flexGrow: 1,
+            p: { xs: 1, sm: 2 },
+            pb: { xs: 1, sm: 2 },
+          }}
+        >
           <Typography
             gutterBottom
             variant="h6"
             sx={{
               color: "#D4AF37",
               fontWeight: "600",
-              fontSize: { xs: "1rem", sm: "1.1rem" },
-              mb: 1,
+              fontSize: { xs: "1rem", sm: "1.1rem", md: "1.2rem" },
+              mb: { xs: 0.5, sm: 1 },
+              lineHeight: 1.2,
             }}
           >
             {project.title}
@@ -398,9 +441,10 @@ function ProjectCard({
               color: "#ccc",
               lineHeight: 1.4,
               overflow: "hidden",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-              WebkitLineClamp: 2,
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              minHeight: { xs: "3.2em", sm: "3.6em" },
             }}
           >
             {project.description}
@@ -411,7 +455,7 @@ function ProjectCard({
               sx={{
                 fontSize: { xs: "0.75rem", sm: "0.8rem" },
                 color: "#db1515ff",
-                marginTop: "8px",
+                mt: { xs: 0.5, sm: 1 },
               }}
             >
               {project.more}
@@ -421,18 +465,44 @@ function ProjectCard({
       </CardActionArea>
 
       <CardActions
-        sx={{ justifyContent: "center", padding: "8px", gap: 1, mt: "auto" }}
+        sx={{
+          justifyContent: "center",
+          p: { xs: "4px", sm: "8px" },
+          gap: { xs: 1, sm: 2 },
+          mt: "auto",
+        }}
       >
-        <Link href={project.linkview} target="_blank" rel="noopener">
-          <IconButton size="small">
+        <Link href={project.linkview} target="_blank" rel="noopener noreferrer">
+          <IconButton
+            size="small"
+            sx={{
+              "&:hover": {
+                backgroundColor: "rgba(212, 175, 55, 0.1)",
+              },
+            }}
+          >
             <DownloadIcon
-              sx={{ color: "#D4AF37", fontSize: { xs: "20px", sm: "24px" } }}
+              sx={{
+                color: "#D4AF37",
+                fontSize: { xs: "20px", sm: "24px" },
+              }}
             />
           </IconButton>
         </Link>
-        <IconButton size="small" onClick={() => onOpenModal(project)}>
+        <IconButton
+          size="small"
+          onClick={() => onOpenModal(project)}
+          sx={{
+            "&:hover": {
+              backgroundColor: "rgba(212, 175, 55, 0.1)",
+            },
+          }}
+        >
           <MoreHorizIcon
-            sx={{ color: "#D4AF37", fontSize: { xs: "20px", sm: "24px" } }}
+            sx={{
+              color: "#D4AF37",
+              fontSize: { xs: "20px", sm: "24px" },
+            }}
           />
         </IconButton>
       </CardActions>
