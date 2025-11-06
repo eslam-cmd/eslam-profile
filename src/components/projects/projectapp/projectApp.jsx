@@ -28,7 +28,7 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const [currentIndex, setCurrentIndex] = React.useState(0);
-  const [loadingImages, setLoadingImages] = React.useState({});
+  const [imageLoadingStates, setImageLoadingStates] = React.useState({});
 
   if (!projectAppData || !Array.isArray(projectAppData)) {
     return (
@@ -45,18 +45,47 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
     );
   }
 
-  // معالجة تحميل الصور
+  // إدارة حالة تحميل الصور
   const handleImageLoad = React.useCallback((projectId) => {
-    setLoadingImages((prev) => ({ ...prev, [projectId]: false }));
+    setImageLoadingStates((prev) => ({
+      ...prev,
+      [projectId]: { loading: false, error: false, loaded: true },
+    }));
   }, []);
 
   const handleImageError = React.useCallback((projectId) => {
-    setLoadingImages((prev) => ({ ...prev, [projectId]: false }));
+    setImageLoadingStates((prev) => ({
+      ...prev,
+      [projectId]: { loading: false, error: true, loaded: false },
+    }));
   }, []);
 
   const handleImageStartLoad = React.useCallback((projectId) => {
-    setLoadingImages((prev) => ({ ...prev, [projectId]: true }));
+    setImageLoadingStates((prev) => ({
+      ...prev,
+      [projectId]: { loading: true, error: false, loaded: false },
+    }));
   }, []);
+
+  // تحميل الصور مسبقاً للبيانات
+  React.useEffect(() => {
+    projectAppData.forEach((project) => {
+      if (project.photo && !imageLoadingStates[project.id]?.loaded) {
+        handleImageStartLoad(project.id);
+
+        const img = new Image();
+        img.src = project.photo;
+        img.onload = () => handleImageLoad(project.id);
+        img.onerror = () => handleImageError(project.id);
+      }
+    });
+  }, [
+    projectAppData,
+    handleImageLoad,
+    handleImageError,
+    handleImageStartLoad,
+    imageLoadingStates,
+  ]);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => {
@@ -236,15 +265,18 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
             <ProjectCard
               project={projectAppData[currentIndex]}
               onOpenModal={onOpenModal}
-              loading={loadingImages[projectAppData[currentIndex]?.id]}
+              imageState={
+                imageLoadingStates[projectAppData[currentIndex]?.id] || {
+                  loading: false,
+                  error: false,
+                  loaded: false,
+                }
+              }
               onImageLoad={() =>
                 handleImageLoad(projectAppData[currentIndex]?.id)
               }
               onImageError={() =>
                 handleImageError(projectAppData[currentIndex]?.id)
-              }
-              onImageStartLoad={() =>
-                handleImageStartLoad(projectAppData[currentIndex]?.id)
               }
             />
 
@@ -284,10 +316,15 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
                 <ProjectCard
                   project={project}
                   onOpenModal={onOpenModal}
-                  loading={loadingImages[project.id]}
+                  imageState={
+                    imageLoadingStates[project.id] || {
+                      loading: false,
+                      error: false,
+                      loaded: false,
+                    }
+                  }
                   onImageLoad={() => handleImageLoad(project.id)}
                   onImageError={() => handleImageError(project.id)}
-                  onImageStartLoad={() => handleImageStartLoad(project.id)}
                 />
               </Grid>
             ))}
@@ -298,214 +335,274 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
   );
 }
 
-function ProjectCard({
-  project,
-  onOpenModal,
-  loading,
-  onImageLoad,
-  onImageError,
-  onImageStartLoad,
-}) {
-  const [imageLoaded, setImageLoaded] = React.useState(false);
+const ProjectCard = React.memo(
+  ({ project, onOpenModal, imageState, onImageLoad, onImageError }) => {
+    const { loading, error, loaded } = imageState;
 
-  React.useEffect(() => {
-    if (project.photo) {
-      onImageStartLoad();
-      const img = new Image();
-      img.src = project.photo;
-      img.onload = () => {
-        setImageLoaded(true);
-        onImageLoad();
-      };
-      img.onerror = () => {
-        onImageError();
-      };
-    }
-  }, [project.photo, onImageLoad, onImageError, onImageStartLoad]);
+    // معالجة تحميل الصورة داخل الكارد
+    React.useEffect(() => {
+      if (project.photo && !loaded && !loading && !error) {
+        const img = new Image();
+        img.src = project.photo;
+        img.onload = onImageLoad;
+        img.onerror = onImageError;
+      }
+    }, [project.photo, loaded, loading, error, onImageLoad, onImageError]);
 
-  return (
-    <Card
-      sx={{
-        width: { xs: 280, sm: 300, md: 320 },
-        maxWidth: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        transition: "all 0.3s ease",
-        padding: { xs: "8px", sm: "12px" },
-        background: "rgba(10, 31, 68, 0.85)",
-        borderRadius: { xs: "16px", sm: "20px" },
-        boxShadow: "0px 4px 10px rgba(212, 175, 55, 0.3)",
-        border: "2px solid #D4AF37",
-        margin: { xs: "0 auto", sm: 0 },
-        "&:hover": {
-          transform: { xs: "none", sm: "translateY(-5px) scale(1.02)" },
-          boxShadow: {
-            xs: "0px 4px 10px rgba(212, 175, 55, 0.3)",
-            sm: "0px 8px 20px rgba(212, 175, 55, 0.4)",
+    return (
+      <Card
+        sx={{
+          width: { xs: 280, sm: 300, md: 320 },
+          maxWidth: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          transition: "all 0.3s ease",
+          padding: { xs: "8px", sm: "12px" },
+          background: "rgba(10, 31, 68, 0.85)",
+          borderRadius: { xs: "16px", sm: "20px" },
+          boxShadow: "0px 4px 10px rgba(212, 175, 55, 0.3)",
+          border: "2px solid #D4AF37",
+          margin: { xs: "0 auto", sm: 0 },
+          "&:hover": {
+            transform: { xs: "none", sm: "translateY(-5px) scale(1.02)" },
+            boxShadow: {
+              xs: "0px 4px 10px rgba(212, 175, 55, 0.3)",
+              sm: "0px 8px 20px rgba(212, 175, 55, 0.4)",
+            },
           },
-        },
-      }}
-    >
-      <CardActionArea>
-        <Box
-          sx={{
-            position: "relative",
-            height: { xs: 160, sm: 180 },
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
-            borderRadius: { xs: "12px", sm: "12px" },
-            overflow: "hidden",
-          }}
-        >
-          {/* مؤشر التحميل */}
-          {(loading || !imageLoaded) && (
-            <Box
+        }}
+      >
+        <CardActionArea>
+          <Box
+            sx={{
+              position: "relative",
+              height: { xs: 160, sm: 180 },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.3)",
+              borderRadius: { xs: "12px", sm: "12px" },
+              overflow: "hidden",
+            }}
+          >
+            {/* مؤشر التحميل */}
+            {(loading || !loaded) && !error && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  zIndex: 2,
+                }}
+              >
+                <CircularProgress
+                  sx={{
+                    color: "#D4AF37",
+                    width: { xs: "30px !important", sm: "40px !important" },
+                    height: { xs: "30px !important", sm: "40px !important" },
+                  }}
+                />
+              </Box>
+            )}
+
+            {/* رسالة خطأ */}
+            {error && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(0, 0, 0, 0.7)",
+                  zIndex: 2,
+                  color: "#ff5555",
+                  textAlign: "center",
+                  p: 2,
+                  fontSize: "0.8rem",
+                  flexDirection: "column",
+                  gap: 1,
+                }}
+              >
+                <Typography variant="body2" sx={{ color: "#ff5555" }}>
+                  Failed to load image
+                </Typography>
+                <Typography variant="caption" sx={{ color: "#ccc" }}>
+                  {project.title}
+                </Typography>
+              </Box>
+            )}
+
+            {/* الصورة */}
+            {!error && project.photo && (
+              <CardMedia
+                component="img"
+                image={project.photo}
+                alt={project.title}
+                sx={{
+                  objectFit: "cover",
+                  borderRadius: { xs: "12px", sm: "12px" },
+                  width: "100%",
+                  height: "100%",
+                  transition: "opacity 0.3s ease",
+                  opacity: loaded ? 1 : 0,
+                  position: "relative",
+                  zIndex: 1,
+                }}
+                onLoad={onImageLoad}
+                onError={onImageError}
+              />
+            )}
+
+            {/* حالة عدم وجود صورة */}
+            {!error && !project.photo && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  zIndex: 2,
+                  color: "#D4AF37",
+                  textAlign: "center",
+                  p: 2,
+                  fontSize: "0.8rem",
+                  flexDirection: "column",
+                  gap: 1,
+                }}
+              >
+                <Typography variant="body2" sx={{ color: "#D4AF37" }}>
+                  No Image Available
+                </Typography>
+                <Typography variant="caption" sx={{ color: "#ccc" }}>
+                  {project.title}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+
+          <Divider
+            sx={{
+              backgroundColor: "#D4AF37",
+              my: { xs: 1, sm: 1.5 },
+            }}
+          />
+
+          <CardContent
+            sx={{
+              flexGrow: 1,
+              p: { xs: 1, sm: 2 },
+              pb: { xs: 1, sm: 2 },
+            }}
+          >
+            <Typography
+              gutterBottom
+              variant="h6"
               sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                zIndex: 2,
+                color: "#D4AF37",
+                fontWeight: "600",
+                fontSize: { xs: "1rem", sm: "1.1rem", md: "1.2rem" },
+                mb: { xs: 0.5, sm: 1 },
+                lineHeight: 1.2,
               }}
             >
-              <CircularProgress
-                sx={{
-                  color: "#D4AF37",
-                  width: { xs: "30px !important", sm: "40px !important" },
-                  height: { xs: "30px !important", sm: "40px !important" },
-                }}
-              />
-            </Box>
-          )}
-
-          {/* الصورة */}
-          <CardMedia
-            component="img"
-            image={project.photo}
-            alt={project.title}
-            sx={{
-              objectFit: "cover",
-              borderRadius: { xs: "12px", sm: "12px" },
-              width: "100%",
-              height: "100%",
-              transition: "opacity 0.3s ease",
-              opacity: imageLoaded ? 1 : 0,
-              position: "relative",
-              zIndex: 1,
-            }}
-            onLoad={() => setImageLoaded(true)}
-            onError={onImageError}
-          />
-        </Box>
-
-        <Divider
-          sx={{
-            backgroundColor: "#D4AF37",
-            my: { xs: 1, sm: 1.5 },
-          }}
-        />
-
-        <CardContent
-          sx={{
-            flexGrow: 1,
-            p: { xs: 1, sm: 2 },
-            pb: { xs: 1, sm: 2 },
-          }}
-        >
-          <Typography
-            gutterBottom
-            variant="h6"
-            sx={{
-              color: "#D4AF37",
-              fontWeight: "600",
-              fontSize: { xs: "1rem", sm: "1.1rem", md: "1.2rem" },
-              mb: { xs: 0.5, sm: 1 },
-              lineHeight: 1.2,
-            }}
-          >
-            {project.title}
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              fontSize: { xs: "0.8rem", sm: "0.9rem" },
-              color: "#ccc",
-              lineHeight: 1.4,
-              overflow: "hidden",
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
-              minHeight: { xs: "3.2em", sm: "3.6em" },
-            }}
-          >
-            {project.description}
-          </Typography>
-          {project.more && (
+              {project.title}
+            </Typography>
             <Typography
               variant="body2"
               sx={{
-                fontSize: { xs: "0.75rem", sm: "0.8rem" },
-                color: "#db1515ff",
-                mt: { xs: 0.5, sm: 1 },
+                fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                color: "#ccc",
+                lineHeight: 1.4,
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                minHeight: { xs: "3.2em", sm: "3.6em" },
               }}
             >
-              {project.more}
+              {project.description}
             </Typography>
-          )}
-        </CardContent>
-      </CardActionArea>
+            {project.more && (
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: { xs: "0.75rem", sm: "0.8rem" },
+                  color: "#db1515ff",
+                  mt: { xs: 0.5, sm: 1 },
+                }}
+              >
+                {project.more}
+              </Typography>
+            )}
+          </CardContent>
+        </CardActionArea>
 
-      <CardActions
-        sx={{
-          justifyContent: "center",
-          p: { xs: "4px", sm: "8px" },
-          gap: { xs: 1, sm: 2 },
-          mt: "auto",
-        }}
-      >
-        <Link href={project.linkview} target="_blank" rel="noopener noreferrer">
+        <CardActions
+          sx={{
+            justifyContent: "center",
+            p: { xs: "4px", sm: "8px" },
+            gap: { xs: 1, sm: 2 },
+            mt: "auto",
+          }}
+        >
+          <Link
+            href={project.linkview}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconButton
+              size="small"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "rgba(212, 175, 55, 0.1)",
+                },
+              }}
+            >
+              <DownloadIcon
+                sx={{
+                  color: "#D4AF37",
+                  fontSize: { xs: "20px", sm: "24px" },
+                }}
+              />
+            </IconButton>
+          </Link>
           <IconButton
             size="small"
+            onClick={() => onOpenModal(project)}
             sx={{
               "&:hover": {
                 backgroundColor: "rgba(212, 175, 55, 0.1)",
               },
             }}
           >
-            <DownloadIcon
+            <MoreHorizIcon
               sx={{
                 color: "#D4AF37",
                 fontSize: { xs: "20px", sm: "24px" },
               }}
             />
           </IconButton>
-        </Link>
-        <IconButton
-          size="small"
-          onClick={() => onOpenModal(project)}
-          sx={{
-            "&:hover": {
-              backgroundColor: "rgba(212, 175, 55, 0.1)",
-            },
-          }}
-        >
-          <MoreHorizIcon
-            sx={{
-              color: "#D4AF37",
-              fontSize: { xs: "20px", sm: "24px" },
-            }}
-          />
-        </IconButton>
-      </CardActions>
-    </Card>
-  );
-}
+        </CardActions>
+      </Card>
+    );
+  }
+);
+
+ProjectCard.displayName = "ProjectCard";

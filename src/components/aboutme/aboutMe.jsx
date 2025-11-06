@@ -79,7 +79,9 @@ export default function AboutPage() {
       technologies: ["Git", "Linux", "Vercel", "Docker (Basics)"],
       color: isDark ? "#A78BFA" : "#8B5CF6",
     },
-    {
+    
+    /*
+      {
       icon: <Psychology />,
       name: "Soft Skills",
       technologies: [
@@ -91,6 +93,7 @@ export default function AboutPage() {
       ],
       color: isDark ? "#FBBF24" : "#F59E0B",
     },
+    */
   ];
 
   const experience = [
@@ -176,7 +179,7 @@ export default function AboutPage() {
               }}
             >
               <Avatar
-                src="/logo/my-photo-2.jpg"
+                src="/logo/my-photo.jpg"
                 sx={{
                   width: { xs: 120, sm: 150, md: 180 },
                   height: { xs: 120, sm: 150, md: 180 },

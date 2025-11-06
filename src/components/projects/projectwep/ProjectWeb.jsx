@@ -28,7 +28,7 @@ export default function ProjectWeb({ projects, onOpenModal }) {
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [selectedTech, setSelectedTech] = React.useState("all");
-  const [loadingImages, setLoadingImages] = React.useState({});
+  const [imageLoadingStates, setImageLoadingStates] = React.useState({});
 
   const filteredProjects = React.useMemo(() => {
     if (!projects || !Array.isArray(projects)) return [];
@@ -71,18 +71,49 @@ export default function ProjectWeb({ projects, onOpenModal }) {
     return visibleProjects;
   }, [currentIndex, filteredProjects, getVisibleCardsCount]);
 
-  // معالجة تحميل الصور
+  // إدارة حالة تحميل الصور
   const handleImageLoad = React.useCallback((projectId) => {
-    setLoadingImages((prev) => ({ ...prev, [projectId]: false }));
+    setImageLoadingStates((prev) => ({
+      ...prev,
+      [projectId]: { loading: false, error: false, loaded: true },
+    }));
   }, []);
 
   const handleImageError = React.useCallback((projectId) => {
-    setLoadingImages((prev) => ({ ...prev, [projectId]: false }));
+    setImageLoadingStates((prev) => ({
+      ...prev,
+      [projectId]: { loading: false, error: true, loaded: false },
+    }));
   }, []);
 
   const handleImageStartLoad = React.useCallback((projectId) => {
-    setLoadingImages((prev) => ({ ...prev, [projectId]: true }));
+    setImageLoadingStates((prev) => ({
+      ...prev,
+      [projectId]: { loading: true, error: false, loaded: false },
+    }));
   }, []);
+
+  // تحميل الصور مسبقاً للبطاقات المرئية
+  React.useEffect(() => {
+    const visibleProjects = getVisibleProjects();
+
+    visibleProjects.forEach((project) => {
+      if (project.photo && !imageLoadingStates[project.id]?.loaded) {
+        handleImageStartLoad(project.id);
+
+        const img = new Image();
+        img.src = project.photo;
+        img.onload = () => handleImageLoad(project.id);
+        img.onerror = () => handleImageError(project.id);
+      }
+    });
+  }, [
+    getVisibleProjects,
+    handleImageLoad,
+    handleImageError,
+    handleImageStartLoad,
+    imageLoadingStates,
+  ]);
 
   const NavigationDots = ({ count, activeIndex, onDotClick }) => (
     <Box
@@ -359,31 +390,38 @@ export default function ProjectWeb({ projects, onOpenModal }) {
                   maxWidth: { xs: "100%", sm: "600px", md: "1200px" },
                 }}
               >
-                {getVisibleProjects().map((project, index) => (
-                  <Box
-                    key={project.id}
-                    sx={{
-                      flex: {
-                        xs: "0 0 280px",
-                        sm: "0 0 calc(50% - 12px)",
-                        md: "0 0 calc(33.333% - 22px)",
-                      },
-                      display: "flex",
-                      justifyContent: "center",
-                      transition: "all 0.5s ease",
-                      opacity: 1,
-                    }}
-                  >
-                    <ProjectCard
-                      project={project}
-                      onOpenModal={onOpenModal}
-                      loading={loadingImages[project.id]}
-                      onImageLoad={() => handleImageLoad(project.id)}
-                      onImageError={() => handleImageError(project.id)}
-                      onImageStartLoad={() => handleImageStartLoad(project.id)}
-                    />
-                  </Box>
-                ))}
+                {getVisibleProjects().map((project, index) => {
+                  const imageState = imageLoadingStates[project.id] || {
+                    loading: false,
+                    error: false,
+                    loaded: false,
+                  };
+
+                  return (
+                    <Box
+                      key={project.id}
+                      sx={{
+                        flex: {
+                          xs: "0 0 280px",
+                          sm: "0 0 calc(50% - 12px)",
+                          md: "0 0 calc(33.333% - 22px)",
+                        },
+                        display: "flex",
+                        justifyContent: "center",
+                        transition: "all 0.5s ease",
+                        opacity: 1,
+                      }}
+                    >
+                      <ProjectCard
+                        project={project}
+                        onOpenModal={onOpenModal}
+                        imageState={imageState}
+                        onImageLoad={() => handleImageLoad(project.id)}
+                        onImageError={() => handleImageError(project.id)}
+                      />
+                    </Box>
+                  );
+                })}
               </Box>
 
               {/* زر التالي */}
@@ -463,30 +501,8 @@ export default function ProjectWeb({ projects, onOpenModal }) {
 }
 
 const ProjectCard = React.memo(
-  ({
-    project,
-    onOpenModal,
-    loading,
-    onImageLoad,
-    onImageError,
-    onImageStartLoad,
-  }) => {
-    const [imageLoaded, setImageLoaded] = React.useState(false);
-
-    React.useEffect(() => {
-      if (project.photo) {
-        onImageStartLoad();
-        const img = new Image();
-        img.src = project.photo;
-        img.onload = () => {
-          setImageLoaded(true);
-          onImageLoad();
-        };
-        img.onerror = () => {
-          onImageError();
-        };
-      }
-    }, [project.photo, onImageLoad, onImageError, onImageStartLoad]);
+  ({ project, onOpenModal, imageState, onImageLoad, onImageError }) => {
+    const { loading, error, loaded } = imageState;
 
     return (
       <Card
@@ -522,7 +538,7 @@ const ProjectCard = React.memo(
             }}
           >
             {/* مؤشر التحميل */}
-            {(loading || !imageLoaded) && (
+            {(loading || !loaded) && !error && (
               <Box
                 sx={{
                   position: "absolute",
@@ -547,24 +563,50 @@ const ProjectCard = React.memo(
               </Box>
             )}
 
+            {/* رسالة خطأ */}
+            {error && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(0, 0, 0, 0.7)",
+                  zIndex: 2,
+                  color: "#ff5555",
+                  textAlign: "center",
+                  p: 2,
+                  fontSize: "0.8rem",
+                }}
+              >
+                Failed to load image
+              </Box>
+            )}
+
             {/* الصورة */}
-            <CardMedia
-              component="img"
-              height={180}
-              image={project.photo}
-              alt={project.title}
-              sx={{
-                objectFit: "cover",
-                borderRadius: { xs: "12px", sm: "16px" },
-                width: "100%",
-                transition: "opacity 0.3s ease",
-                opacity: imageLoaded ? 1 : 0,
-                position: "relative",
-                zIndex: 1,
-              }}
-              onLoad={() => setImageLoaded(true)}
-              onError={onImageError}
-            />
+            {!error && (
+              <CardMedia
+                component="img"
+                height={180}
+                image={project.photo}
+                alt={project.title}
+                sx={{
+                  objectFit: "cover",
+                  borderRadius: { xs: "12px", sm: "16px" },
+                  width: "100%",
+                  transition: "opacity 0.3s ease",
+                  opacity: loaded ? 1 : 0,
+                  position: "relative",
+                  zIndex: 1,
+                }}
+                onLoad={onImageLoad}
+                onError={onImageError}
+              />
+            )}
           </Box>
 
           <Divider
