@@ -76,7 +76,7 @@ export default function AboutPage() {
     {
       icon: <RocketLaunch />,
       name: "DevOps",
-      technologies: ["Git", "Linux", "Vercel", "Docker (Basics)"],
+      technologies: ["Git", "Vercel"],
       color: isDark ? "#A78BFA" : "#8B5CF6",
     },
     
@@ -179,7 +179,7 @@ export default function AboutPage() {
               }}
             >
               <Avatar
-                src="/logo/my-photo.jpg"
+                src="/logo/my-photo-2.jpg"
                 sx={{
                   width: { xs: 120, sm: 150, md: 180 },
                   height: { xs: 120, sm: 150, md: 180 },
