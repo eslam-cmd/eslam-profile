@@ -95,8 +95,12 @@ export default function ContactSection({ toggleTheme, darkMode }) {
         </Typography>
 
         <Typography
-
-          sx={{ marginBottom: "32px", fontFamily: "Arail", fontSize:"20px",fontWeight:"700" }}
+          sx={{
+            marginBottom: "32px",
+            fontFamily: "Arail",
+            fontSize: "20px",
+            fontWeight: "700",
+          }}
         >
           Have something in mind?{" "}
           <Link
@@ -127,8 +131,7 @@ export default function ContactSection({ toggleTheme, darkMode }) {
               color: colors.buttonText,
               textDecoration: "none",
               fontFamily: "Arail",
-              fontWeight:"700",
-
+              fontWeight: "700",
             }}
           >
             Contact me ..
