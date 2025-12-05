@@ -8,7 +8,7 @@ import {
   FaNodeJs,
   FaPaw,
 } from "react-icons/fa";
-import { SiReact, SiExpo, SiPrisma, SiDocker } from "react-icons/si";
+import { SiReact, SiExpo, SiPrisma, SiDocker, SiTypeorm } from "react-icons/si";
 import {
   SiTailwindcss,
   SiMui,
@@ -20,6 +20,9 @@ import {
   SiNextdotjs,
   SiJavascript,
   SiSupabase,
+  SiNestjs,
+  SiGraphql,
+  SiGit,
 } from "react-icons/si";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 
@@ -58,6 +61,21 @@ export const cards = [
   { id: 15, title: "Node.js", icon: <FaNodeJs size={40} color="#68a063" /> },
   { id: 16, title: "Express", icon: <SiExpress size={40} color="#ccc" /> },
   {
+    id: 26,
+    title: "Nest.js",
+    icon: <SiNestjs size={40} color="#e0234e" />,
+  },
+  {
+    id: 28,
+    title: "Git",
+    icon: <SiGit size={40} color="#f05032" />,
+  },
+  {
+    id: 29,
+    title: "TypeORM",
+    icon: <SiTypeorm size={40} color="#ff2d20" />,
+  },
+  {
     id: 18,
     title: "Supabase",
     icon: <SiSupabase size={40} color="#2b7fc4ff" />,
@@ -67,7 +85,6 @@ export const cards = [
     title: "PostgreSQL",
     icon: <SiPostgresql size={40} color="#336791" />,
   },
-  { id: 12, title: "Axios", icon: <SiAxios size={40} color="#5a29e4" /> },
   { id: 11, title: "GitHub", icon: <FaGithub size={40} color="#ccc" /> },
   { id: 19, title: "Postman", icon: <SiPostman size={40} color="#ff6c37" /> },
   { id: 22, title: "Zustand", icon: <FaPaw size={40} color="#a0522d" /> },
