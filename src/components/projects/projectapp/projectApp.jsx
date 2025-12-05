@@ -563,7 +563,7 @@ const ProjectCard = React.memo(
           }}
         >
           <Link
-            href={project.linkview}
+            href={project.downloadLink}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -576,6 +576,7 @@ const ProjectCard = React.memo(
               }}
             >
               <DownloadIcon
+                href={project.downloadLink}
                 sx={{
                   color: "#D4AF37",
                   fontSize: { xs: "20px", sm: "24px" },
@@ -602,7 +603,7 @@ const ProjectCard = React.memo(
         </CardActions>
       </Card>
     );
-  }
+  },
 );
 
 ProjectCard.displayName = "ProjectCard";
