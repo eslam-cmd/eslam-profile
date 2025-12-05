@@ -41,7 +41,7 @@ import {
 import { TypeAnimation } from "react-type-animation";
 import Link from "next/link";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
-import HomeIcon from '@mui/icons-material/Home';
+import HomeIcon from "@mui/icons-material/Home";
 export default function AboutPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -69,17 +69,21 @@ export default function AboutPage() {
     {
       icon: <Storage />,
       name: "Backend",
-      technologies: ["Node.js", "Express", "Supabase", "PostgreSQL", "REST API"],
+      technologies: [
+        "Node.js",
+        "Express",
+        "Supabase",
+        "PostgreSQL",
+        "REST API",
+      ],
       color: isDark ? "#6EE7B7" : "#10B981",
     },
-
     {
       icon: <RocketLaunch />,
       name: "DevOps",
-      technologies: ["Git", "Vercel"],
+      technologies: ["Git", "CI/CD (GitHub)", "Vercel", "Linux"],
       color: isDark ? "#A78BFA" : "#8B5CF6",
     },
-    
     /*
       {
       icon: <Psychology />,
@@ -825,9 +829,8 @@ export default function AboutPage() {
                 textAlign: "center",
               }}
             >
-            
               Let's Connect
-                <LocalPhoneIcon  fontSize="10px"/>
+              <LocalPhoneIcon fontSize="10px" />
             </Typography>
 
             <Paper

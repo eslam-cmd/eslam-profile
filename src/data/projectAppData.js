@@ -15,7 +15,7 @@ export const projectAppData = [
     description:
       "A sleek and intuitive weather application built with React Native, offering real-time weather updates and multi-day forecasts for any city worldwide. The app integrates with the OpenWeather API to deliver accurate climate data, while providing a modern, user-friendly interface optimized for mobile devices.",
     photo: "/mobile/2.png",
-    downloadLink: "https://play.google.com/store/apps/details?id=com.weatherapp",
+    downloadLink: "https://github.com/eslam-cmd/weather-app-mobile/releases/download/V1.0/WeatherApp.apk",
     techStack: ["React Native", "OpenWeather API", "Expo", "Styled Components"],
     focus: "API Integration & Front-End UI/UX",
   },
