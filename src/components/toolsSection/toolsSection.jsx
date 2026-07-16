@@ -9,10 +9,38 @@ import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { cards } from "../../data/skillsData";
 import { useTheme } from "@emotion/react";
 
-// تقسيم المهارات إلى فئات محدثة
+// استيراد ملف الـ JSON الجديد
+import cards from "../../data/skillsData.json";
+
+// استيراد جميع الأيقونات من المكتبات الثلاث المستخدمة في ملف الـ JSON
+import * as FaIcons from "react-icons/fa";
+import * as SiIcons from "react-icons/si";
+import * as MdIcons from "react-icons/md";
+
+// مكون فرعي لعرض الأيقونات ديناميكياً بناءً على بيانات الـ JSON
+const DynamicIcon = ({ iconName, library, color, size = 40 }) => {
+  let IconComponent;
+
+  // اختيار المكتبة الصحيحة بناءً على حقل library في الـ JSON
+  if (library === "fa") {
+    IconComponent = FaIcons[iconName];
+  } else if (library === "si") {
+    IconComponent = SiIcons[iconName];
+  } else if (library === "md") {
+    IconComponent = MdIcons[iconName];
+  }
+
+  // في حال عدم العثور على الأيقونة لأي سبب، نعرض أيقونة افتراضية أو مساحة فارغة
+  if (!IconComponent) {
+    return <Box sx={{ width: size, height: size }} />;
+  }
+
+  return <IconComponent size={size} color={color} />;
+};
+
+// تقسيم المهارات إلى فئات محدثة اعتماداً على بيانات الـ JSON
 const categorizedSkills = {
   frontend: cards.filter((card) =>
     [
@@ -271,7 +299,13 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
                           mb: 1,
                         }}
                       >
-                        {card.icon}
+                        {/* استخدام المكون الديناميكي الجديد وتمرير البيانات النصية القادمة من الـ JSON */}
+                        <DynamicIcon
+                          iconName={card.icon}
+                          library={card.library}
+                          color={card.color}
+                          size={40}
+                        />
                       </Box>
                       <Typography
                         variant="body1"

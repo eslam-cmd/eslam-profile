@@ -22,7 +22,10 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-export default function ProjectWeb({ projects, onOpenModal }) {
+// استيراد ملف الـ JSON الجديد مباشرة هنا
+import projectsData from "../../../data/projectWebData.json";
+
+export default function ProjectWeb({ onOpenModal }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
@@ -30,14 +33,15 @@ export default function ProjectWeb({ projects, onOpenModal }) {
   const [selectedTech, setSelectedTech] = React.useState("all");
   const [imageLoadingStates, setImageLoadingStates] = React.useState({});
 
+  // تصفية المشاريع القادمة من ملف الـ JSON المستورد
   const filteredProjects = React.useMemo(() => {
-    if (!projects || !Array.isArray(projects)) return [];
-    return projects.filter(
-      (project) => selectedTech === "all" || project.tech === selectedTech
+    if (!projectsData || !Array.isArray(projectsData)) return [];
+    return projectsData.filter(
+      (project) => selectedTech === "all" || project.tech === selectedTech,
     );
-  }, [projects, selectedTech]);
+  }, [selectedTech]);
 
-  // عدد البطاقات المعروضة في كل مرة
+  // عدد البطاقات المعروضة في كل مرة حسب حجم الشاشة
   const getVisibleCardsCount = React.useCallback(() => {
     if (isMobile) return 1;
     if (isTablet) return 2;
@@ -58,10 +62,12 @@ export default function ProjectWeb({ projects, onOpenModal }) {
     });
   }, [filteredProjects.length]);
 
-  // الحصول على البطاقات المرئية الحالية
+  // الحصول على المشاريع المرئية حالياً في السلايدر
   const getVisibleProjects = React.useCallback(() => {
     const visibleCount = getVisibleCardsCount();
     const visibleProjects = [];
+
+    if (filteredProjects.length === 0) return [];
 
     for (let i = 0; i < visibleCount; i++) {
       const index = (currentIndex + i) % filteredProjects.length;
@@ -71,7 +77,7 @@ export default function ProjectWeb({ projects, onOpenModal }) {
     return visibleProjects;
   }, [currentIndex, filteredProjects, getVisibleCardsCount]);
 
-  // إدارة حالة تحميل الصور
+  // إدارة حالة تحميل الصور للنسخ النصية المخزنة في الـ JSON
   const handleImageLoad = React.useCallback((projectId) => {
     setImageLoadingStates((prev) => ({
       ...prev,
@@ -93,12 +99,12 @@ export default function ProjectWeb({ projects, onOpenModal }) {
     }));
   }, []);
 
-  // تحميل الصور مسبقاً للبطاقات المرئية
+  // تحميل الصور مسبقاً للبطاقات المرئية الحالية لضمان استجابة سريعة
   React.useEffect(() => {
     const visibleProjects = getVisibleProjects();
 
     visibleProjects.forEach((project) => {
-      if (project.photo && !imageLoadingStates[project.id]?.loaded) {
+      if (project && project.photo && !imageLoadingStates[project.id]?.loaded) {
         handleImageStartLoad(project.id);
 
         const img = new Image();
@@ -114,6 +120,27 @@ export default function ProjectWeb({ projects, onOpenModal }) {
     handleImageStartLoad,
     imageLoadingStates,
   ]);
+
+  // إعادة تعيين مؤشر العرض عند تغيير فلتر التقنية المستخدمة
+  React.useEffect(() => {
+    setCurrentIndex(0);
+  }, [selectedTech]);
+
+  // التحقق الأمني من وجود ملف الـ JSON وسلامة محتواه
+  if (!projectsData || !Array.isArray(projectsData)) {
+    return (
+      <Typography
+        sx={{
+          color: "red",
+          textAlign: "center",
+          marginTop: "20px",
+          fontSize: { xs: "0.9rem", sm: "1rem" },
+        }}
+      >
+        Projects data is missing or invalid.
+      </Typography>
+    );
+  }
 
   const NavigationDots = ({ count, activeIndex, onDotClick }) => (
     <Box
@@ -223,26 +250,6 @@ export default function ProjectWeb({ projects, onOpenModal }) {
     </Box>
   );
 
-  // إعادة تعيين الفهرس عند تغيير التصنيف
-  React.useEffect(() => {
-    setCurrentIndex(0);
-  }, [selectedTech]);
-
-  if (!projects || !Array.isArray(projects)) {
-    return (
-      <Typography
-        sx={{
-          color: "red",
-          textAlign: "center",
-          marginTop: "20px",
-          fontSize: { xs: "0.9rem", sm: "1rem" },
-        }}
-      >
-        Projects data is missing or invalid.
-      </Typography>
-    );
-  }
-
   return (
     <Box
       component="section"
@@ -272,6 +279,7 @@ export default function ProjectWeb({ projects, onOpenModal }) {
           Projects Website
         </Typography>
 
+        {/* فلاتر التصنيفات البرمجية */}
         <Box
           sx={{
             display: "flex",
@@ -309,12 +317,12 @@ export default function ProjectWeb({ projects, onOpenModal }) {
               {category === "all"
                 ? "All"
                 : category === "htmlcss"
-                ? "HTML/CSS"
-                : category === "react"
-                ? "React"
-                : category === "next"
-                ? "Next"
-                : "JS"}
+                  ? "HTML/CSS"
+                  : category === "react"
+                    ? "React"
+                    : category === "next"
+                      ? "Next"
+                      : "JS"}
             </Button>
           ))}
         </Box>
@@ -341,7 +349,7 @@ export default function ProjectWeb({ projects, onOpenModal }) {
               width: "100%",
             }}
           >
-            {/* عرض البطاقات */}
+            {/* عرض بطاقات المشاريع داخل السلايدر */}
             <Box
               sx={{
                 display: "flex",
@@ -352,34 +360,35 @@ export default function ProjectWeb({ projects, onOpenModal }) {
                 minHeight: "400px",
               }}
             >
-              {/* زر السابق */}
-              {!isMobile && filteredProjects.length > 1 && (
-                <IconButton
-                  onClick={handlePrev}
-                  sx={{
-                    position: "absolute",
-                    left: { sm: 10, md: 20, lg: 40 },
-                    zIndex: 10,
-                    backgroundColor: "#0A1F44",
-                    color: "#D4AF37",
-                    border: "2px solid #D4AF37",
-                    padding: { sm: "12px", md: "16px" },
-                    "&:hover": {
-                      backgroundColor: "#D4AF37",
-                      color: "#000",
-                      transform: "scale(1.1)",
-                    },
-                    transition: "all 0.3s ease",
-                    boxShadow: "0px 4px 15px rgba(212, 175, 55, 0.3)",
-                  }}
-                >
-                  <ArrowBackIosIcon
-                    sx={{ fontSize: { sm: "20px", md: "24px" } }}
-                  />
-                </IconButton>
-              )}
+              {/* زر السهم السابق للتنقل للشاشات الكبيرة */}
+              {!isMobile &&
+                filteredProjects.length > getVisibleCardsCount() && (
+                  <IconButton
+                    onClick={handlePrev}
+                    sx={{
+                      position: "absolute",
+                      left: { sm: 10, md: 20, lg: 40 },
+                      zIndex: 10,
+                      backgroundColor: "#0A1F44",
+                      color: "#D4AF37",
+                      border: "2px solid #D4AF37",
+                      padding: { sm: "12px", md: "16px" },
+                      "&:hover": {
+                        backgroundColor: "#D4AF37",
+                        color: "#000",
+                        transform: "scale(1.1)",
+                      },
+                      transition: "all 0.3s ease",
+                      boxShadow: "0px 4px 15px rgba(212, 175, 55, 0.3)",
+                    }}
+                  >
+                    <ArrowBackIosIcon
+                      sx={{ fontSize: { sm: "20px", md: "24px" } }}
+                    />
+                  </IconButton>
+                )}
 
-              {/* حاوية البطاقات */}
+              {/* حاوية عرض كروت المشاريع */}
               <Box
                 sx={{
                   display: "flex",
@@ -390,7 +399,8 @@ export default function ProjectWeb({ projects, onOpenModal }) {
                   maxWidth: { xs: "100%", sm: "600px", md: "1200px" },
                 }}
               >
-                {getVisibleProjects().map((project, index) => {
+                {getVisibleProjects().map((project) => {
+                  if (!project) return null;
                   const imageState = imageLoadingStates[project.id] || {
                     loading: false,
                     error: false,
@@ -424,35 +434,36 @@ export default function ProjectWeb({ projects, onOpenModal }) {
                 })}
               </Box>
 
-              {/* زر التالي */}
-              {!isMobile && filteredProjects.length > 1 && (
-                <IconButton
-                  onClick={handleNext}
-                  sx={{
-                    position: "absolute",
-                    right: { sm: 10, md: 20, lg: 40 },
-                    zIndex: 10,
-                    backgroundColor: "#0A1F44",
-                    color: "#D4AF37",
-                    border: "2px solid #D4AF37",
-                    padding: { sm: "12px", md: "16px" },
-                    "&:hover": {
-                      backgroundColor: "#D4AF37",
-                      color: "#000",
-                      transform: "scale(1.1)",
-                    },
-                    transition: "all 0.3s ease",
-                    boxShadow: "0px 4px 15px rgba(212, 175, 55, 0.3)",
-                  }}
-                >
-                  <ArrowForwardIosIcon
-                    sx={{ fontSize: { sm: "20px", md: "24px" } }}
-                  />
-                </IconButton>
-              )}
+              {/* زر السهم التالي للتنقل للشاشات الكبيرة */}
+              {!isMobile &&
+                filteredProjects.length > getVisibleCardsCount() && (
+                  <IconButton
+                    onClick={handleNext}
+                    sx={{
+                      position: "absolute",
+                      right: { sm: 10, md: 20, lg: 40 },
+                      zIndex: 10,
+                      backgroundColor: "#0A1F44",
+                      color: "#D4AF37",
+                      border: "2px solid #D4AF37",
+                      padding: { sm: "12px", md: "16px" },
+                      "&:hover": {
+                        backgroundColor: "#D4AF37",
+                        color: "#000",
+                        transform: "scale(1.1)",
+                      },
+                      transition: "all 0.3s ease",
+                      boxShadow: "0px 4px 15px rgba(212, 175, 55, 0.3)",
+                    }}
+                  >
+                    <ArrowForwardIosIcon
+                      sx={{ fontSize: { sm: "20px", md: "24px" } }}
+                    />
+                  </IconButton>
+                )}
             </Box>
 
-            {/* أدوات التنقل */}
+            {/* أشرطة التنقل السفلية للهواتف والشاشات الكبيرة */}
             {isMobile ? (
               <>
                 <EnhancedNavigationButtons
@@ -537,7 +548,7 @@ const ProjectCard = React.memo(
               overflow: "hidden",
             }}
           >
-            {/* مؤشر التحميل */}
+            {/* مؤشر تحميل الصور */}
             {(loading || !loaded) && !error && (
               <Box
                 sx={{
@@ -563,7 +574,7 @@ const ProjectCard = React.memo(
               </Box>
             )}
 
-            {/* رسالة خطأ */}
+            {/* رسالة الخطأ في حال لم يتم تحميل الصورة بالشكل المطلوب */}
             {error && (
               <Box
                 sx={{
@@ -587,7 +598,7 @@ const ProjectCard = React.memo(
               </Box>
             )}
 
-            {/* الصورة */}
+            {/* مكون عرض الصورة من الـ JSON */}
             {!error && (
               <CardMedia
                 component="img"
@@ -697,7 +708,7 @@ const ProjectCard = React.memo(
         </CardActions>
       </Card>
     );
-  }
+  },
 );
 
 ProjectCard.displayName = "ProjectCard";

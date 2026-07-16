@@ -19,9 +19,11 @@ import {
 } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { projectAppData } from "../../../data/projectAppData";
 import DownloadIcon from "@mui/icons-material/Download";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+
+// استيراد بيانات مشاريع تطبيقات الهواتف من ملف الـ JSON الجديد مباشرة
+import projectAppData from "../../../data/projectAppData.json";
 
 export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
   const theme = useTheme();
@@ -30,6 +32,7 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [imageLoadingStates, setImageLoadingStates] = React.useState({});
 
+  // التحقق الآمن من وجود البيانات وتوافقها
   if (!projectAppData || !Array.isArray(projectAppData)) {
     return (
       <Typography
@@ -67,7 +70,7 @@ export default function ProjectApp({ toggleTheme, darkMode, onOpenModal }) {
     }));
   }, []);
 
-  // تحميل الصور مسبقاً للبيانات
+  // تحميل الصور مسبقاً للبيانات القادمة من الـ JSON
   React.useEffect(() => {
     projectAppData.forEach((project) => {
       if (project.photo && !imageLoadingStates[project.id]?.loaded) {
@@ -576,7 +579,6 @@ const ProjectCard = React.memo(
               }}
             >
               <DownloadIcon
-                href={project.downloadLink}
                 sx={{
                   color: "#D4AF37",
                   fontSize: { xs: "20px", sm: "24px" },
