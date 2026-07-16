@@ -143,7 +143,7 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
         <Divider
           sx={{
             backgroundColor: colors.buttonBg,
-            marginTop: "230px",
+            marginTop: "35px",
             height: "2px",
           }}
         />

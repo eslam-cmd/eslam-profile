@@ -14,6 +14,7 @@ import AppsIcon from "@mui/icons-material/Apps";
 import { useTheme } from "@mui/material/styles";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import VerifiedIcon from "@mui/icons-material/Verified";
+
 export default function MainSection({ toggleTheme, darkMode }) {
   const theme = useTheme();
   const colors = {
@@ -34,19 +35,81 @@ export default function MainSection({ toggleTheme, darkMode }) {
     twitter: darkMode ? "#64B5F6" : "#1DA1F2",
   };
 
+  // ألوان قوية واضحة لتظهر المربعات الخلفية بشكل ممتاز ومميز
+  const bgElements = {
+    color1: darkMode ? "rgba(212, 175, 55, 0.25)" : "rgba(24, 110, 150, 0.2)",
+    color2: darkMode ? "rgba(10, 31, 68, 0.5)" : "rgba(144, 202, 249, 0.25)",
+  };
+
   return (
     <>
-      <section id="home">
+      <section
+        id="home"
+        style={{ position: "relative", overflow: "hidden", minHeight: "100vh" }}
+      >
+        {/* المربعات الخلفية المضيئة بوضوح وحركتها ملحوظة ومميزة */}
         <Box
           sx={{
-            marginTop: "280px",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            pointerEvents: "none",
+            zIndex: 0,
+            overflow: "hidden",
+          }}
+        >
+          {/* مربع مضيء كبير علوي يسار */}
+          <Box
+            className="strong-square square-1"
+            sx={{
+              position: "absolute",
+              width: { xs: "180px", md: "300px" },
+              height: { xs: "180px", md: "300px" },
+              background: `linear-gradient(135deg, ${bgElements.color1} 0%, transparent 100%)`,
+              top: "10%",
+              left: "8%",
+            }}
+          />
+          {/* مربع مضيء كبير سفلي يمين */}
+          <Box
+            className="strong-square square-2"
+            sx={{
+              position: "absolute",
+              width: { xs: "220px", md: "380px" },
+              height: { xs: "220px", md: "380px" },
+              background: `linear-gradient(135deg, ${bgElements.color2} 0%, transparent 100%)`,
+              bottom: "10%",
+              right: "8%",
+            }}
+          />
+          {/* مربع مضيء متوسط في المنتصف */}
+          <Box
+            className="strong-square square-3"
+            sx={{
+              position: "absolute",
+              width: { xs: "120px", md: "220px" },
+              height: { xs: "120px", md: "220px" },
+              background: `linear-gradient(135deg, ${bgElements.color1} 0%, transparent 100%)`,
+              bottom: "35%",
+              left: "25%",
+            }}
+          />
+        </Box>
+
+        <Box
+          sx={{
+            marginTop: "280px", // استعادة القيمة الأصلية للـ marginTop التي حددتها في كودك
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             textAlign: "center",
             padding: { xs: "20px", sm: "30px", md: "30px" },
-            height: "20vh",
+            height: "20vh", // استعادة قيمة الارتفاع الأصلية لكودك
+            position: "relative",
+            zIndex: 1, // لضمان بقاء الأزرار والروابط فوق المربعات وقابلة للنقر بالكامل
           }}
         >
           <Box sx={{ position: "relative", display: "inline-block" }}>
@@ -176,7 +239,6 @@ export default function MainSection({ toggleTheme, darkMode }) {
                 VIEW PROJECTS
               </Link>
             </Button>
-            
           </Box>
 
           <Box sx={{ display: "flex", gap: 2, marginTop: 4 }}>
@@ -205,12 +267,58 @@ export default function MainSection({ toggleTheme, darkMode }) {
 
           <style>
             {`
-        @keyframes glow {
-          0% { text-shadow: 0 0 0px #3f51b5; opacity: 0.4; }
-          50% { text-shadow: 0 0 8px #3f51b5; opacity: 1; }
-          100% { text-shadow: 0 0 0px #3f51b5; opacity: 0.4; }
-        }
-      `}
+              @keyframes glow {
+                0% { text-shadow: 0 0 0px #3f51b5; opacity: 0.4; }
+                50% { text-shadow: 0 0 8px #3f51b5; opacity: 1; }
+                100% { text-shadow: 0 0 0px #3f51b5; opacity: 0.4; }
+              }
+
+              /* إعدادات المربعات الخلفية: بلور خفيف وحواف ناعمة بوضوح لرؤية الشكل المربع */
+              .strong-square {
+                will-change: transform;
+                filter: blur(15px);
+                border-radius: 12px; /* زوايا منحنية خفيفة لتبدو المربعات بشكل عصري ورائع */
+                transition: background 0.6s ease;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+              }
+
+              /* حركات نشطة مستمرة بمدى حركة واسع مع دوران خفيف (rotation) لتعطي مظهراً حركياً ممتازاً للمربعات */
+              .square-1 {
+                animation: activeSquareMove 12s ease-in-out infinite alternate;
+              }
+
+              .square-2 {
+                animation: activeSquareMoveReverse 14s ease-in-out infinite alternate;
+              }
+
+              .square-3 {
+                animation: activeSquareMove 13s ease-in-out infinite alternate 1s;
+              }
+
+              @keyframes activeSquareMove {
+                0% {
+                  transform: translateY(0px) translateX(0px) rotate(0deg) scale(1);
+                }
+                50% {
+                  transform: translateY(-40px) translateX(25px) rotate(15deg) scale(1.05);
+                }
+                100% {
+                  transform: translateY(15px) translateX(-15px) rotate(-10deg) scale(0.95);
+                }
+              }
+
+              @keyframes activeSquareMoveReverse {
+                0% {
+                  transform: translateY(0px) translateX(0px) rotate(0deg) scale(0.95);
+                }
+                50% {
+                  transform: translateY(40px) translateX(-25px) rotate(-15deg) scale(1.08);
+                }
+                100% {
+                  transform: translateY(-15px) translateX(15px) rotate(10deg) scale(1);
+                }
+              }
+            `}
           </style>
         </Box>
       </section>
