@@ -39,7 +39,7 @@
     "description": "A modern educational platform showcasing courses or learning content, designed using React.",
     "photo": "/web/student.png",
     "linkview": "https://eslam-cmd.github.io/E-learning/",
-    "linkgithub": "/project",
+    "linkgithub": "https://github.com/eslam-cmd/E-learning",
     "tech": "react",
     "techStack": ["React", "MUI"],
     "focus": "Front-End UI/UX & Educational Layout"
@@ -61,7 +61,7 @@
     "description": "SportUp is a fast, modern website for selling supplements and healthy products. Built with Next.js, React, Tailwind CSS, and Supabase.",
     "photo": "/web/store next.png",
     "linkview": "https://e-commrece-client.vercel.app",
-    "linkgithub": "/",
+    "linkgithub": "https://github.com/eslam-cmd/e-commrece-client",
     "tech": "next",
     "techStack": ["Next.js", "Express", "Tailwind CSS", "Supabase"],
     "focus": "Full-Stack Development (Front-End + Back-End + Database)"
@@ -70,9 +70,9 @@
     "id": 8,
     "title": "Student Administration",
     "description": "A comprehensive student management system that includes a dashboard for the teacher where they can add student data, and this data appears in each student's ID.",
-    "photo": "/web/manager.png",
+    "photo": "/web/manager-student.png",
     "linkview": "https://e-school-client.vercel.app",
-    "linkgithub": "/",
+    "linkgithub": "https://github.com/eslam-cmd/e-school-client",
     "tech": "next",
     "techStack": ["Next.js", "MUI", "Express", "PostgreSQL"],
     "focus": "Full-Stack Development & Data Management"
@@ -83,7 +83,7 @@
     "description": "A modern, responsive landing page built with React, Tailwind CSS, Zustand, and shadcn/ui.",
     "photo": "/web/glowui.png",
     "linkview": "https://glow-ui-fawn.vercel.app",
-    "linkgithub": "/",
+    "linkgithub": "https://github.com/eslam-cmd/GlowUI",
     "tech": "react",
     "techStack": ["React", "Tailwind CSS", "Zustand", "shadcn/ui"],
     "focus": "Front-End UI/UX with State Management"
@@ -94,9 +94,20 @@
     "description": "A simple and modern task management application, built using Next.js, TypeScript, Zustand, and Tailwind CSS.",
     "photo": "/web/todo-zustand.png",
     "linkview": "https://to-do-list-zustand-next-tailwind.vercel.app",
-    "linkgithub": "/",
+    "linkgithub": "https://github.com/eslam-cmd/To-Do-List-Zustand-Next-Tailwind-",
     "tech": "next",
     "techStack": ["Next.js", "TypeScript", "Zustand", "Tailwind CSS"],
     "focus": "Front-End State Management & TypeScript"
+  },
+  {
+    "id": 11,
+    "title": "DevEngine Auth",
+    "description": "A secure, dual-role session management and authentication system utilizing HTTP-Only cookies, JWT rotation, and cross-origin security workflows.",
+    "photo": "/web/nest-auth.png",
+    "linkview": "https://nest-auth-client.vercel.app",
+    "linkgithub": "https://github.com/eslam-cmd/Nest-Auth-client",
+    "tech": "next",
+    "techStack": ["Next.js", "NestJS", "TypeORM", "PostgreSQL", "MUI"],
+    "focus": "Full-Stack Authentication & Security Architecture"
   }
 ]
