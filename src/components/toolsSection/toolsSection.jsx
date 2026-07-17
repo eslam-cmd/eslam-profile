@@ -14,16 +14,15 @@ import { useTheme } from "@emotion/react";
 // استيراد ملف الـ JSON الجديد
 import cards from "../../data/skillsData.json";
 
-// استيراد جميع الأيقونات من المكتبات الثلاث المستخدمة في ملف الـ JSON
+// استيراد جميع الأيقونات من المكتبات المستخدمة
 import * as FaIcons from "react-icons/fa";
 import * as SiIcons from "react-icons/si";
 import * as MdIcons from "react-icons/md";
 
-// مكون فرعي لعرض الأيقونات ديناميكياً بناءً على بيانات الـ JSON
-const DynamicIcon = ({ iconName, library, color, size = 40 }) => {
+// مكون فرعي لعرض الأيقونات ديناميكياً مع دعم التباين بين المظهر الداكن والفاتح
+const DynamicIcon = ({ iconName, library, color, size = 40, darkMode }) => {
   let IconComponent;
 
-  // اختيار المكتبة الصحيحة بناءً على حقل library في الـ JSON
   if (library === "fa") {
     IconComponent = FaIcons[iconName];
   } else if (library === "si") {
@@ -32,15 +31,23 @@ const DynamicIcon = ({ iconName, library, color, size = 40 }) => {
     IconComponent = MdIcons[iconName];
   }
 
-  // في حال عدم العثور على الأيقونة لأي سبب، نعرض أيقونة افتراضية أو مساحة فارغة
   if (!IconComponent) {
     return <Box sx={{ width: size, height: size }} />;
   }
 
-  return <IconComponent size={size} color={color} />;
+  // تحسين UX: معالجة الألوان التي قد تختفي في الثيمات المختلفة (مثل الأيقونات البيضاء بالكامل)
+  let resolvedColor = color;
+  if (
+    !darkMode &&
+    (color.toLowerCase() === "#ffffff" || color.toLowerCase() === "#cccccc")
+  ) {
+    resolvedColor = "#1a202c"; // تحويل الأيقونات البيضاء الفاتحة إلى لون غامق في الـ Light Mode لضمان التباين
+  }
+
+  return <IconComponent size={size} color={resolvedColor} />;
 };
 
-// تقسيم المهارات إلى فئات محدثة اعتماداً على بيانات الـ JSON
+// تقسيم المهارات إلى فئات واضحة ومنظمة
 const categorizedSkills = {
   frontend: cards.filter((card) =>
     [
@@ -56,6 +63,9 @@ const categorizedSkills = {
   ),
   backend: cards.filter((card) =>
     ["Node.js", "Express", "Nest.js"].includes(card.title),
+  ),
+  desktop: cards.filter((card) =>
+    ["Python", "Qt6", "PySide6"].includes(card.title),
   ),
   design: cards.filter((card) =>
     ["MUI", "Bootstrap", "Tailwind", "shadcn/ui"].includes(card.title),
@@ -82,7 +92,7 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
           observer.disconnect();
         }
       },
-      { threshold: 0.2 },
+      { threshold: 0.1 },
     );
 
     if (sectionRef.current) {
@@ -109,13 +119,15 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
     tabInactive: darkMode ? "#4a5568" : "#a0aec0",
   };
 
-  // ألوان مميزة لكل فئة
+  // ألوان مميزة ومعبرة لكل فئة من فئات التبويبات
   const getCategoryColor = (category) => {
     switch (category) {
       case "frontend":
         return "#3182ce"; // أزرق
       case "backend":
-        return "#38a169"; // أخضر
+        return "#38a169"; // أخضر غامق
+      case "desktop":
+        return "#41CD52"; // أخضر Qt زاهي
       case "design":
         return "#9333ea"; // بنفسجي
       case "database":
@@ -130,6 +142,7 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
   const tabLabels = [
     "Frontend",
     "Backend",
+    "Desktop & Python",
     "Design Libraries",
     "Database & ORM",
     "Tools",
@@ -143,7 +156,7 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
         <Divider
           sx={{
             backgroundColor: colors.buttonBg,
-            marginTop: "35px",
+            marginTop: "40px",
             height: "2px",
           }}
         />
@@ -172,7 +185,7 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
             I Work Hard To Improve My Skills Regularly
           </Typography>
 
-          {/* Tabs for categories - بدون أعداد */}
+          {/* التبويبات الذكية لتصفية لغات البرمجة */}
           <Box
             sx={{
               display: "flex",
@@ -242,7 +255,7 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
             </Tabs>
           </Box>
 
-          {/* Skills Grid */}
+          {/* شبكة عرض كروت المهارات */}
           <Grid
             container
             spacing={1.5}
@@ -266,7 +279,7 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
                     opacity: inView ? 1 : 0,
                     transform: inView ? "translateY(0)" : "translateY(40px)",
                     transition: "all 0.6s ease",
-                    transitionDelay: `${index * 0.1}s`,
+                    transitionDelay: `${index * 0.08}s`, // تسريع طفيف في الأنيميشن لتحسين الاستجابة البصرية
                     "&:hover": {
                       transform: "translateY(-5px)",
                       boxShadow: darkMode
@@ -299,12 +312,12 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
                           mb: 1,
                         }}
                       >
-                        {/* استخدام المكون الديناميكي الجديد وتمرير البيانات النصية القادمة من الـ JSON */}
                         <DynamicIcon
                           iconName={card.icon}
                           library={card.library}
                           color={card.color}
                           size={40}
+                          darkMode={darkMode}
                         />
                       </Box>
                       <Typography

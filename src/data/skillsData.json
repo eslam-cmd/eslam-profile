@@ -166,5 +166,26 @@
     "icon": "SiDocker",
     "library": "si",
     "color": "#2496ED"
+  },
+  {
+    "id": 30,
+    "title": "Python",
+    "icon": "FaPython",
+    "library": "fa",
+    "color": "#3776AB"
+  },
+  {
+    "id": 31,
+    "title": "Qt6",
+    "icon": "SiQt",
+    "library": "si",
+    "color": "#41CD52"
+  },
+  {
+    "id": 32,
+    "title": "PySide6",
+    "icon": "SiQt",
+    "library": "si",
+    "color": "#90E59A"
   }
 ]
