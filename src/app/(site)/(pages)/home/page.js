@@ -14,7 +14,7 @@ export default function HomePage({ toggleTheme, darkMode }) {
       <Header toggleTheme={toggleTheme} darkMode={darkMode} />
       <MainSection toggleTheme={toggleTheme} darkMode={darkMode} />
       <ToolsSection toggleTheme={toggleTheme} darkMode={darkMode} />
-      <SkillsRatingSection toggleTheme={toggleTheme} darkMode={darkMode} />
+      {/* <SkillsRatingSection toggleTheme={toggleTheme} darkMode={darkMode} /> */}
       <AboutPage toggleTheme={toggleTheme} darkMode={darkMode} />
       <Footer />
     </>

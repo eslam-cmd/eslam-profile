@@ -152,10 +152,10 @@ export default function Footer() {
               color: colors.textMuted,
             }}
           >
-            Designed by Islam <span style={{ fontWeight: "bold" }}>© 2025</span>
+            Designed by Islam <span style={{ fontWeight: "bold" }}>© 2026</span>
           </Typography>
 
-          <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap" }}>
+          {/* <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap" }}>
             <Button
               variant="contained"
               startIcon={<AndroidIcon />}
@@ -205,7 +205,7 @@ export default function Footer() {
             >
               Download iOS App
             </Button>
-          </Box>
+          </Box> */}
         </Box>
       </Box>
 

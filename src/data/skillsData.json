@@ -187,5 +187,33 @@
     "icon": "SiQt",
     "library": "si",
     "color": "#90E59A"
+  },
+  {
+    "id": 33,
+    "title": "AWS",
+    "icon": "FaAws",
+    "library": "fa",
+    "color": "#FF9900"
+  },
+  {
+    "id": 34,
+    "title": "Jest",
+    "icon": "SiJest",
+    "library": "si",
+    "color": "#C21325"
+  },
+  {
+    "id": 35,
+    "title": "Testing",
+    "icon": "SiTestinglibrary",
+    "library": "si",
+    "color": "#E33332"
+  },
+  {
+    "id": 36,
+    "title": "Vitest",
+    "icon": "SiVitest",
+    "library": "si",
+    "color": "#729B1B"
   }
 ]

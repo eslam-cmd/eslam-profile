@@ -21,7 +21,7 @@
     "techStack": ["React", "Prayer Times API", "MUI"],
     "focus": "Localization & API Integration"
   },
- 
+
   {
     "id": 4,
     "title": "E-Commerce",
@@ -57,17 +57,6 @@
   },
   {
     "id": 7,
-    "title": "Nutritional supplements store",
-    "description": "SportUp is a fast, modern website for selling supplements and healthy products. Built with Next.js, React, Tailwind CSS, and Supabase.",
-    "photo": "/web/store next.png",
-    "linkview": "https://e-commrece-client.vercel.app",
-    "linkgithub": "https://github.com/eslam-cmd/e-commrece-client",
-    "tech": "next",
-    "techStack": ["Next.js", "Express", "Tailwind CSS", "Supabase"],
-    "focus": "Full-Stack Development (Front-End + Back-End + Database)"
-  },
-  {
-    "id": 8,
     "title": "Student Administration",
     "description": "A comprehensive student management system that includes a dashboard for the teacher where they can add student data, and this data appears in each student's ID.",
     "photo": "/web/manager-student.png",
@@ -78,7 +67,7 @@
     "focus": "Full-Stack Development & Data Management"
   },
   {
-    "id": 9,
+    "id": 8,
     "title": "GlowUI",
     "description": "A modern, responsive landing page built with React, Tailwind CSS, Zustand, and shadcn/ui.",
     "photo": "/web/glowui.png",
@@ -89,7 +78,7 @@
     "focus": "Front-End UI/UX with State Management"
   },
   {
-    "id": 10,
+    "id": 9,
     "title": "To-do List",
     "description": "A simple and modern task management application, built using Next.js, TypeScript, Zustand, and Tailwind CSS.",
     "photo": "/web/todo-zustand.png",
@@ -100,7 +89,7 @@
     "focus": "Front-End State Management & TypeScript"
   },
   {
-    "id": 11,
+    "id": 10,
     "title": "DevEngine Auth",
     "description": "A secure, dual-role session management and authentication system utilizing HTTP-Only cookies, JWT rotation, and cross-origin security workflows.",
     "photo": "/web/nest-auth.png",

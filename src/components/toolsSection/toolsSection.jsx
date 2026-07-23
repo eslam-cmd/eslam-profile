@@ -58,7 +58,7 @@ const categorizedSkills = {
       "React",
       "Next.js",
       "React Native",
-      "Zustand",
+      
     ].includes(card.title),
   ),
   backend: cards.filter((card) =>
@@ -74,7 +74,7 @@ const categorizedSkills = {
     ["PostgreSQL", "Supabase", "Prisma", "TypeORM"].includes(card.title),
   ),
   tools: cards.filter((card) =>
-    ["GitHub", "Postman", "Docker", "Git"].includes(card.title),
+    ["GitHub", "Postman", "Docker", "Git","Zustand","Testing","AWS","Jest", "Vitest","Testing"].includes(card.title),
   ),
 };
 
@@ -155,7 +155,7 @@ export default function ToolsSection({ toggleTheme, darkMode }) {
       <section id="skills" ref={sectionRef}>
         <Divider
           sx={{
-            backgroundColor: colors.buttonBg,
+            backgroundColor: colors.border,
             marginTop: "40px",
             height: "2px",
           }}

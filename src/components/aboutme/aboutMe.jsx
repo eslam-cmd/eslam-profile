@@ -64,6 +64,7 @@ export default function AboutPage() {
 
   return (
     <Box id="contect" sx={{ minHeight: "100vh", pt: { xs: 8, md: 12 }, pb: 8 }}>
+    
       <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
         {/* About Section */}
         <Fade in timeout={1000}>
@@ -121,14 +122,13 @@ export default function AboutPage() {
                       mb: 3,
                     }}
                   >
-                    I am Islam Hadaya, and I work on developing websites and
-                    mobile applications that combine speed, simplicity, and ease
-                    of use. I offer practical digital solutions that suit the
-                    needs of individuals and institutions, with a focus on high
-                    performance and a comfortable user experience. On my
-                    website, you will find samples of the work I have completed,
-                    so you can get to know my working style and the quality of
-                    execution, and choose what suits you for your next project.
+                    Self-taught Full-Stack Developer with a passion for building
+                    practical, high-performance web applications. Over the past
+                    3 year's, I've built and deployed 10+ projects using React,
+                    Next.js, and Node.js — from weather apps to full e-commerce
+                    platforms. Currently expanding into cloud infrastructure
+                    (Docker, AWS) and seeking opportunities to contribute to
+                    real-world products. Open to remote roles.
                   </Typography>
                   <Typography
                     variant="body1"
