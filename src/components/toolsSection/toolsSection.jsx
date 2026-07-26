@@ -74,7 +74,8 @@ const categorizedSkills = {
     ["PostgreSQL", "Supabase", "Prisma", "TypeORM"].includes(card.title),
   ),
   tools: cards.filter((card) =>
-    ["GitHub", "Postman", "Docker", "Git","Zustand","Testing","AWS","Jest", "Vitest","Testing"].includes(card.title),
+    ["GitHub", "Postman", "Docker", "Git","Zustand"].includes(card.title),
+  // ,"Testing","AWS","Jest", "Vitest","Testing"
   ),
 };
 
