@@ -62,13 +62,7 @@
     "library": "si",
     "color": "#007fff"
   },
-  {
-    "id": 4,
-    "title": "Bootstrap",
-    "icon": "FaBootstrap",
-    "library": "fa",
-    "color": "#7952b3"
-  },
+
   {
     "id": 3,
     "title": "Tailwind",
@@ -175,13 +169,6 @@
     "color": "#3776AB"
   },
   {
-    "id": 31,
-    "title": "Qt6",
-    "icon": "SiQt",
-    "library": "si",
-    "color": "#41CD52"
-  },
-  {
     "id": 32,
     "title": "PySide6",
     "icon": "SiQt",
@@ -208,12 +195,6 @@
     "icon": "SiTestinglibrary",
     "library": "si",
     "color": "#E33332"
-  },
-  {
-    "id": 36,
-    "title": "Vitest",
-    "icon": "SiVitest",
-    "library": "si",
-    "color": "#729B1B"
   }
+ 
 ]

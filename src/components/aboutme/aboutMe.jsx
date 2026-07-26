@@ -21,19 +21,13 @@ export default function AboutPage() {
   const isDark = theme.palette.mode === "dark";
   const [contactOpen, setContactOpen] = React.useState(false);
 
-  // ===== Unified color system — everything derives from isDark =====
   const colors = {
-    // Brand accent: gold in dark mode, blue in light mode
     primary: isDark ? "#D4AF37" : "#186e96",
-    // Main body text
     text: isDark ? "#F5F5F5" : "#1A1A2E",
-    // Secondary/muted text
     textMuted: isDark ? alpha("#F5F5F5", 0.7) : alpha("#1A1A2E", 0.7),
-    // Card / paper backgrounds
     cardBg: isDark
       ? "linear-gradient(135deg, rgba(26, 43, 77, 0.85), rgba(10, 31, 68, 0.85))"
       : "linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(230, 240, 246, 0.85))",
-    // Section/hero background — matches overall page background per mode
     sectionBg: isDark
       ? "linear-gradient(135deg, rgba(10, 31, 68, 0.85), rgba(26, 26, 46, 0.85))"
       : "linear-gradient(135deg, rgba(240, 246, 250, 0.9), rgba(220, 235, 245, 0.9))",
@@ -46,7 +40,7 @@ export default function AboutPage() {
       company: "Local Tech Projects",
       period: "2024",
       description:
-        "Built responsive interfaces for local clients and integrated APIs for real-time data.",
+        "Developed 3 responsive web apps using React & TypeScript, reducing load time by 40% through code splitting and lazy loading. Integrated REST APIs for real-time dashboards serving 200+ daily users.",
       icon: <Code />,
     },
   ];
@@ -55,7 +49,7 @@ export default function AboutPage() {
     {
       degree: "Diploma in Computer Science",
       institution: "The Higher Institute of Computer Science",
-      period: "2025 - Present",
+      period: "2025 - Expected Graduation: 2026",
       description:
         "Studying software engineering fundamentals, web and mobile development, and database systems.",
       icon: <School />,
@@ -63,8 +57,7 @@ export default function AboutPage() {
   ];
 
   return (
-    <Box id="contect" sx={{ minHeight: "100vh", pt: { xs: 8, md: 12 }, pb: 8 }}>
-    
+    <Box id="contact" sx={{ minHeight: "100vh", pt: { xs: 8, md: 12 }, pb: 8 }}>
       <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
         {/* About Section */}
         <Fade in timeout={1000}>
@@ -124,11 +117,13 @@ export default function AboutPage() {
                   >
                     Self-taught Full-Stack Developer with a passion for building
                     practical, high-performance web applications. Over the past
-                    3 year's, I've built and deployed 10+ projects using React,
-                    Next.js, and Node.js — from weather apps to full e-commerce
-                    platforms. Currently expanding into cloud infrastructure
-                    (Docker, AWS) and seeking opportunities to contribute to
-                    real-world products. Open to remote roles.
+                    3 years, I've built and deployed 3 projects using React,
+                    Next.js, Node.js, and PostgreSQL — including a secure
+                    authentication system (DevEngine Auth) and a student
+                    management platform with role-based dashboards. Currently
+                    expanding into cloud infrastructure (Docker, AWS) and
+                    seeking opportunities to contribute to real-world products.
+                    Open to remote roles and relocation to Canada.
                   </Typography>
                   <Typography
                     variant="body1"
@@ -335,7 +330,7 @@ export default function AboutPage() {
 
         {/* Contact Section */}
         <Fade in timeout={1800}>
-          <Box id="contact">
+          <Box id="contact-section">
             <Typography
               variant="h2"
               sx={{

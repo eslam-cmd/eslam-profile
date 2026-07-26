@@ -1,102 +1,43 @@
 [
+ 
   {
     "id": 1,
-    "title": "Weather App React",
-    "description": "An interactive weather application built with React that provides real-time climate data for cities around the world.",
-    "photo": "/web/weather.png",
-    "linkview": "https://eslam-cmd.github.io/Weather-App-React/",
-    "linkgithub": "https://github.com/eslam-cmd/Weather-App-React",
-    "tech": "react",
-    "techStack": ["React", "OpenWeather API", "MUI"],
-    "focus": "API Integration & Front-End UI/UX"
-  },
-  {
-    "id": 3,
-    "title": "Prays Times",
-    "description": "A straightforward site that displays accurate prayer times across Syrian governorates, updated automatically.",
-    "photo": "/web/pryas times.png",
-    "linkview": "https://eslam-cmd.github.io/Prays-Times/",
-    "linkgithub": "https://github.com/eslam-cmd/Prays-Times",
-    "tech": "react",
-    "techStack": ["React", "Prayer Times API", "MUI"],
-    "focus": "Localization & API Integration"
-  },
-
-  {
-    "id": 4,
-    "title": "E-Commerce",
-    "description": "A full-featured e-commerce site built with React, including product browsing, shopping cart, and secure checkout features.",
-    "photo": "/web/store react.png",
-    "linkview": "https://eslam-cmd.github.io/E-Commerce/",
-    "linkgithub": "https://github.com/eslam-cmd/E-Commerce",
-    "tech": "react",
-    "techStack": ["React", "Bootstrap"],
-    "focus": "Front-End UI & Shopping Flow"
-  },
-  {
-    "id": 5,
-    "title": "E-Learning",
-    "description": "A modern educational platform showcasing courses or learning content, designed using React.",
-    "photo": "/web/student.png",
-    "linkview": "https://eslam-cmd.github.io/E-learning/",
-    "linkgithub": "https://github.com/eslam-cmd/E-learning",
-    "tech": "react",
-    "techStack": ["React", "MUI"],
-    "focus": "Front-End UI/UX & Educational Layout"
-  },
-  {
-    "id": 6,
-    "title": "Tea-Project",
-    "description": "A charming website dedicated to tea lovers, featuring different types of tea, pricing, and an aesthetic layout.",
-    "photo": "/web/css.png",
-    "linkview": "https://eslam-cmd.github.io/Tea-Project/",
-    "linkgithub": "https://github.com/eslam-cmd/Tea-Project",
-    "tech": "htmlcss",
-    "techStack": ["HTML", "CSS"],
-    "focus": "Static UI Design & Styling"
-  },
-  {
-    "id": 7,
-    "title": "Student Administration",
-    "description": "A comprehensive student management system that includes a dashboard for the teacher where they can add student data, and this data appears in each student's ID.",
-    "photo": "/web/manager-student.png",
-    "linkview": "https://e-school-client.vercel.app",
-    "linkgithub": "https://github.com/eslam-cmd/e-school-client",
-    "tech": "next",
-    "techStack": ["Next.js", "MUI", "Express", "PostgreSQL"],
-    "focus": "Full-Stack Development & Data Management"
-  },
-  {
-    "id": 8,
     "title": "GlowUI",
-    "description": "A modern, responsive landing page built with React, Tailwind CSS, Zustand, and shadcn/ui.",
+    "subtitle": "A modern, responsive landing page built with React, Tailwind CSS, Zustand, and shadcn/ui.",
     "photo": "/web/glowui.png",
     "linkview": "https://glow-ui-fawn.vercel.app",
     "linkgithub": "https://github.com/eslam-cmd/GlowUI",
-    "tech": "react",
+ 
     "techStack": ["React", "Tailwind CSS", "Zustand", "shadcn/ui"],
     "focus": "Front-End UI/UX with State Management"
   },
-  {
-    "id": 9,
-    "title": "To-do List",
-    "description": "A simple and modern task management application, built using Next.js, TypeScript, Zustand, and Tailwind CSS.",
-    "photo": "/web/todo-zustand.png",
-    "linkview": "https://to-do-list-zustand-next-tailwind.vercel.app",
-    "linkgithub": "https://github.com/eslam-cmd/To-Do-List-Zustand-Next-Tailwind-",
-    "tech": "next",
-    "techStack": ["Next.js", "TypeScript", "Zustand", "Tailwind CSS"],
-    "focus": "Front-End State Management & TypeScript"
+ {
+    "id": 2,
+    "title": "Student Administration System",
+    "subtitle": "Full-stack student management platform with role-based access. Teachers manage records via a secure dashboard; data syncs instantly to student digital IDs. Features JWT authentication, CRUD operations, and server-side validation.",
+    "techStack": ["Next.js", "Express", "PostgreSQL", "JWT", "MUI", "REST API"],
+    "focus": "Full-Stack Development: Auth, RBAC, Database Design",
+
+    "photo": "/web/manager-student.png",
+    "linkview": "https://e-school-client.vercel.app",
+    "linkgithub": "https://github.com/eslam-cmd/e-school-client"
   },
   {
-    "id": 10,
+    "id": 3,
     "title": "DevEngine Auth",
-    "description": "A secure, dual-role session management and authentication system utilizing HTTP-Only cookies, JWT rotation, and cross-origin security workflows.",
+    "subtitle": "Enterprise-Grade Authentication System",
     "photo": "/web/nest-auth.png",
     "linkview": "https://nest-auth-client.vercel.app",
     "linkgithub": "https://github.com/eslam-cmd/Nest-Auth-client",
-    "tech": "next",
-    "techStack": ["Next.js", "NestJS", "TypeORM", "PostgreSQL", "MUI"],
-    "focus": "Full-Stack Authentication & Security Architecture"
+    "techStack": [
+      "Next.js",
+      "NestJS",
+      "TypeORM",
+      "PostgreSQL",
+      "JWT",
+      "HTTP-Only Cookies",
+      "CORS Security"
+    ],
+    "focus": "Security Architecture: Authentication & Session Management"
   }
 ]

@@ -2,7 +2,6 @@
 
 import {
   Email as EmailIcon,
-  Facebook as FacebookIcon,
   GitHub as GitHubIcon,
   LinkedIn as LinkedInIcon,
   Close as CloseIcon,
@@ -31,9 +30,10 @@ export default function ContactPage({ open, onClose }) {
 
   const formRef = useRef();
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [sending, setSending] = useState(false);
 
-  // ===== Unified color system — everything derives from isDark =====
   const colors = {
     primary: isDark ? "#D4AF37" : "#186e96",
     onPrimary: isDark ? "#0A1F44" : "#ffffff",
@@ -48,32 +48,46 @@ export default function ContactPage({ open, onClose }) {
 
   const iconColors = {
     email: colors.primary,
-    facebook: "#1877F2",
     linkedin: "#0A66C2",
     github: isDark ? "#EAEAEA" : "#333333",
   };
 
+  const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+  const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+  const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
   const sendEmail = (e) => {
     e.preventDefault();
+
+    if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+      setSnackbarMessage(
+        "Email service not configured. Please contact via social links.",
+      );
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+      return;
+    }
+
     setSending(true);
 
-    emailjs
-      .sendForm(
-        "service_un3a9dt",
-        "template_r6rw1jg",
-        formRef.current,
-        "TJQrTHj8YbQMKH9xb"
-      )
-      .then(
-        () => {
-          setOpenSnackbar(true);
-          setSending(false);
-          onClose?.();
-        },
-        () => {
-          setSending(false);
-        }
-      );
+    emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, formRef.current, PUBLIC_KEY).then(
+      () => {
+        setSnackbarMessage("Message sent successfully ✅");
+        setSnackbarSeverity("success");
+        setOpenSnackbar(true);
+        setSending(false);
+        formRef.current?.reset();
+        setTimeout(() => onClose?.(), 1500);
+      },
+      (error) => {
+        setSnackbarMessage(
+          "Failed to send. Please try again or use social links.",
+        );
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+        setSending(false);
+      },
+    );
   };
 
   return (
@@ -106,30 +120,30 @@ export default function ContactPage({ open, onClose }) {
             right: 8,
             color: colors.textMuted,
           }}
+          aria-label="Close contact dialog"
         >
           <CloseIcon />
         </IconButton>
 
-        <CardContent sx={{ p: { xs: 2, sm: 2 } }}>
+        <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
           <Typography
             variant="h4"
             sx={{
               color: colors.primary,
-              fontWeight: "700",
+              fontWeight: 700,
               textAlign: "center",
               mb: 2,
               fontSize: { xs: "1.6rem", sm: "2rem" },
             }}
           >
-            Let's Work Together
+            Let&apos;s Work Together
           </Typography>
 
           <Typography
             variant="body1"
             sx={{ mb: 3, color: colors.textMuted, textAlign: "center" }}
           >
-            You can send your inquiries and we will respond to you as soon as
-            possible.
+            Send your inquiry and I will respond as soon as possible.
           </Typography>
 
           <form ref={formRef} onSubmit={sendEmail}>
@@ -139,24 +153,28 @@ export default function ContactPage({ open, onClose }) {
                 label="Name"
                 variant="outlined"
                 required
+                disabled={sending}
                 InputLabelProps={{ style: { color: colors.primary } }}
                 InputProps={{ style: { color: colors.fieldText } }}
               />
               <TextField
                 name="email"
                 label="Email"
+                type="email"
                 variant="outlined"
                 required
+                disabled={sending}
                 InputLabelProps={{ style: { color: colors.primary } }}
                 InputProps={{ style: { color: colors.fieldText } }}
               />
               <TextField
                 name="message"
-                label="Your message ..."
+                label="Your message..."
                 variant="outlined"
                 required
                 multiline
                 rows={4}
+                disabled={sending}
                 InputLabelProps={{ style: { color: colors.primary } }}
                 InputProps={{ style: { color: colors.fieldText } }}
               />
@@ -172,7 +190,7 @@ export default function ContactPage({ open, onClose }) {
                   py: 1.5,
                   backgroundColor: colors.primary,
                   color: colors.onPrimary,
-                  fontWeight: "600",
+                  fontWeight: 600,
                   borderRadius: "25px",
                   textTransform: "none",
                   "&:hover": {
@@ -186,22 +204,34 @@ export default function ContactPage({ open, onClose }) {
             </CardActions>
           </form>
 
-          <Box sx={{ display: "flex", gap: 2, mt: -2, justifyContent: "center" }}>
-            <Link href="mailto:hdayaaslam34@gmail.com" target="_blank">
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              mt: 2,
+              pt: 2,
+              justifyContent: "center",
+              borderTop: `1px solid ${colors.border}`,
+            }}
+          >
+            <Link
+              href="mailto:hdayaaslam34@gmail.com"
+              target="_blank"
+              aria-label="Send email"
+            >
               <EmailIcon sx={{ color: iconColors.email }} />
             </Link>
-            {/* <Link
-              href="https://www.facebook.com/islam.hadaya.2025?mibextid=ZbWKwL"
+            <Link
+              href="https://github.com/eslam-cmd"
               target="_blank"
+              aria-label="GitHub profile"
             >
-              <FacebookIcon sx={{ color: iconColors.facebook }} />
-            </Link> */}
-            <Link href="https://github.com/eslam-cmd" target="_blank">
               <GitHubIcon sx={{ color: iconColors.github }} />
             </Link>
             <Link
               href="https://www.linkedin.com/in/eslam-hd-60a056357"
               target="_blank"
+              aria-label="LinkedIn profile"
             >
               <LinkedInIcon sx={{ color: iconColors.linkedin }} />
             </Link>
@@ -215,8 +245,11 @@ export default function ContactPage({ open, onClose }) {
         onClose={() => setOpenSnackbar(false)}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
-        <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
-          The message was sent successfully ✅
+        <Alert
+          severity={snackbarSeverity}
+          onClose={() => setOpenSnackbar(false)}
+        >
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </>
