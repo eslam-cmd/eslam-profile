@@ -18,7 +18,7 @@
     "techStack": ["Next.js", "Express", "PostgreSQL", "JWT", "MUI", "REST API"],
     "focus": "Full-Stack Development: Auth, RBAC, Database Design",
 
-    "photo": "/web/manager-student.png",
+    "photo": "/web/management.jpeg",
     "linkview": "https://e-school-client.vercel.app",
     "linkgithub": "https://github.com/eslam-cmd/e-school-client"
   },
@@ -26,7 +26,7 @@
     "id": 3,
     "title": "DevEngine Auth",
     "subtitle": "Enterprise-Grade Authentication System",
-    "photo": "/web/nest-auth.png",
+    "photo": "/web/nest.jpeg",
     "linkview": "https://nest-auth-client.vercel.app",
     "linkgithub": "https://github.com/eslam-cmd/Nest-Auth-client",
     "techStack": [
