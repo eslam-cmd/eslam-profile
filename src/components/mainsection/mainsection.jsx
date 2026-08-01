@@ -414,7 +414,6 @@ export default function MainSection({ toggleTheme, darkMode }) {
             alignItems: "center",
             maxWidth: { xs: "100%", md: "500px" },
             width: "100%",
-            marginTop:{ xs: "-200px", md: "0" }
           }}
         >
           <Paper
