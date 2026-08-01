@@ -185,7 +185,7 @@ export default function MainSection({ toggleTheme, darkMode }) {
           gap: { xs: 4, md: 6 },
           maxWidth: "1200px",
           mx: "auto",
-          marginTop: { xs: "80px", md: "120px" },
+          marginTop: { xs: "120px", md: "120px" },
         }}
       >
         {/* القسم الأيسر - المعلومات الشخصية */}
@@ -414,7 +414,7 @@ export default function MainSection({ toggleTheme, darkMode }) {
             alignItems: "center",
             maxWidth: { xs: "100%", md: "500px" },
             width: "100%",
-            marginTop:{ xs: "-500px", md: "0" }
+            marginTop:{ xs: "-200px", md: "0" }
           }}
         >
           <Paper
