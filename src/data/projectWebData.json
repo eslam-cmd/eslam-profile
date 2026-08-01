@@ -1,5 +1,4 @@
 [
- 
   {
     "id": 1,
     "title": "GlowUI",
@@ -7,11 +6,11 @@
     "photo": "/web/glowui.png",
     "linkview": "https://glow-ui-fawn.vercel.app",
     "linkgithub": "https://github.com/eslam-cmd/GlowUI",
- 
+
     "techStack": ["React", "Tailwind CSS", "Zustand", "shadcn/ui"],
     "focus": "Front-End UI/UX with State Management"
   },
- {
+  {
     "id": 2,
     "title": "Student Administration System",
     "subtitle": "Full-stack student management platform with role-based access. Teachers manage records via a secure dashboard; data syncs instantly to student digital IDs. Features JWT authentication, CRUD operations, and server-side validation.",
@@ -22,22 +21,30 @@
     "linkview": "https://e-school-client.vercel.app",
     "linkgithub": "https://github.com/eslam-cmd/e-school-client"
   },
+
   {
     "id": 3,
-    "title": "DevEngine Auth",
-    "subtitle": "Enterprise-Grade Authentication System",
-    "photo": "/web/nest.jpeg",
-    "linkview": "https://nest-auth-client.vercel.app",
-    "linkgithub": "https://github.com/eslam-cmd/Nest-Auth-client",
+    "title": "ScanLens - Security Posture Scanner",
+    "subtitle": "Enterprise-grade security scanning platform that analyzes HTTP headers, SSL/TLS configurations, CORS policies, and cookie security. Features AI-powered remediation with Google Gemini, subscription management (Free/Pro/Extra), license key system, automated expiration reminders, and comprehensive admin dashboard with revenue analytics and payment tracking.",
+    "photo": "/web/scanlens.jpeg",
+    "linkview": "https://scan-lens-client.vercel.app",
+    "linkgithub": "https://github.com/eslam-cmd/ScanLens-client",
     "techStack": [
       "Next.js",
       "NestJS",
-      "TypeORM",
+      "TypeScript",
+      "Prisma ORM",
       "PostgreSQL",
-      "JWT",
+      "BullMQ",
+      "JWT Authentication",
       "HTTP-Only Cookies",
-      "CORS Security"
+      "Google Gemini AI",
+      "Tailwind CSS",
+      "Recharts",
+      "PDFKit",
+      "Nodemailer",
+      "REST API"
     ],
-    "focus": "Security Architecture: Authentication & Session Management"
+    "focus": "Full-Stack Security Engineering: Scanning Engine, AI Integration, Subscription System, Admin Dashboard"
   }
 ]
