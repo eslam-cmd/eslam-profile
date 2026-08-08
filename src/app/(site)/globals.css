@@ -1,19 +1,59 @@
-#root,
-html,
-body {
+/* 📁 src/app/globals.css */
+
+/* ===== ✅ إعادة تعيين عام ===== */
+* {
   margin: 0;
   padding: 0;
-  width: 100%;
-  height: auto;
-  min-height: 100vh;
-  scroll-behavior: smooth;
-  overflow-x: hidden;
-  background-color: rgba(255, 255, 255, 0.027);
-  user-select: none;
-  -webkit-user-select: none;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/*main section*/
+/* ===== ✅ إصلاح أساسي لـ iOS ===== */
+html {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background-color: rgba(255, 255, 255, 0.027);
+  margin: 0;
+  padding: 0;
+  position: relative;
+  /* ✅ إزالة user-select: none من الجسم */
+}
+
+#root,
+#__next {
+  height: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== ✅ إصلاح مشكلة 100vh على iOS ===== */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* ===== ✅ Main Section ===== */
+.text-main-section {
+  color: #bdbdbd;
+  padding: 25px;
+  width: 100%;
+  max-width: 500px;
+  overflow: hidden;
+  margin: 0 auto;
+}
 
 .font-box {
   border: 1px solid #ddd;
@@ -21,13 +61,9 @@ body {
   margin: 10px;
   border-radius: 8px;
   text-align: center;
+  max-width: 100%;
 }
-.text-main-section {
-  color: #bdbdbd;
-  padding: 25px;
-  width: 500px;
-  overflow: hidden;
-}
+
 @keyframes glow {
   0% {
     text-shadow: 0 0 0px #d4af37;
@@ -42,37 +78,181 @@ body {
     opacity: 0.4;
   }
 }
-/*end main section*/
 
-/*projct section*/
+/* ===== ✅ Project Section ===== */
 .card-project {
   border: 1px solid #1976d2;
   padding: 5px;
-  height: 330px;
-  transition: 0.5s;
+  min-height: 330px;
+  height: auto;
+  transition:
+    transform 0.5s ease,
+    box-shadow 0.5s ease;
+  border-radius: 8px;
+  overflow: hidden;
 }
+
 .card-project:hover {
   transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
+
 .eye-btn {
-  transition: 0.5s;
+  transition: all 0.3s ease;
   color: #1976d2;
 }
+
 .eye-btn:hover {
-  color: #ffff;
+  color: #ffffff;
 }
-.github-btn:hover {
-  color: #ffff;
-}
-img:hover {
-  transform: scale(1.05);
+
+.github-btn {
   transition: all 0.3s ease;
 }
+
+.github-btn:hover {
+  color: #ffffff;
+}
+
+/* ✅ تحسين الصور */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+img:hover {
+  transform: scale(1.05);
+}
+
+.title-card {
+  transition: color 0.3s ease;
+}
+
 .title-card:hover {
   color: #d4af37;
 }
+
 .jhc {
-  background-color: #1f212c9d;
+  background-color: rgba(31, 33, 44, 0.62);
+  backdrop-filter: blur(4px);
+  border-radius: 4px;
 }
 
-/*end server section*/
+/* ===== ✅ إصلاح مشكلة iOS ===== */
+@supports (-webkit-touch-callout: none) {
+  html,
+  body,
+  #root,
+  #__next {
+    height: -webkit-fill-available !important;
+    min-height: -webkit-fill-available !important;
+  }
+
+  /* ✅ إزالة أي background-attachment: fixed */
+  * {
+    background-attachment: scroll !important;
+  }
+}
+
+/* ===== ✅ تحسين التمرير ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1976d2;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d4af37;
+}
+
+/* ===== ✅ تحسين التركيز ===== */
+*:focus {
+  outline: 2px solid #d4af37;
+  outline-offset: 2px;
+}
+
+/* ===== ✅ تحسين الروابط ===== */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ===== ✅ تحسين الأزرار ===== */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* ===== ✅ منع التحديد فقط على العناصر المطلوبة ===== */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ===== ✅ تحسين الأداء على iOS ===== */
+.animated {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* ===== ✅ تحسين التجاوب ===== */
+@media (max-width: 768px) {
+  .text-main-section {
+    padding: 15px;
+    max-width: 100%;
+  }
+
+  .card-project {
+    min-height: 280px;
+  }
+
+  .font-box {
+    padding: 15px;
+    margin: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-project {
+    min-height: 240px;
+  }
+
+  .text-main-section {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .font-box {
+    padding: 10px;
+    margin: 5px;
+  }
+}
+
+/* ===== ✅ دعم الوضع المظلم ===== */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #0a0f1e;
+    color: #e0e0e0;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  body {
+    background-color: #f8fafc;
+    color: #1a202c;
+  }
+}

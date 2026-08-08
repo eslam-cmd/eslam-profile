@@ -4,14 +4,19 @@ import React, { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Box, CircularProgress, Typography, Stack } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Stack,
+  Button,
+} from "@mui/material";
 import LoadingScreen from "../../components/Others/loading.jsx";
 
 // ✅ تحسين: تعريف Homepage مع fallback
 const Homepage = lazy(() =>
   import("./(pages)/home/page.js").catch((error) => {
     console.error("Failed to load homepage:", error);
-    // ✅ إرجاع مكون بديل عند فشل التحميل
     return {
       default: () => (
         <Box sx={{ textAlign: "center", py: 10 }}>
@@ -191,7 +196,6 @@ export default function Home() {
   const handleRetry = React.useCallback(() => {
     setHasError(false);
     setRetryCount((prev) => prev + 1);
-    // إعادة تحميل المكون
     window.location.reload();
   }, []);
 
@@ -223,19 +227,24 @@ export default function Home() {
     };
   }, [loading]);
 
-  const backgroundStyle = useMemo(
-    () => ({
+  // ✅ **الحل الرئيسي: إزالة backgroundAttachment: "fixed" للأجهزة المحمولة**
+  const backgroundStyle = useMemo(() => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isMobileDevice = isMobile || isIOS;
+
+    return {
       background: darkMode
         ? "linear-gradient(135deg, #000000 0%, #0a1929 50%, #001e3c 100%)"
         : "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%)",
       backgroundSize: "cover",
-      backgroundAttachment: "fixed",
+      backgroundAttachment: isMobileDevice ? "scroll" : "fixed",
       transition: "all 0.3s ease-in-out",
       minHeight: "100vh",
       color: theme.palette.text.primary,
-    }),
-    [darkMode, theme],
-  );
+      WebkitOverflowScrolling: "touch",
+      overflow: "auto",
+    };
+  }, [darkMode, theme, isMobile]);
 
   // ✅ عرض شاشة الخطأ إذا فشل التحميل
   if (hasError) {
