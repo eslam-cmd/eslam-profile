@@ -13,6 +13,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://eslam-profile.vercel.app";
+
 export const metadata = {
   title: {
     default: "إسلام هدايا | مطور ويب فريلانسر - Next.js, Node.js, PostgreSQL",
@@ -113,7 +116,7 @@ export const metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://your-domain.com"),
+  metadataBase: new URL(siteUrl),
   alternates: {
     canonical: "/",
   },
@@ -121,7 +124,7 @@ export const metadata = {
     title: "إسلام هدايا | مطور ويب فريلانسر - Next.js, Node.js, PostgreSQL",
     description:
       "إسلام هدايا، مطور ويب متخصص في بناء منصات SaaS وتطبيقات الويب. أقدم خدمات تطوير ويب متكاملة في حلب، سوريا والعالم العربي.",
-    url: "https://your-domain.com",
+    url: siteUrl,
     siteName: "إسلام هدايا | مطور ويب",
     locale: "ar_SY",
     type: "website",
@@ -174,7 +177,7 @@ export default function RootLayout({ children }) {
         />
 
         {/* رابط الـ Canonical */}
-        <link rel="canonical" href="https://your-domain.com" />
+        <link rel="canonical" href={siteUrl} />
 
         {/* RSS Feed (اختياري) */}
         <link
