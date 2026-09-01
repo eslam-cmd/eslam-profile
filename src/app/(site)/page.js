@@ -187,9 +187,22 @@ export default function Home() {
 
   // ✅ تحسين: محاولة إعادة التحميل عند الفشل
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 200);
+    const connection =
+      navigator.connection ||
+      navigator.mozConnection ||
+      navigator.webkitConnection;
+
+    const slowConnection =
+      connection?.saveData ||
+      ["slow-2g", "2g", "3g"].includes(connection?.effectiveType);
+
+    const timer = setTimeout(
+      () => {
+        setLoading(false);
+      },
+      slowConnection ? 80 : 200,
+    );
+
     return () => clearTimeout(timer);
   }, []);
 

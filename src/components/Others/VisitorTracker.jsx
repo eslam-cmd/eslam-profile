@@ -7,9 +7,26 @@ export default function VisitorTracker() {
   const pathname = usePathname();
 
   useEffect(() => {
+    const shouldSkipTracking = () => {
+      if (typeof navigator === "undefined") return true;
+
+      const connection =
+        navigator.connection ||
+        navigator.mozConnection ||
+        navigator.webkitConnection;
+
+      if (connection?.saveData) return true;
+
+      const effectiveType = connection?.effectiveType || "4g";
+      return ["slow-2g", "2g", "3g"].includes(effectiveType);
+    };
+
     const trackVisitor = async () => {
+      if (shouldSkipTracking()) {
+        return;
+      }
+
       try {
-        // 1. جلب أو إنشاء معرف الزائر
         let visitorId = localStorage.getItem("visitorId");
         if (!visitorId) {
           visitorId =
@@ -20,7 +37,6 @@ export default function VisitorTracker() {
           localStorage.setItem("visitorId", visitorId);
         }
 
-        // 2. جلب معلومات الجهاز
         const ua = navigator.userAgent;
         const isMobile = /Mobi|Android|iPhone|iPad/i.test(ua);
         const isTablet = /Tablet|iPad/i.test(ua);
@@ -45,7 +61,6 @@ export default function VisitorTracker() {
                   ? "iOS"
                   : "Unknown";
 
-        // 3. كشف مصدر الزيارة
         const referrer = document.referrer || "";
         const freelanceSites = [
           "upwork.com",
@@ -67,7 +82,6 @@ export default function VisitorTracker() {
           source = "personal";
         else if (referrer) source = "other";
 
-        // 4. جلب UTM parameters
         const params = new URLSearchParams(window.location.search);
         const utm = {
           utm_source: params.get("utm_source") || "",
@@ -75,7 +89,6 @@ export default function VisitorTracker() {
           utm_campaign: params.get("utm_campaign") || "",
         };
 
-        // 5. تجميع البيانات
         const data = {
           visitorId,
           page: pathname || "/",
@@ -89,24 +102,35 @@ export default function VisitorTracker() {
           email: null,
         };
 
-        // 6. إرسال البيانات إلى API
-        const response = await fetch("/api/track", {
+        await fetch("/api/track", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
+          keepalive: true,
         });
-
-        const result = await response.json();
-        console.log("📊 تم التتبع:", result);
       } catch (error) {
         console.error("❌ خطأ في التتبع:", error);
       }
     };
 
-    const timeoutId = setTimeout(trackVisitor, 500);
-    return () => clearTimeout(timeoutId);
+    const runTracking = () => {
+      const delay =
+        typeof window !== "undefined" &&
+        window.navigator &&
+        (window.navigator.connection?.saveData ||
+          ["slow-2g", "2g", "3g"].includes(
+            window.navigator.connection?.effectiveType,
+          ))
+          ? 3000
+          : 1200;
+
+      const timeoutId = setTimeout(trackVisitor, delay);
+      return () => clearTimeout(timeoutId);
+    };
+
+    return runTracking();
   }, [pathname]);
 
   return null;

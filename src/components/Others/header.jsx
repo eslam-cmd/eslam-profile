@@ -25,6 +25,7 @@ export default function Header({ toggleTheme, darkMode }) {
     { name: "SKILLS", link: "#skills" },
     { name: "WORK", link: "/project" },
     { name: "CONTACT", link: "#contact" },
+    { name: "MY BLOG", link: "https://binaa-chi.vercel.app/blog" },
   ];
 
   const handleOpenNavMenu = (event) => {
@@ -155,15 +156,15 @@ export default function Header({ toggleTheme, darkMode }) {
         left: 0,
         right: 0,
         width: "fit-content",
-        minWidth: { xs: "96%", sm: "92%", md: "85%" },
+        minWidth: { xs: "94%", sm: "92%", md: "85%" },
       }}
     >
       <Toolbar
         sx={{
           justifyContent: "space-between",
-          px: { xs: 1.8, sm: 3 },
-          py: { xs: 0.5, sm: 0.8 },
-          minHeight: { xs: "60px", sm: "68px" },
+          px: { xs: 1.2, sm: 3 },
+          py: { xs: 0.3, sm: 0.8 },
+          minHeight: { xs: "54px", sm: "68px" },
         }}
       >
         {/* اللوجو - تصميم عصري Minimal */}
@@ -172,7 +173,7 @@ export default function Header({ toggleTheme, darkMode }) {
           sx={{
             fontFamily: "'Inter', -apple-system, sans-serif",
             fontWeight: 700,
-            fontSize: { xs: "20px", sm: "24px", md: "28px" },
+            fontSize: { xs: "17px", sm: "24px", md: "28px" },
             letterSpacing: "-0.02em",
             background: darkMode
               ? "linear-gradient(135deg, #D4AF37 0%, #f5d76e 100%)"
@@ -181,12 +182,13 @@ export default function Header({ toggleTheme, darkMode }) {
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
             userSelect: "none",
+            whiteSpace: "nowrap",
             "&::after": {
               content: '"•"',
               color: darkMode ? "#D4AF37" : "#186e96",
               WebkitTextFillColor: darkMode ? "#D4AF37" : "#186e96",
               marginLeft: "4px",
-              fontSize: { xs: "16px", sm: "20px" },
+              fontSize: { xs: "14px", sm: "20px" },
             },
           }}
         >
@@ -348,7 +350,7 @@ export default function Header({ toggleTheme, darkMode }) {
             onClick={handleOpenNavMenu}
             sx={{
               display: { xs: "flex", md: "none" },
-              p: 0.5,
+              p: 0.6,
               color: darkMode ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.6)",
               borderRadius: "10px",
               transition: "all 0.3s ease",
@@ -359,7 +361,7 @@ export default function Header({ toggleTheme, darkMode }) {
               },
             }}
           >
-            <MenuIcon />
+            <MenuIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
           </IconButton>
         </Box>
 
@@ -411,9 +413,7 @@ export default function Header({ toggleTheme, darkMode }) {
                   fontFamily: "'Inter', sans-serif",
                   fontSize: "0.9rem",
                   letterSpacing: "0.3px",
-                  color: darkMode
-                    ? "rgba(255,255,255,0.8)"
-                    : "rgba(0,0,0,0.7)",
+                  color: darkMode ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.7)",
                 }}
               >
                 {page.name}

@@ -217,50 +217,7 @@ export default function Footer() {
               ))}
             </Box>
 
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              <Button
-                variant="outlined"
-                startIcon={<AndroidIcon />}
-                onClick={() => handleDownloadClick("android")}
-                sx={{
-                  borderColor: colors.primary,
-                  color: colors.primary,
-                  borderRadius: "10px",
-                  textTransform: "none",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    bgcolor: alpha(colors.primary, 0.05),
-                    transform: "scale(1.02)",
-                    borderColor: colors.primary,
-                  },
-                }}
-              >
-                Android
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<AppleIcon />}
-                onClick={() => handleDownloadClick("ios")}
-                sx={{
-                  borderColor: colors.primary,
-                  color: colors.primary,
-                  borderRadius: "10px",
-                  textTransform: "none",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    bgcolor: alpha(colors.primary, 0.05),
-                    transform: "scale(1.02)",
-                    borderColor: colors.primary,
-                  },
-                }}
-              >
-                iOS
-              </Button>
-            </Box>
+         
           </Box>
         </Box>
 

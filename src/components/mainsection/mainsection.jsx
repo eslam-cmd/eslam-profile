@@ -15,7 +15,6 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 import CodeIcon from "@mui/icons-material/Code";
 import { keyframes } from "@mui/system";
 
-
 import { FaReact, FaNodeJs } from "react-icons/fa";
 import { SiNextdotjs, SiPostgresql } from "react-icons/si";
 
@@ -61,7 +60,6 @@ export default function MainSection({ toggleTheme, darkMode }) {
     github: darkMode ? "#EAEAEA" : "#000",
     linkedin: darkMode ? "#64B5F6" : "#0A66C2",
   };
-
 
   const codeLines = [
     "const developer = {",
@@ -115,7 +113,6 @@ export default function MainSection({ toggleTheme, darkMode }) {
     }
   }, [textIndex]);
 
- 
   const techIcons = [
     { icon: FaReact, color: "#61DBFB", top: "10%", right: "8%", size: 60 },
     {
@@ -134,7 +131,6 @@ export default function MainSection({ toggleTheme, darkMode }) {
       id="home"
       style={{ position: "relative", overflow: "hidden", minHeight: "100vh" }}
     >
-   
       <Box
         sx={{
           position: "absolute",
@@ -178,14 +174,14 @@ export default function MainSection({ toggleTheme, darkMode }) {
           alignItems: "center",
           justifyContent: "center",
           textAlign: "center",
-          padding: { xs: "20px", sm: "30px", md: "40px" },
+          padding: { xs: "12px 12px 24px", sm: "30px", md: "40px" },
           minHeight: "100vh",
           position: "relative",
           zIndex: 2,
-          gap: { xs: 4, md: 6 },
+          gap: { xs: 3, md: 6 },
           maxWidth: "1200px",
           mx: "auto",
-          marginTop: { xs: "120px", md: "120px" },
+          marginTop: { xs: "84px", md: "120px" },
         }}
       >
         {/* القسم الأيسر - المعلومات الشخصية */}
@@ -203,8 +199,8 @@ export default function MainSection({ toggleTheme, darkMode }) {
               alt="Islam Hadaya"
               src="/logo/my-photo-2.jpg"
               sx={{
-                width: { xs: 160, sm: 180, md: 200, lg: 220 },
-                height: { xs: 160, sm: 180, md: 200, lg: 220 },
+                width: { xs: 132, sm: 180, md: 200, lg: 220 },
+                height: { xs: 132, sm: 180, md: 200, lg: 220 },
                 boxShadow: colors.avatarShadow,
                 border: "3px solid " + colors.avatarBorder,
                 transition: "all 0.3s ease",
@@ -233,7 +229,7 @@ export default function MainSection({ toggleTheme, darkMode }) {
             sx={{
               fontFamily: "'Inter', sans-serif",
               fontSize: {
-                xs: "1.8rem",
+                xs: "1.5rem",
                 sm: "2.2rem",
                 md: "2.8rem",
                 lg: "3.2rem",
@@ -252,12 +248,12 @@ export default function MainSection({ toggleTheme, darkMode }) {
 
           <Typography
             sx={{
-              fontSize: { xs: "0.95rem", sm: "1rem", md: "1.1rem" },
+              fontSize: { xs: "0.82rem", sm: "1rem", md: "1.1rem" },
               maxWidth: "600px",
-              lineHeight: 1.8,
+              lineHeight: 1.7,
               fontWeight: 400,
               mt: 2,
-              minHeight: "3.5rem",
+              minHeight: "3rem",
               color: darkMode ? "#ccc" : "#333",
             }}
           >
@@ -285,24 +281,27 @@ export default function MainSection({ toggleTheme, darkMode }) {
           <Box
             sx={{
               display: "flex",
-              gap: 2,
-              mt: 4,
+              gap: 1.5,
+              mt: 3,
               flexWrap: "wrap",
               justifyContent: "center",
+              width: "100%",
             }}
           >
             <Button
               variant="contained"
               endIcon={<DownloadIcon />}
               sx={{
-                px: { xs: 2.5, sm: 3 },
-                py: { xs: 1, sm: 1.2 },
+                px: { xs: 2, sm: 3 },
+                py: { xs: 0.8, sm: 1.2 },
                 borderRadius: "25px",
-                fontSize: { xs: "0.75rem", sm: "0.85rem", md: "0.95rem" },
+                fontSize: { xs: "0.72rem", sm: "0.85rem", md: "0.95rem" },
                 backgroundColor: colors.buttonBg,
                 color: colors.buttonText,
                 fontWeight: 600,
                 textTransform: "none",
+                width: { xs: "100%", sm: "auto" },
+                maxWidth: { xs: "240px", sm: "none" },
                 "&:hover": {
                   transform: "translateY(-3px)",
                   boxShadow: `0 8px 30px ${darkMode ? "rgba(212, 175, 55, 0.3)" : "rgba(24, 110, 150, 0.3)"}`,
@@ -316,8 +315,8 @@ export default function MainSection({ toggleTheme, darkMode }) {
               variant="contained"
               endIcon={<AppsIcon sx={{ color: colors.buttonText }} />}
               sx={{
-                px: { xs: 2.5, sm: 3 },
-                py: { xs: 1, sm: 1.2 },
+                px: { xs: 2, sm: 3 },
+                py: { xs: 0.8, sm: 1.2 },
                 borderRadius: "25px",
                 fontSize: { xs: "0.75rem", sm: "0.85rem", md: "0.95rem" },
                 backgroundColor: colors.buttonBg,

@@ -11,7 +11,7 @@ import React, {
 } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Box, Fab, Zoom, Tooltip, Badge,Typography  } from "@mui/material";
+import { Box, Fab, Zoom, Tooltip, Badge, Typography } from "@mui/material";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { keyframes } from "@mui/system";
 
@@ -66,13 +66,111 @@ export default function ClientLayout({ children }) {
           },
         },
         typography: {
-          fontFamily: "'Inter', 'Roboto', sans-serif",
-          h1: { fontWeight: 700 },
-          h2: { fontWeight: 600 },
-          body1: { lineHeight: 1.6 },
+          fontFamily: "'SF Pro Display', 'Inter', 'Segoe UI', sans-serif",
+          htmlFontSize: 16,
+          h1: {
+            fontWeight: 700,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.08,
+            fontSize: "clamp(2.3rem, 5vw, 4.25rem)",
+          },
+          h2: {
+            fontWeight: 700,
+            letterSpacing: "-0.03em",
+            lineHeight: 1.12,
+            fontSize: "clamp(1.9rem, 4vw, 3rem)",
+          },
+          h3: {
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.18,
+            fontSize: "clamp(1.4rem, 3vw, 2.2rem)",
+          },
+          h4: {
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.2,
+            fontSize: "clamp(1.2rem, 2.5vw, 1.8rem)",
+          },
+          h5: {
+            fontWeight: 600,
+            letterSpacing: "-0.015em",
+            lineHeight: 1.25,
+            fontSize: "clamp(1.05rem, 2vw, 1.35rem)",
+          },
+          h6: {
+            fontWeight: 600,
+            letterSpacing: "-0.015em",
+            lineHeight: 1.3,
+            fontSize: "clamp(0.96rem, 1.8vw, 1.1rem)",
+          },
+          body1: {
+            lineHeight: 1.7,
+            letterSpacing: "-0.01em",
+            fontSize: "clamp(0.95rem, 1.9vw, 1.08rem)",
+          },
+          body2: {
+            lineHeight: 1.65,
+            letterSpacing: "-0.01em",
+            fontSize: "clamp(0.82rem, 1.6vw, 0.96rem)",
+          },
+          button: {
+            fontWeight: 600,
+            letterSpacing: "-0.01em",
+            textTransform: "none",
+            fontSize: "0.96rem",
+          },
         },
         shape: {
-          borderRadius: 8,
+          borderRadius: 16,
+        },
+        components: {
+          MuiButton: {
+            defaultProps: {
+              disableElevation: true,
+            },
+            styleOverrides: {
+              root: {
+                minHeight: 44,
+                padding: "0.8rem 1.3rem",
+                borderRadius: 14,
+                fontWeight: 600,
+                letterSpacing: "-0.01em",
+                textTransform: "none",
+                transition: "all 0.2s ease",
+                boxShadow: "none",
+                "&:hover": {
+                  boxShadow: "none",
+                },
+              },
+              contained: {
+                boxShadow: "none",
+              },
+            },
+          },
+          MuiIconButton: {
+            styleOverrides: {
+              root: {
+                width: 44,
+                height: 44,
+                borderRadius: 14,
+              },
+            },
+          },
+          MuiPaper: {
+            styleOverrides: {
+              root: {
+                borderRadius: 20,
+              },
+            },
+          },
+          MuiTypography: {
+            styleOverrides: {
+              root: {
+                letterSpacing: "-0.02em",
+              },
+            },
+          },
         },
       }),
     [darkMode],

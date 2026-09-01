@@ -1,10 +1,10 @@
 "use client";
 import * as React from "react";
 import { useTheme } from "@mui/material/styles";
+import Image from "next/image";
 import {
   Card,
   CardContent,
-  CardMedia,
   CardActionArea,
   CardActions,
   Typography,
@@ -113,18 +113,54 @@ export default function ProjectWeb({ darkMode, onOpenModal }) {
     }));
   }, []);
 
+  const shouldReduceNetworkUsage = React.useCallback(() => {
+    if (typeof navigator === "undefined") return false;
+
+    const connection =
+      navigator.connection ||
+      navigator.mozConnection ||
+      navigator.webkitConnection;
+
+    if (!connection) return false;
+
+    return (
+      Boolean(connection.saveData) ||
+      ["slow-2g", "2g", "3g"].includes(connection.effectiveType)
+    );
+  }, []);
+
   React.useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const visibleProjects = getVisibleProjects();
-    visibleProjects.forEach((project) => {
-      if (project && project.photo && !imageLoadingStates[project.id]?.loaded) {
+    const reduceNetworkUsage = shouldReduceNetworkUsage();
+
+    visibleProjects.forEach((project, index) => {
+      const shouldSkip = reduceNetworkUsage && index > 0;
+
+      if (
+        project &&
+        project.photo &&
+        !imageLoadingStates[project.id]?.loaded &&
+        !shouldSkip
+      ) {
         handleImageStartLoad(project.id);
-        const img = new Image();
+        const img = new window.Image();
+        img.decoding = "async";
+        img.loading = "lazy";
         img.src = project.photo;
         img.onload = () => handleImageLoad(project.id);
         img.onerror = () => handleImageError(project.id);
       }
     });
-  }, [getVisibleProjects, handleImageLoad, handleImageError, handleImageStartLoad, imageLoadingStates]);
+  }, [
+    getVisibleProjects,
+    handleImageLoad,
+    handleImageError,
+    handleImageStartLoad,
+    imageLoadingStates,
+    shouldReduceNetworkUsage,
+  ]);
 
   const NavigationDots = ({ count, activeIndex, onDotClick }) => (
     <Box
@@ -473,7 +509,8 @@ const ProjectCard = React.memo(
             right: "-50%",
             width: "200%",
             height: "200%",
-            background: "radial-gradient(circle at 70% 30%, rgba(212,175,55,0.03) 0%, transparent 60%)",
+            background:
+              "radial-gradient(circle at 70% 30%, rgba(212,175,55,0.03) 0%, transparent 60%)",
             pointerEvents: "none",
           },
         }}
@@ -546,24 +583,39 @@ const ProjectCard = React.memo(
             )}
 
             {!error && (
-              <CardMedia
-                component="img"
-                image={project.photo}
-                alt={project.title}
-                className="project-image"
+              <Box
                 sx={{
-                  objectFit: "cover",
-                  borderRadius: { xs: "14px", sm: "18px" },
+                  position: "relative",
                   width: "100%",
                   height: "100%",
-                  transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+                  borderRadius: { xs: "14px", sm: "18px" },
+                  overflow: "hidden",
                   opacity: loaded ? 1 : 0,
-                  position: "relative",
+                  transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
                   zIndex: 1,
                 }}
-                onLoad={onImageLoad}
-                onError={onImageError}
-              />
+              >
+                <Image
+                  src={project.photo}
+                  alt={project.title}
+                  className="project-image"
+                  width={900}
+                  height={540}
+                  priority={project.id === 1}
+                  loading={project.id === 1 ? "eager" : "lazy"}
+                  unoptimized
+                  sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  onLoad={onImageLoad}
+                  onError={onImageError}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                    transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                />
+              </Box>
             )}
 
             {/* شارة التقنيات */}
@@ -726,7 +778,7 @@ const ProjectCard = React.memo(
         </CardActions>
       </Card>
     );
-  }
+  },
 );
 
 ProjectCard.displayName = "ProjectCard";

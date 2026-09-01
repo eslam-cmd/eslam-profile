@@ -1,6 +1,14 @@
 "use client";
 import * as React from "react";
-import { Tabs, Tab, Box, useTheme, useMediaQuery, Chip, Fade } from "@mui/material";
+import {
+  Tabs,
+  Tab,
+  Box,
+  useTheme,
+  useMediaQuery,
+  Chip,
+  Fade,
+} from "@mui/material";
 import ProjectWeb from "./projectwep/ProjectWeb";
 import ProjectApp from "./projectapp/projectApp";
 import ProjectModal from "./projectModal";
@@ -16,15 +24,70 @@ const float = keyframes`
   50% { transform: translateY(-3px); }
 `;
 
+// ✅ تأثير تقليب الصفحات (Page Flip)
+const pageFlip = keyframes`
+  0% {
+    transform: perspective(1000px) rotateY(-90deg);
+    opacity: 0;
+  }
+  100% {
+    transform: perspective(1000px) rotateY(0deg);
+    opacity: 1;
+  }
+`;
+
+const pageFlipOut = keyframes`
+  0% {
+    transform: perspective(1000px) rotateY(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(1000px) rotateY(90deg);
+    opacity: 0;
+  }
+`;
+
+// ✅ تأثير تقليب الكتب (Book Flip)
+const bookFlip = keyframes`
+  0% {
+    transform: perspective(1200px) rotateY(-180deg) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: perspective(1200px) rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+`;
+
+const bookFlipOut = keyframes`
+  0% {
+    transform: perspective(1200px) rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(1200px) rotateY(180deg) scale(0.8);
+    opacity: 0;
+  }
+`;
+
 export default function ProjectSection({ projects, projectAppData, darkMode }) {
   const theme = useTheme();
   const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [value, setValue] = React.useState(0);
   const [selectedProject, setSelectedProject] = React.useState(null);
+  const [isFlipping, setIsFlipping] = React.useState(false);
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    if (newValue !== value) {
+      setIsFlipping(true);
+      setTimeout(() => {
+        setValue(newValue);
+        setTimeout(() => {
+          setIsFlipping(false);
+        }, 100);
+      }, 300);
+    }
   };
 
   const handleOpenModal = (project) => {
@@ -54,7 +117,7 @@ export default function ProjectSection({ projects, projectAppData, darkMode }) {
         overflow: "hidden",
       }}
     >
-      {/* التبويبات الثابتة */}
+      {/* التبويبات الثابتة - بدون ترقيم */}
       <Box
         sx={{
           position: "fixed",
@@ -122,28 +185,7 @@ export default function ProjectSection({ projects, projectAppData, darkMode }) {
                 />
               }
               iconPosition="start"
-              label={
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Box sx={{ display: { xs: "none", sm: "block" } }}>
-                    Projects Web
-                  </Box>
-                  <Chip
-                    label={webCount}
-                    size="small"
-                    sx={{
-                      bgcolor: value === 0 ? "#D4AF37" : "rgba(255,255,255,0.1)",
-                      color: value === 0 ? "#000" : "#D4AF37",
-                      fontWeight: 600,
-                      fontSize: "10px",
-                      height: "18px",
-                      minWidth: "18px",
-                      "& .MuiChip-label": {
-                        px: 0.8,
-                      },
-                    }}
-                  />
-                </Box>
-              }
+              label="Projects Web"
               sx={{
                 "&.MuiTab-root": {
                   minHeight: { xs: "48px", sm: "64px" },
@@ -160,28 +202,7 @@ export default function ProjectSection({ projects, projectAppData, darkMode }) {
                 />
               }
               iconPosition="start"
-              label={
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Box sx={{ display: { xs: "none", sm: "block" } }}>
-                    App Mobile
-                  </Box>
-                  <Chip
-                    label={appCount}
-                    size="small"
-                    sx={{
-                      bgcolor: value === 1 ? "#D4AF37" : "rgba(255,255,255,0.1)",
-                      color: value === 1 ? "#000" : "#D4AF37",
-                      fontWeight: 600,
-                      fontSize: "10px",
-                      height: "18px",
-                      minWidth: "18px",
-                      "& .MuiChip-label": {
-                        px: 0.8,
-                      },
-                    }}
-                  />
-                </Box>
-              }
+              label="App Mobile"
               sx={{
                 "&.MuiTab-root": {
                   minHeight: { xs: "48px", sm: "64px" },
@@ -225,38 +246,87 @@ export default function ProjectSection({ projects, projectAppData, darkMode }) {
         </Box>
       </Box>
 
-      {/* المحتوى */}
+      {/* المحتوى مع تأثير تقليب الكتب */}
       <Box
         sx={{
           pt: { xs: 1, sm: 2 },
           px: { xs: 1, sm: 2, md: 3 },
           position: "relative",
           zIndex: 1,
+          perspective: "1200px",
         }}
       >
-        <Fade in={value === 0} timeout={400} unmountOnExit>
-          <Box>
+        <Box
+          sx={{
+            position: "relative",
+            transformStyle: "preserve-3d",
+            transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+        >
+          {/* مشاريع الويب */}
+          <Box
+            sx={{
+              position: "relative",
+              animation:
+                isFlipping && value === 0
+                  ? `${bookFlip} 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards`
+                  : isFlipping && value !== 0
+                    ? `${bookFlipOut} 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards`
+                    : value === 0
+                      ? `${bookFlip} 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards`
+                      : "none",
+              transformStyle: "preserve-3d",
+              backfaceVisibility: "hidden",
+            }}
+          >
             {value === 0 && (
-              <ProjectWeb
-                projects={projects}
-                darkMode={darkMode}
-                onOpenModal={handleOpenModal}
-              />
+              <Box
+                sx={{
+                  animation: `${pageFlip} 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards`,
+                  transformOrigin: "left center",
+                }}
+              >
+                <ProjectWeb
+                  projects={projects}
+                  darkMode={darkMode}
+                  onOpenModal={handleOpenModal}
+                />
+              </Box>
             )}
           </Box>
-        </Fade>
 
-        <Fade in={value === 1} timeout={400} unmountOnExit>
-          <Box>
+          {/* مشاريع التطبيقات */}
+          <Box
+            sx={{
+              position: "relative",
+              animation:
+                isFlipping && value === 1
+                  ? `${bookFlip} 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards`
+                  : isFlipping && value !== 1
+                    ? `${bookFlipOut} 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards`
+                    : value === 1
+                      ? `${bookFlip} 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards`
+                      : "none",
+              transformStyle: "preserve-3d",
+              backfaceVisibility: "hidden",
+            }}
+          >
             {value === 1 && (
-              <ProjectApp
-                projectAppData={projectAppData}
-                darkMode={darkMode}
-                onOpenModal={handleOpenModal}
-              />
+              <Box
+                sx={{
+                  animation: `${pageFlip} 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards`,
+                  transformOrigin: "left center",
+                }}
+              >
+                <ProjectApp
+                  projectAppData={projectAppData}
+                  darkMode={darkMode}
+                  onOpenModal={handleOpenModal}
+                />
+              </Box>
             )}
           </Box>
-        </Fade>
+        </Box>
       </Box>
 
       {/* المودال */}
@@ -265,6 +335,47 @@ export default function ProjectSection({ projects, projectAppData, darkMode }) {
         onClose={handleCloseModal}
         project={selectedProject}
       />
+
+      {/* CSS للتأثيرات */}
+      <style jsx global>{`
+        /* تأثير تقليب الصفحات */
+        .page-flip-enter {
+          animation: ${pageFlip} 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          transform-origin: left center;
+        }
+
+        .page-flip-exit {
+          animation: ${pageFlipOut} 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          transform-origin: left center;
+        }
+
+        /* تأثير تقليب الكتب */
+        .book-flip-enter {
+          animation: ${bookFlip} 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          transform-origin: center center;
+        }
+
+        .book-flip-exit {
+          animation: ${bookFlipOut} 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          transform-origin: center center;
+        }
+
+        /* تحسين العرض على الشاشات الصغيرة */
+        @media (max-width: 600px) {
+          .book-flip-enter {
+            animation-duration: 0.5s;
+          }
+          .book-flip-exit {
+            animation-duration: 0.5s;
+          }
+          .page-flip-enter {
+            animation-duration: 0.5s;
+          }
+          .page-flip-exit {
+            animation-duration: 0.5s;
+          }
+        }
+      `}</style>
     </Box>
   );
 }

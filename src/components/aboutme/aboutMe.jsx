@@ -62,7 +62,7 @@ export default function AboutPage() {
   React.useEffect(() => {
     const observers = Object.entries(sectionRefs).map(([key, ref]) => {
       if (!ref.current) return null;
-      
+
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
@@ -74,12 +74,12 @@ export default function AboutPage() {
             }
           });
         },
-        { 
+        {
           threshold: 0.15,
-          rootMargin: "0px 0px -50px 0px"
-        }
+          rootMargin: "0px 0px -50px 0px",
+        },
       );
-      
+
       observer.observe(ref.current);
       return observer;
     });
@@ -116,11 +116,10 @@ export default function AboutPage() {
   return (
     <Box id="about" sx={{ minHeight: "100vh", pt: { xs: 8, md: 12 }, pb: 8 }}>
       <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
-        
         {/* ===== About Section ===== */}
         <Box ref={sectionRefs.about}>
-          <Fade 
-            in={visibleSections.about} 
+          <Fade
+            in={visibleSections.about}
             timeout={800}
             style={{ transitionDelay: "0ms" }}
           >
@@ -151,7 +150,7 @@ export default function AboutPage() {
                   borderRadius: "50%",
                   background: `radial-gradient(circle, ${alpha(
                     colors.primary,
-                    0.1
+                    0.1,
                   )} 0%, transparent 70%)`,
                   zIndex: 0,
                   animation: `${float} 8s ease-in-out infinite`,
@@ -161,7 +160,9 @@ export default function AboutPage() {
               <Box position="relative" zIndex={1}>
                 <Box sx={{ textAlign: "center", mb: { xs: 3, md: 4 } }}>
                   <Chip
-                    icon={<Person sx={{ fontSize: 16, color: colors.primary }} />}
+                    icon={
+                      <Person sx={{ fontSize: 16, color: colors.primary }} />
+                    }
                     label="ABOUT ME"
                     sx={{
                       bgcolor: alpha(colors.primary, 0.08),
@@ -187,13 +188,22 @@ export default function AboutPage() {
                   </Typography>
                 </Box>
 
-                <Grid container spacing={3} alignItems="center" justifyContent="center">
+                <Grid
+                  container
+                  spacing={3}
+                  alignItems="center"
+                  justifyContent="center"
+                >
                   <Grid item xs={12} md={10} lg={9}>
                     <Box sx={{ maxWidth: "900px", mx: "auto" }}>
                       <Typography
                         variant="body1"
                         sx={{
-                          fontSize: { xs: "0.95rem", sm: "1rem", md: "1.05rem" },
+                          fontSize: {
+                            xs: "0.95rem",
+                            sm: "1rem",
+                            md: "1.05rem",
+                          },
                           lineHeight: { xs: 1.8, md: 1.9 },
                           color: colors.text,
                           textAlign: "justify",
@@ -202,17 +212,22 @@ export default function AboutPage() {
                           px: { xs: 0, sm: 2 },
                         }}
                       >
-                        Self-taught Full-Stack Developer with a passion for building
-                        practical, high-performance web applications. Over the past
-                        3 years, I've built and deployed 3 projects using React,
-                        Next.js, Node.js, and PostgreSQL — including a secure
-                        authentication system (DevEngine Auth) and a student
-                        management platform with role-based dashboards.
+                        Self-taught Full-Stack Developer with a passion for
+                        building practical, high-performance web applications.
+                        Over the past 3 years, I've built and deployed 3
+                        projects using React, Next.js, Node.js, and PostgreSQL —
+                        including a secure authentication system (DevEngine
+                        Auth) and a student management platform with role-based
+                        dashboards.
                       </Typography>
                       <Typography
                         variant="body1"
                         sx={{
-                          fontSize: { xs: "0.95rem", sm: "1rem", md: "1.05rem" },
+                          fontSize: {
+                            xs: "0.95rem",
+                            sm: "1rem",
+                            md: "1.05rem",
+                          },
                           lineHeight: { xs: 1.8, md: 1.9 },
                           color: colors.textMuted,
                           textAlign: "justify",
@@ -220,11 +235,12 @@ export default function AboutPage() {
                           px: { xs: 0, sm: 2 },
                         }}
                       >
-                        Currently expanding into cloud infrastructure (Docker, AWS) and
-                        seeking opportunities to contribute to real-world products.
-                        Open to remote roles and relocation to Canada. My approach 
-                        combines technical expertise with creative problem-solving 
-                        to deliver exceptional user experiences that drive business growth.
+                        Currently expanding into cloud infrastructure (Docker,
+                        AWS) and seeking opportunities to contribute to
+                        real-world products. Open to remote roles and relocation
+                        to Canada. My approach combines technical expertise with
+                        creative problem-solving to deliver exceptional user
+                        experiences that drive business growth.
                       </Typography>
                     </Box>
                   </Grid>
@@ -241,13 +257,20 @@ export default function AboutPage() {
           {/* Experience */}
           <Grid item xs={12} lg={6}>
             <Box ref={sectionRefs.experience}>
-              <Fade 
-                in={visibleSections.experience} 
+              <Fade
+                in={visibleSections.experience}
                 timeout={800}
                 style={{ transitionDelay: "100ms" }}
               >
                 <Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      mb: 4,
+                    }}
+                  >
                     <Work sx={{ color: colors.primary, fontSize: 32 }} />
                     <Typography
                       variant="h3"
@@ -284,7 +307,7 @@ export default function AboutPage() {
                           pl: 6,
                           mb: 4,
                           zIndex: 1,
-                          animation: visibleSections.experience 
+                          animation: visibleSections.experience
                             ? `${fadeInUp} 0.8s ease ${index * 0.15}s both`
                             : "none",
                         }}
@@ -342,9 +365,9 @@ export default function AboutPage() {
                           </Typography>
                           <Typography
                             variant="subtitle1"
-                            sx={{ 
-                              color: colors.textMuted, 
-                              mb: 1.5, 
+                            sx={{
+                              color: colors.textMuted,
+                              mb: 1.5,
                               fontWeight: 500,
                               fontSize: "0.85rem",
                             }}
@@ -353,8 +376,8 @@ export default function AboutPage() {
                           </Typography>
                           <Typography
                             variant="body2"
-                            sx={{ 
-                              color: colors.textMuted, 
+                            sx={{
+                              color: colors.textMuted,
                               lineHeight: 1.8,
                               fontSize: "0.9rem",
                             }}
@@ -373,13 +396,20 @@ export default function AboutPage() {
           {/* Education */}
           <Grid item xs={12} lg={6}>
             <Box ref={sectionRefs.education}>
-              <Fade 
-                in={visibleSections.education} 
+              <Fade
+                in={visibleSections.education}
                 timeout={800}
                 style={{ transitionDelay: "200ms" }}
               >
                 <Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      mb: 4,
+                    }}
+                  >
                     <School sx={{ color: colors.primary, fontSize: 32 }} />
                     <Typography
                       variant="h3"
@@ -416,7 +446,7 @@ export default function AboutPage() {
                           pl: 6,
                           mb: 4,
                           zIndex: 1,
-                          animation: visibleSections.education 
+                          animation: visibleSections.education
                             ? `${fadeInUp} 0.8s ease ${index * 0.15 + 0.15}s both`
                             : "none",
                         }}
@@ -474,9 +504,9 @@ export default function AboutPage() {
                           </Typography>
                           <Typography
                             variant="subtitle1"
-                            sx={{ 
-                              color: colors.textMuted, 
-                              mb: 1.5, 
+                            sx={{
+                              color: colors.textMuted,
+                              mb: 1.5,
                               fontWeight: 500,
                               fontSize: "0.85rem",
                             }}
@@ -485,8 +515,8 @@ export default function AboutPage() {
                           </Typography>
                           <Typography
                             variant="body2"
-                            sx={{ 
-                              color: colors.textMuted, 
+                            sx={{
+                              color: colors.textMuted,
                               lineHeight: 1.8,
                               fontSize: "0.9rem",
                             }}
@@ -507,15 +537,19 @@ export default function AboutPage() {
 
         {/* ===== Contact Section ===== */}
         <Box ref={sectionRefs.contact}>
-          <Fade 
-            in={visibleSections.contact} 
+          <Fade
+            in={visibleSections.contact}
             timeout={800}
             style={{ transitionDelay: "300ms" }}
           >
             <Box id="contact-section">
               <Box sx={{ textAlign: "center", mb: { xs: 3, md: 4 } }}>
                 <Chip
-                  icon={<EmojiEmotions sx={{ fontSize: 16, color: colors.primary }} />}
+                  icon={
+                    <EmojiEmotions
+                      sx={{ fontSize: 16, color: colors.primary }}
+                    />
+                  }
                   label="GET IN TOUCH"
                   sx={{
                     bgcolor: alpha(colors.primary, 0.08),
@@ -537,7 +571,8 @@ export default function AboutPage() {
                     letterSpacing: "-0.02em",
                   }}
                 >
-                  Let's Connect <LocalPhoneIcon sx={{ fontSize: { xs: 26, md: 36 } }} />
+                  Let's Connect{" "}
+                  <LocalPhoneIcon sx={{ fontSize: { xs: 26, md: 36 } }} />
                 </Typography>
               </Box>
 
@@ -558,9 +593,9 @@ export default function AboutPage() {
               >
                 <Typography
                   variant="h5"
-                  sx={{ 
-                    mb: 2, 
-                    color: colors.primary, 
+                  sx={{
+                    mb: 2,
+                    color: colors.primary,
                     fontWeight: 700,
                     fontSize: { xs: "1.2rem", sm: "1.4rem", md: "1.6rem" },
                   }}
@@ -570,9 +605,9 @@ export default function AboutPage() {
 
                 <Typography
                   variant="body1"
-                  sx={{ 
-                    mb: 4, 
-                    color: colors.text, 
+                  sx={{
+                    mb: 4,
+                    color: colors.text,
                     fontSize: { xs: "0.95rem", sm: "1rem", md: "1.1rem" },
                     maxWidth: "600px",
                     mx: "auto",
@@ -589,20 +624,28 @@ export default function AboutPage() {
                   variant="contained"
                   onClick={() => setContactOpen(true)}
                   sx={{
-                    px: { xs: 4, sm: 5, md: 6 },
-                    py: { xs: 1.5, sm: 1.6, md: 1.8 },
+                    px: { xs: 5, sm: 6, md: 7 },
+                    py: { xs: 1.6, sm: 1.8, md: 2.2 },
+                    minHeight: { xs: 52, sm: 56, md: 62 },
+                    minWidth: { xs: 220, sm: 240, md: 260 },
                     borderRadius: "30px",
                     background: colors.primary,
                     color: isDark ? "#0A1F44" : "#ffffff",
-                    fontSize: { xs: "0.95rem", sm: "1rem", md: "1.1rem" },
-                    fontWeight: 600,
+                    fontSize: { xs: "1rem", sm: "1.05rem", md: "1.15rem" },
+                    fontWeight: 700,
                     textTransform: "none",
+                    letterSpacing: "-0.01em",
                     boxShadow: `0 4px 20px ${alpha(colors.primary, 0.25)}`,
                     transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                     "&:hover": {
                       background: colors.primary,
                       transform: "translateY(-3px) scale(1.02)",
                       boxShadow: `0 8px 35px ${alpha(colors.primary, 0.35)}`,
+                    },
+                    "@media (max-width: 390px)": {
+                      minWidth: 200,
+                      width: "100%",
+                      maxWidth: 260,
                     },
                   }}
                 >
