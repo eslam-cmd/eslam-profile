@@ -99,9 +99,12 @@ const ErrorFallback = ({ onRetry }) => (
       We're having trouble loading the page. This might be due to a slow
       internet connection.
     </Typography>
+<<<<<<< HEAD
 
 
     
+=======
+>>>>>>> 4c73d5cd024798fc128efd0d1dfb94d1aa36d90e
     <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
       <Button
         variant="contained"
@@ -231,6 +234,7 @@ export default function Home() {
   }, [loading]);
 
   // ✅ **الحل الرئيسي: إزالة backgroundAttachment: "fixed" للأجهزة المحمولة**
+<<<<<<< HEAD
 
   const backgroundStyle = useMemo(() => {
     const isIOS =
@@ -238,6 +242,10 @@ export default function Home() {
         ? /iPad|iPhone|iPod/.test(navigator.userAgent)
         : false; // على السيرفر نرجع false مباشرة
 
+=======
+  const backgroundStyle = useMemo(() => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+>>>>>>> 4c73d5cd024798fc128efd0d1dfb94d1aa36d90e
     const isMobileDevice = isMobile || isIOS;
 
     return {

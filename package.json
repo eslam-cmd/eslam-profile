@@ -16,7 +16,10 @@
     "@mui/material": "^7.2.0",
     "emailjs-com": "^3.2.0",
     "framer-motion": "^12.23.24",
+<<<<<<< HEAD
     "js-cookie": "^3.0.8",
+=======
+>>>>>>> 4c73d5cd024798fc128efd0d1dfb94d1aa36d90e
     "next": "^16.2.10",
     "pg": "^8.16.3",
     "react": "^19.0.0",
