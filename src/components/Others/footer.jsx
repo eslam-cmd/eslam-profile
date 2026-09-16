@@ -31,10 +31,22 @@ export default function Footer() {
   };
 
   const socials = [
-    { icon: <EmailIcon />, link: "mailto:hdayaaslam34@gmail.com", color: "#D4AF37" },
+    {
+      icon: <EmailIcon />,
+      link: "mailto:hdayaaslam34@gmail.com",
+      color: "#D4AF37",
+    },
     { icon: <TwitterIcon />, link: "https://twitter.com/", color: "#1DA1F2" },
-    { icon: <LinkedInIcon />, link: "https://www.linkedin.com/in/Islam-hadaya", color: "#0A66C2" },
-    { icon: <GitHubIcon />, link: "https://github.com/eslam-cmd", color: isDark ? "#fff" : "#333" },
+    {
+      icon: <LinkedInIcon />,
+      link: "https://www.linkedin.com/in/Islam-hadaya",
+      color: "#0A66C2",
+    },
+    {
+      icon: <GitHubIcon />,
+      link: "https://github.com/eslam-cmd",
+      color: isDark ? "#fff" : "#333",
+    },
   ];
 
   const handleDownloadClick = (platform) => {
@@ -94,7 +106,11 @@ export default function Footer() {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "2fr 1.5fr 1.5fr" },
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "1fr 1fr",
+              md: "2fr 1.5fr 1.5fr",
+            },
             gap: { xs: 4, md: 6 },
             position: "relative",
             zIndex: 1,
@@ -128,7 +144,7 @@ export default function Footer() {
                 fontFamily: "'Inter', sans-serif",
               }}
             >
-              Building the future, one line of code at a time. 
+              Building the future, one line of code at a time.
               <span style={{ display: "block", marginTop: "8px" }}>
                 ✦ Software Engineer ✦
               </span>
@@ -216,8 +232,6 @@ export default function Footer() {
                 </IconButton>
               ))}
             </Box>
-
-         
           </Box>
         </Box>
 

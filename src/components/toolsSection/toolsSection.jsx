@@ -104,7 +104,7 @@ const CATEGORIES = [
     label: "DevOps & Quality",
     color: "#F1C40F",
     glowColor: "rgba(241, 196, 15, 0.3)",
-    items: ["Git", "GitHub", "Docker", "Postman", "AWS", "Jest", "Vitest"],
+    items: ["Git", "GitHub", "Docker", "Postman", ],
   },
 ];
 
@@ -559,21 +559,7 @@ export default function ToolsSection({ darkMode }) {
           ))}
         </Grid>
 
-        {/* عدد المهارات */}
-        <Typography
-          sx={{
-            mt: 4,
-            fontSize: "0.75rem",
-            color: colors.textSecondary,
-            fontFamily: "'Inter', sans-serif",
-            letterSpacing: "1px",
-            opacity: 0.6,
-          }}
-        >
-          {activeSkills.length} technologies •{" "}
-          {CATEGORIES.reduce((acc, cat) => acc + cat.items.length, 0)} total
-          skills
-        </Typography>
+        
       </Box>
     </section>
   );

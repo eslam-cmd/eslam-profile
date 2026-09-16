@@ -163,7 +163,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="ltr">
       <head>
         {/* إضافة الـ Meta Tags الإضافية */}
         <meta charSet="UTF-8" />

@@ -23,7 +23,7 @@ export default function Header({ toggleTheme, darkMode }) {
 
   const pages = [
     { name: "SKILLS", link: "#skills" },
-    { name: "WORK", link: "/project" },
+    { name: "WORK", link: "#Portfolio" },
     { name: "CONTACT", link: "#contact" },
     { name: "MY BLOG", link: "https://binaa-chi.vercel.app/blog" },
   ];

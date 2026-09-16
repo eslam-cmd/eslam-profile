@@ -1,0 +1,86 @@
+[
+  {
+    "id": 1,
+    "title": "ScanLens — Web Security Scanner",
+    "tagline": "Automated security posture assessment with AI-powered remediation.",
+    "subtitle": "A web security assessment platform that analyzes HTTP security headers, SSL/TLS configuration, CORS policies, and cookie security. Includes automated findings, AI-assisted remediation guidance, subscription management, and an administrative analytics dashboard.",
+    "techStack": [
+      "Next.js",
+      "NestJS",
+      "TypeScript",
+      "Prisma ORM",
+      "PostgreSQL",
+      "JWT Authentication",
+      "HTTP-Only Cookies",
+      "Google Gemini AI",
+      "Tailwind CSS",
+      "Recharts",
+      "PDFKit",
+      "Nodemailer"
+    ],
+    "focus": "Full-Stack Security Engineering · Scanning Engine · AI Integration · SaaS Architecture",
+    "category": "Web Security SaaS",
+    "photos": [
+      "https://i.ibb.co/vCpKTFw4/AI-solution-proposal.png",
+      "https://i.ibb.co/kVmthvyM/Record-storage.png",
+      "https://i.ibb.co/yc0t27x5/Subscription-Section.png",
+      "https://i.ibb.co/R4YMWpQD/verify-page.png"
+    ],
+    "linkview": "https://scan-lens-client.vercel.app",
+    "linkgithub": "https://github.com/eslam-cmd/ScanLens-client",
+    "featured": true
+  },
+  {
+    "id": 2,
+    "title": "Student Administration System",
+    "tagline": "Dual-role academic management platform with real-time analytics.",
+    "subtitle": "A full-stack platform for managing student records, academic data, attendance, and assessments. Includes role-based access control, secure authentication, server-side validation, and a responsive dashboard for administrative workflows.",
+    "techStack": [
+      "Next.js",
+      "Express.js",
+      "PostgreSQL",
+      "JWT",
+      "MUI",
+      "Recharts",
+      "REST API"
+    ],
+    "focus": "Full-Stack Development · RBAC · Database Design · Real-time Analytics",
+    "category": "Academic Platform",
+    "photos": [
+      "https://i.ibb.co/FdQysrT/1.jpg",
+      "https://i.ibb.co/Qvngk9JH/2.jpg",
+      "https://i.ibb.co/hRJr7yKh/3.jpg",
+      "https://i.ibb.co/p6Mx5j0W/4.jpg",
+      "https://i.ibb.co/BHWc65P0/5.jpg"
+    ],
+    "linkview": "https://e-school-client.vercel.app",
+    "linkgithub": "https://github.com/eslam-cmd/e-school-client",
+    "featured": true
+  },
+  {
+    "id": 3,
+    "title": "Freelance & Consulting Platform",
+    "tagline": "Commercial service portal with telemetry and automated alerts.",
+    "subtitle": "Full-scale commercial service portal for technical consultations and development requests. Includes a client portal, Markdown-driven blog engine, admin telemetry dashboard, and automated notification system.",
+    "techStack": [
+      "Next.js App Router",
+      "React 19",
+      "Express.js",
+      "PostgreSQL",
+      "Native pg",
+      "Nodemailer",
+      "Telegram Bot API",
+      "Markdown"
+    ],
+    "focus": "Full-Stack Development · Admin Telemetry · Integrations · SEO Optimization",
+    "category": "Freelance Platform",
+    "photos": [
+      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&q=80",
+      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&q=80",
+      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=80"
+    ],
+    "linkview": "https://my-profile-personal-nextjs.vercel.app",
+    "linkgithub": "https://github.com/eslam-cmd",
+    "featured": false
+  }
+]

@@ -6,6 +6,7 @@ import Footer from "@/components/Others/footer";
 import MainSection from "@/components/mainsection/mainsection";
 import ToolsSection from "@/components/toolsSection/toolsSection";
 import AboutPage from "@/components/aboutme/aboutMe";
+import SelectedProjects from "@/components/SelectedProjects/SelectedProjects";
 
 export default function HomePage({ toggleTheme, darkMode }) {
   return (
@@ -14,6 +15,7 @@ export default function HomePage({ toggleTheme, darkMode }) {
       <MainSection toggleTheme={toggleTheme} darkMode={darkMode} />
       <ToolsSection toggleTheme={toggleTheme} darkMode={darkMode} />
       <AboutPage toggleTheme={toggleTheme} darkMode={darkMode} />
+      <SelectedProjects darkMode={darkMode} />
       <Footer />
     </>
   );
