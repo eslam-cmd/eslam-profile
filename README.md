@@ -34,8 +34,7 @@ Full-stack school management platform built with strict Role-Based Access Contro
 **Backend:** Node.js · NestJS · Express.js · RESTful APIs · Background Jobs (Redis)
 **Databases & ORM:** PostgreSQL · Prisma · TypeORM · Supabase  
 **Security & Architecture:** RBAC · JWT (Access & Refresh Tokens) · 2FA (OTP) · Rate Limiting · System Design
-**DevOps & Tools:** Docker · Git · GitHub · Caddy · Linux
-
+**DevOps & Tools:** Docker · Git · GitHub 
 ---
 
 ## 🎯 About Me
