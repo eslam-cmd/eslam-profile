@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?logo=typescript)](https://www.typescriptlang.org)
 
 > Full-Stack Developer specializing in **Next.js, NestJS, Express, PostgreSQL, and System Architecture**.  
-> Passionate about modern UI/UX design and scalable backend systems. Open to remote roles and relocation to **Canada 🇨🇦**.
+> Passionate about modern UI/UX design and scalable backend systems.
 
 ---
 
@@ -14,7 +14,7 @@
 
 ### 1. ScanLens — Automated Security Posture Analysis (SaaS)
 
-Production-ready security audit platform that runs non-invasive web scans (SSL/TLS, HTTP Security Headers, CORS, and Cookie flags)[cite: 1]. Integrated with AI-driven remediation to provide contextual fix instructions and code snippets[cite: 1]. Features a tiered licensing engine (Free / Pro / Extra) with background processing and admin analytics[cite: 1].
+Production-ready security audit platform that runs non-invasive web scans (SSL/TLS, HTTP Security Headers, CORS, and Cookie flags)[cite: 1]. Integrated with AI-driven remediation to provide contextual fix instructions and code snippets. Features a tiered licensing engine (Free / Pro / Extra) with background processing and admin analytics.
 
 **Stack:** Next.js 15 · TypeScript · NestJS · Prisma · PostgreSQL · Redis · Google Gemini API  
 **Links:** [Live Demo](https://scan-lens-client.vercel.app) · [Source Code](https://github.com/eslam-cmd/scan-lens-client)
@@ -52,19 +52,3 @@ Full-stack school management platform built with strict Role-Based Access Contro
 - **Email:** [hdayaaslam34@gmail.com](mailto:hdayaaslam34@gmail.com)
 - **LinkedIn:** [Islam Hadaya](https://www.linkedin.com/in/Islam-hadaya)
 - **GitHub:** [@eslam-cmd](https://github.com/eslam-cmd)
-
----
-
-## 🏗️ Run Locally
-
-```bash
-# Clone the repository
-git clone [https://github.com/eslam-cmd/eslam-profile.git](https://github.com/eslam-cmd/eslam-profile.git)
-
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-
-# Open http://localhost:3000
