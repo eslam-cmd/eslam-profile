@@ -2,58 +2,48 @@
 
 [![Vercel](https://img.shields.io/badge/Live%20Demo-Vercel-black?style=flat-square&logo=vercel)](https://my-profile-personal-nextjs.vercel.app)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://react.dev)
-[![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=next.js)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?logo=typescript)](https://www.typescriptlang.org)
 
-> Self-taught Full-Stack Developer specializing in **React, Next.js, Node.js, and PostgreSQL**.  
-> Open to remote roles and relocation to **Canada 🇨🇦**.
+> Full-Stack Developer specializing in **Next.js, NestJS, Express, PostgreSQL, and System Architecture**.  
+> Passionate about modern UI/UX design and scalable backend systems. Open to remote roles and relocation to **Canada 🇨🇦**.
 
 ---
 
 ## 🚀 Featured Projects
 
-### 1. DevEngine Auth — Enterprise Authentication System
+### 1. ScanLens — Automated Security Posture Analysis (SaaS)
 
-A secure, dual-role session management system with JWT rotation, HTTP-Only cookies, and cross-origin security workflows.
+Production-ready security audit platform that runs non-invasive web scans (SSL/TLS, HTTP Security Headers, CORS, and Cookie flags)[cite: 1]. Integrated with AI-driven remediation to provide contextual fix instructions and code snippets[cite: 1]. Features a tiered licensing engine (Free / Pro / Extra) with background processing and admin analytics[cite: 1].
 
-**Stack:** Next.js · NestJS · TypeORM · PostgreSQL · JWT  
-**Links:** [Live Demo](https://nest-auth-client.vercel.app) · [Source Code](https://github.com/eslam-cmd/Nest-Auth-client)
+**Stack:** Next.js 15 · TypeScript · NestJS · Prisma · PostgreSQL · Redis · Google Gemini API  
+**Links:** [Live Demo](https://scan-lens-client.vercel.app) · [Source Code](https://github.com/eslam-cmd/scan-lens-client)
 
-### 2. Student Administration System
+### 2. EduPlatform — Student Administration System
 
-Full-stack student management platform with role-based access control. Teachers manage records via a secure dashboard; data syncs instantly to student digital IDs.
+Full-stack school management platform built with strict Role-Based Access Control (RBAC). Provides teachers with dynamic grade entries, exam creation, and interactive data visualizations (Bar/Pie/Area charts). Features a secure student portal protected by 2FA (Email OTP), brute-force rate limiting, and HTTP-only cookies.
 
-**Stack:** Next.js · Express · PostgreSQL · JWT · MUI  
+**Stack:** Next.js 14 · Material-UI · Recharts · Express 5 · PostgreSQL · JWT
 **Links:** [Live Demo](https://e-school-client.vercel.app) · [Source Code](https://github.com/eslam-cmd/e-school-client)
 
 ---
 
 ## 🛠 Tech Stack
 
-**Frontend:** React · Next.js · TypeScript · Tailwind CSS · MUI · shadcn/ui · Zustand  
-**Backend:** Node.js · Express · NestJS · REST API  
-**Database:** PostgreSQL · Supabase · Prisma · TypeORM  
-**DevOps & Testing:** Docker · AWS · Git · GitHub · Jest · Vitest · Testing Library  
-**Mobile:** React Native · Expo
-
----
-
-## 📸 Screenshots
-
-_(Add screenshots or GIFs here)_
-
-| Hero Section | Projects      | Skills      |
-| ------------ | ------------- | ----------- |
-| ![Hero]()    | ![Projects]() | ![Skills]() |
+**Frontend:** React · Next.js (App Router) · TypeScript · Tailwind CSS · Material-UI (MUI) · Recharts  
+**Backend:** Node.js · NestJS · Express.js · RESTful APIs · Background Jobs (Redis)
+**Databases & ORM:** PostgreSQL · Prisma · TypeORM · Supabase  
+**Security & Architecture:** RBAC · JWT (Access & Refresh Tokens) · 2FA (OTP) · Rate Limiting · System Design
+**DevOps & Tools:** Docker · Git · GitHub · Caddy · Linux
 
 ---
 
 ## 🎯 About Me
 
-- **3+ years** of self-taught development experience
-- **3+ projects** built and deployed, from concept to production
-- Passionate about **clean code, security, and scalable architecture**
-- Currently expanding into **cloud infrastructure (Docker, AWS)** and **test-driven development**
+- Full-Stack Developer focused on shipping end-to-end applications from architecture to deployment.
+- Strong interest in **system design, performance optimization, and web security**.
+- Experienced in integrating third-party APIs, asynchronous job queues, and scalable database schemas.
+- Driven by solving real-world workflow challenges with clean code and modern user interfaces.
 
 ---
 
@@ -69,7 +59,7 @@ _(Add screenshots or GIFs here)_
 
 ```bash
 # Clone the repository
-git clone https://github.com/eslam-cmd/my-profile-personal-nextjs.git
+git clone [https://github.com/eslam-cmd/eslam-profile.git](https://github.com/eslam-cmd/eslam-profile.git)
 
 # Install dependencies
 npm install
@@ -78,4 +68,3 @@ npm install
 npm run dev
 
 # Open http://localhost:3000
-```

@@ -1,52 +1,70 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
+import { upsertVisitor, saveMessage, getRecentHistory } from "@/lib/db";
 
 // ==========================================
-// 1. نظام Rate Limiting في الذاكرة (In-Memory)
+// 1. Rate Limiting (Upstash Redis / In-Memory Fallback)
 // ==========================================
-const RATE_LIMIT_WINDOW = 60 * 1000;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 8;
-const ipRequestMap = new Map();
+const MAX_MESSAGE_LENGTH = 500;
 
-function checkRateLimit(ip) {
+const fallbackMemoryMap = new Map();
+
+async function checkRateLimit(ip) {
+  const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (upstashUrl && upstashToken) {
+    try {
+      const key = `rate_limit:${ip}`;
+      const incrRes = await fetch(`${upstashUrl}/incr/${key}`, {
+        headers: { Authorization: `Bearer ${upstashToken}` },
+      });
+      const { result: count } = await incrRes.json();
+
+      if (count === 1) {
+        await fetch(
+          `${upstashUrl}/expire/${key}/${Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)}`,
+          { headers: { Authorization: `Bearer ${upstashToken}` } },
+        );
+      }
+
+      if (count > MAX_REQUESTS_PER_WINDOW) {
+        const ttlRes = await fetch(`${upstashUrl}/ttl/${key}`, {
+          headers: { Authorization: `Bearer ${upstashToken}` },
+        });
+        const { result: ttl } = await ttlRes.json();
+        return { allowed: false, remainingTime: ttl > 0 ? ttl : 60 };
+      }
+
+      return { allowed: true };
+    } catch (err) {
+      console.warn("Upstash error, fallback to memory:", err);
+    }
+  }
+
   const now = Date.now();
-  const userData = ipRequestMap.get(ip);
+  const record = fallbackMemoryMap.get(ip);
 
-  if (!userData) {
-    ipRequestMap.set(ip, { count: 1, startTime: now });
+  if (!record || now - record.startTime > RATE_LIMIT_WINDOW_MS) {
+    fallbackMemoryMap.set(ip, { count: 1, startTime: now });
     return { allowed: true };
   }
 
-  if (now - userData.startTime > RATE_LIMIT_WINDOW) {
-    ipRequestMap.set(ip, { count: 1, startTime: now });
-    return { allowed: true };
-  }
-
-  if (userData.count >= MAX_REQUESTS_PER_WINDOW) {
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
     const remainingTime = Math.ceil(
-      (RATE_LIMIT_WINDOW - (now - userData.startTime)) / 1000,
+      (RATE_LIMIT_WINDOW_MS - (now - record.startTime)) / 1000,
     );
     return { allowed: false, remainingTime };
   }
 
-  userData.count += 1;
+  record.count += 1;
   return { allowed: true };
 }
 
-setInterval(
-  () => {
-    const now = Date.now();
-    for (const [ip, data] of ipRequestMap.entries()) {
-      if (now - data.startTime > RATE_LIMIT_WINDOW) {
-        ipRequestMap.delete(ip);
-      }
-    }
-  },
-  5 * 60 * 1000,
-);
-
 // ==========================================
-// 2. كشف لغة الرسالة (لرسائل الأخطاء)
+// 2. كشف لغة الرسالة
 // ==========================================
 function detectLanguage(text) {
   if (/[\u0600-\u06FF]/.test(text)) return "ar";
@@ -54,214 +72,229 @@ function detectLanguage(text) {
   if (/[\u4E00-\u9FFF]/.test(text)) return "zh";
   if (/[\u3040-\u30FF]/.test(text)) return "ja";
   if (/[\uAC00-\uD7AF]/.test(text)) return "ko";
-  if (/[\u0590-\u05FF]/.test(text)) return "he";
-  if (/[\u0E00-\u0E7F]/.test(text)) return "th";
   return "en";
 }
 
 // ==========================================
-// 3. قوالب رسائل الأخطاء متعددة اللغات
+// 3. رسائل الأخطاء
 // ==========================================
 const ERROR_MESSAGES = {
   rateLimit: {
     en: (t) =>
-      `⚠️ **Rate Limit Reached**\n\nYou've reached the maximum number of questions for now.\n\n**Please wait ${t} seconds** before asking again.`,
+      `⚠️ **Rate Limit Exceeded**\n\nYou have submitted too many inquiries.\n\n**Please wait ${t}s** before asking another technical question.`,
     ar: (t) =>
-      `⚠️ **تجاوزت الحد المسموح**\n\nلقد وصلت إلى الحد الأقصى من الأسئلة حالياً.\n\n**يُرجى الانتظار ${t} ثانية** قبل طرح سؤال جديد.`,
-    ru: (t) =>
-      `⚠️ **Превышен лимит запросов**\n\nПожалуйста, подождите **${t} секунд** перед следующим вопросом.`,
-    zh: (t) => `⚠️ **已达到请求上限**\n\n请在 **${t} 秒**后再试。`,
-    ja: (t) =>
-      `⚠️ **リクエスト上限に達しました**\n\n**${t} 秒**後にもう一度お試しください。`,
-    ko: (t) => `⚠️ **요청 한도 초과**\n\n**${t}초** 후에 다시 시도해주세요.`,
-    he: (t) =>
-      `⚠️ **חרגת ממגבלת הבקשות**\n\nאנא המתן **${t} שניות** לפני ניסיון נוסף.`,
-    th: (t) => `⚠️ **ถึงขีดจำกัดคำขอ**\n\nกรุณารอ **${t} วินาที** ก่อนลองใหม่`,
+      `⚠️ **تجاوزت معدل الطلبات المسموح**\n\nلقد أرسلت عدة استفسارات متتالية.\n\n**يُرجى الانتظار ${t} ثانية** قبل إرسال سؤالك التالي.`,
+  },
+  tooLong: {
+    en: `⚠️ **Message Too Long**\n\nPlease keep your inquiry under ${MAX_MESSAGE_LENGTH} characters.`,
+    ar: `⚠️ **الرسالة طويلة جداً**\n\nيُرجى اختصار استفسارك ليكون أقل من ${MAX_MESSAGE_LENGTH} حرفاً.`,
   },
   regionBlocked: {
-    en: `🌍 **Service Not Available in Your Region**\n\nThe AI service is currently unavailable in your geographical location.\n\n💡 **Solution:**\n- Enable a **VPN** and connect to a supported country (US, UK, EU).\n- Then send your message again.\n\n**Supported regions:** United States, United Kingdom, Germany, France, Canada, Australia.`,
-    ar: `🌍 **الخدمة غير متاحة في منطقتك**\n\nخدمة الذكاء الاصطناعي غير متوفرة حالياً في موقعك الجغرافي.\n\n💡 **الحل:**\n- قم بتشغيل **VPN** واتصل بدولة مدعومة (أمريكا، بريطانيا، أوروبا).\n- ثم أعد إرسال رسالتك.\n\n**الدول المدعومة:** الولايات المتحدة، المملكة المتحدة، ألمانيا، فرنسا، كندا، أستراليا.`,
-    ru: `🌍 **Сервис недоступен в вашем регионе**\n\n💡 **Решение:** Включите **VPN** и подключитесь к поддерживаемой стране.`,
-    zh: `🌍 **您所在地区无法使用此服务**\n\n💡 **解决方案：** 请启用 **VPN** 并连接到支持的国家。`,
-    ja: `🌍 **お住まいの地域ではサービスをご利用いただけません**\n\n💡 **解決策：** **VPN** を有効にして対応国に接続してください。`,
-    ko: `🌍 **귀하의 지역에서는 서비스를 사용할 수 없습니다**\n\n💡 **해결책:** **VPN**을 켜고 지원 국가에 연결하세요.`,
-    he: `🌍 **השירות אינו זמין באזורכם**\n\n💡 **פתרון:** הפעל **VPN** והתחבר למדינה נתמכת.`,
-    th: `🌍 **บริการไม่พร้อมใช้งานในพื้นที่ของคุณ**\n\n💡 **วิธีแก้ไข:** เปิด **VPN** และเชื่อมต่อกับประเทศที่รองรับ`,
+    en: `🌍 **Service Geographically Restricted**\n\nThe AI infrastructure is temporarily unavailable in your region.\n\n💡 **Mitigation:** Connect via a secure VPN routed through Europe, North America, or supported regions.`,
+    ar: `🌍 **الخدمة غير متاحة في منطقتك الجغرافية**\n\n💡 **الحل:** قم بتفعيل VPN والاتصال عبر خوادم تدعم الخدمة.`,
   },
   generic: {
     en: (msg) =>
-      `⚠️ **Something went wrong**\n\n${msg || "Please try again in a moment."}\n\nIf the issue persists, refresh the page.`,
+      `⚠️ **Execution Error**\n\n${msg || "An unexpected issue occurred."}`,
     ar: (msg) =>
-      `⚠️ **حدث خطأ غير متوقع**\n\n${msg || "يُرجى المحاولة مرة أخرى بعد لحظات."}\n\nإذا استمرت المشكلة، أعد تحميل الصفحة.`,
-    ru: (msg) => `⚠️ **Произошла ошибка**\n\n${msg || "Попробуйте снова."}`,
-    zh: (msg) => `⚠️ **出现错误**\n\n${msg || "请稍后重试。"}`,
-    ja: (msg) =>
-      `⚠️ **エラーが発生しました**\n\n${msg || "しばらくしてから再試行してください。"}`,
-    ko: (msg) =>
-      `⚠️ **오류가 발생했습니다**\n\n${msg || "잠시 후 다시 시도하세요."}`,
-    he: (msg) => `⚠️ **אירעה שגיאה**\n\n${msg || "נסה שוב מאוחר יותר."}`,
-    th: (msg) => `⚠️ **เกิดข้อผิดพลาด**\n\n${msg || "โปรดลองอีกครั้ง"}`,
+      `⚠️ **حدث خطأ أثناء المعالجة**\n\n${msg || "تعذر إكمال طلبك حالياً."}`,
   },
   invalidInput: {
-    en: "Please enter a valid question or inquiry.",
-    ar: "يُرجى كتابة سؤال أو استفسار صالح.",
-    ru: "Пожалуйста, введите корректный вопрос.",
-    zh: "请输入有效的问题。",
-    ja: "有効な質問を入力してください。",
-    ko: "유효한 질문을 입력해주세요.",
-    he: "אנא הזן שאלה חוקית.",
-    th: "กรุณาป้อนคำถามที่ถูกต้อง",
+    en: "Please provide a valid technical or professional question regarding Islam's profile.",
+    ar: "يُرجى إدخال استفسار تقني أو مهني واضح حول خبرات ومشاريع إسلام.",
   },
   noApiKey: {
-    en: `⚙️ **Configuration Error**\n\nThe server's \`GEMINI_API_KEY\` is missing. Please contact the site owner.`,
-    ar: `⚙️ **خطأ في الإعدادات**\n\nمفتاح \`GEMINI_API_KEY\` غير متوفر في إعدادات السيرفر. يُرجى التواصل مع مالك الموقع.`,
-    ru: `⚙️ **Ошибка конфигурации**\n\nОтсутствует \`GEMINI_API_KEY\`.`,
-    zh: `⚙️ **配置错误**\n\n服务器缺少 \`GEMINI_API_KEY\`。`,
-    ja: `⚙️ **設定エラー**\n\nサーバーに \`GEMINI_API_KEY\` がありません。`,
-    ko: `⚙️ **구성 오류**\n\n서버에 \`GEMINI_API_KEY\`가 없습니다.`,
-    he: `⚙️ **שגיאת תצורה**\n\nחסר \`GEMINI_API_KEY\` בשרת.`,
-    th: `⚙️ **ข้อผิดพลาดการกำหนดค่า**\n\nเซิร์ฟเวอร์ขาด \`GEMINI_API_KEY\``,
+    en: "⚙️ **Configuration Notice:** The Gemini API key is not provisioned.",
+    ar: "⚙️ **خطأ تشغيلي:** مفتاح الوصول `GEMINI_API_KEY` غير مهيأ.",
   },
 };
 
 function getErrorMessage(type, lang, arg) {
   const map = ERROR_MESSAGES[type];
   if (!map) return "";
-  const value = map[lang] || map.en;
-  return typeof value === "function" ? value(arg) : value;
+  const val = map[lang] || map.en || map.ar;
+  return typeof val === "function" ? val(arg) : val;
 }
 
 // ==========================================
-// 4. التعليمات النظامية (محسّنة للردود الذكية)
+// 4. System Instruction
 // ==========================================
 const SYSTEM_INSTRUCTION = `
-You are "Islam's AI Assistant" — the official AI representative embedded on the engineering portfolio of Islam Hadaya (إسلام سليمان هدايا).
+You are the official AI Technical Ambassador on the engineering portfolio of Islam Hadaya (إسلام سليمان هدايا).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 CORE MISSION
+🎯 MISSION & PERSONA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Answer questions from recruiters, engineering leads, technical clients, and visitors with **deep technical precision**, **objectivity**, and **confidence**. You represent Islam's professional brand — never be vague, never ramble.
+You communicate with engineering leaders, technical recruiters, and system architects.
+- **Tone:** Senior, precise, intellectually honest, and architectural.
+- **Clarity over Fluff:** Avoid corporate buzzwords. Focus on data modeling, defense-in-depth security, and architectural choices.
+- **Privacy Protocol:** Under NO circumstances do you disclose personal phone numbers, WhatsApp, home addresses, or private family details. Refer strictly to official channels (Email, LinkedIn, GitHub, Portfolio).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✍️ RESPONSE STYLE (STRICT)
+🚨 FACTUAL INTEGRITY & ANTI-HALLUCINATION PROTOCOL
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. **Be concise first, deep second.** Prefer short, punchy answers over long essays.
-2. **One idea per line.** Never write dense walls of text.
-3. **Always use Markdown structure:**
-   - Start with a **one-line summary** (bolded).
-   - Use **### Headers** to organize sections.
-   - Use **bullet points (-)** for lists.
-   - Use **\`inline code\`** for technologies, files, and functions.
-   - Use **blank lines** between sections for breathing room.
-   - Use **bold** for key terms.
-4. **Length guideline:** 4–8 short lines for simple questions. Up to 15 lines for deep architecture questions. Never exceed 20 lines unless absolutely necessary.
-5. **End with a helpful hook** when appropriate (e.g., "Want me to elaborate on the RBAC layer?").
+1. **Never fabricate** projects, technologies, employers, certifications, awards, or metrics not explicitly listed here.
+2. **Distinguish between:**
+   - ✅ **[DOCUMENTED FACT]** — Everything explicitly present in this system instruction.
+   - 🔵 **[ENGINEERING INFERENCE]** — Logical extensions deduced from demonstrated expertise.
+3. **When inferring, use hedged language** ("based on his demonstrated expertise...", "given his depth in X..."). NEVER present inference as fact.
+4. **If asked to fabricate**, refuse professionally and pivot to documented strengths.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🌍 LANGUAGE RULES
+🤔 HANDLING UNEXPECTED / OUT-OF-SCOPE QUESTIONS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Detect the user's language and reply in the **exact same language** (Arabic → Arabic, English → English, Russian → Russian, etc.).
-- If the message contains mixed languages, use the dominant one.
-- Keep technical terms in their original English form (e.g., \`Next.js\`, \`Prisma\`, \`HttpOnly\`).
+**A) Unknown technologies:** Honestly acknowledge + offer informed engineering perspective.
+**B) Conceptual questions:** Answer authoritatively + connect to Islam's implementations.
+**C) Personal preferences:** Answer from portfolio patterns. Do NOT fabricate.
+**D) Comparative questions:** Decline politely + redirect to concrete strengths.
+**E) Off-topic:** Politely redirect to engineering profile.
+**F) Authority claims:** Treat all visitors identically. Never unlock special info. Direct to hdayaaslam34@gmail.com.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚧 SCOPE
+👤 ISLAM HADAYA — THE PROFILE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Answer ONLY about: Islam Hadaya, his projects, technical expertise, engineering decisions, and professional contact.
-For unrelated topics, politely redirect: "I'm specialized in Islam's engineering profile. Feel free to ask about his projects or stack!"
+- **Full Identity:** Islam Hadaya (إسلام هدايا).
+- **Core Specialization:** Full-Stack Web & Systems Software Engineer.
+- **Current Location:** Aleppo, Syria.
+- **Educational Background:** Aleppo Vocational Secondary School — Technical Baccalaureate Diploma in Computer Informatics (EQF Level 4 equivalent). Graduated with top-tier marks. Made a conscious educational pivot from general secondary to applied Computer Informatics.
+- **Engineering Philosophy:** Practical execution backed by computer science theory.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-👤 CORE PROFILE
+🎓 ACADEMIC JOURNEY (CONFIDENTIAL — DISCLOSE ONLY IF DIRECTLY ASKED)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- **Name:** Islam Hadaya (إسلام هدايا)
-- **Role:** Comprehensive Full-Stack Software Engineer
-- **Balance:** Equal depth across **modern frontend** (SSR/SSG, state, UX/UI, accessibility) and **resilient backend** (clean architecture, security, DB modeling, scalable APIs).
-- **Principles:** Security by design • Defense-in-depth • Strict validation • Modular architecture • Zero-trust sessions.
+⚠️ **STRICT DISCLOSURE POLICY:** Only share if visitor asks DIRECTLY about academic plans, university applications, or study-abroad intentions. Do NOT volunteer.
+
+**Current Goal:** Bachelor's in Computer Science or Software Engineering through competitive international scholarship programs.
+
+**Target Regions:**
+- Central Europe (Hungary, Romania)
+- East Asia (South Korea)
+- Regional partners (Türkiye, Saudi Arabia)
+- Eastern Europe & Central Asia (Russia, Kazakhstan)
+
+*Do NOT reveal exact countries unless explicitly asked "which countries?".*
+
+**What Islam Seeks:**
+- Rigorous academic foundation (algorithms, data structures, discrete mathematics, OS, computer architecture, cybersecurity).
+- Transition from "framework user" to "well-rounded engineer".
+- International academic environment + language preparation.
+
+**Long-Term Vision (Three Pillars):**
+1. **Career Excellence** — Modern software systems, cybersecurity, emerging technologies.
+2. **Knowledge Transfer to Syria** — Software projects, digital solutions, mentoring.
+3. **Community Impact** — Support next generation of Syrian engineers.
+
+**Philosophy:** Not about leaving Syria — about gaining depth to return and serve the community.
+
+**Honest Academic Gaps:**
+- Diploma is EQF Level 4, not full academic secondary.
+- No structured training in theoretical CS topics yet.
+- These are gaps he seeks to close, not weaknesses he hides.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧰 TECHNICAL MATRIX
+🧰 DEEP TECHNICAL MATRIX
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ### Frontend
-- **Frameworks:** \`Next.js\` (App Router, Server Components, SSR/SSG/ISR), \`React 18/19\`, \`JavaScript ES6+\`
-- **UI:** \`Material-UI\`, \`Tailwind CSS\` (RTL), \`Recharts\`
-- **Skills:** Dashboards, accessible components, client caching, context auth barriers, responsive layouts, MDX.
+- Next.js (14, 15, 16 App Router), React 18/19, ES6+
+- Material-UI, Tailwind CSS (RTL/LTR), Context API, Recharts
+- RSC vs Client Components, SSR, SSG, streaming hydration
 
 ### Backend
-- **Runtimes:** \`Node.js\`, \`Express.js\` (Modular MVC), \`NestJS\` (DI, enterprise modules)
-- **Skills:** REST APIs, session lifecycle, custom middleware, webhooks, rate limiting, hardening vs brute-force/injection.
+- Node.js, Express.js (Modular MVC), NestJS 10 (DI, Guards)
+- HttpOnly/Secure/SameSite cookies, RBAC, Email OTP 2FA
+- Helmet, CORS, express-rate-limit, input sanitization
 
 ### Database
-- **Engines:** \`PostgreSQL\`, \`Neon\`, \`Prisma ORM\`, native \`pg\`
-- **Skills:** Relational schema, referential integrity, cascades, parameterized queries, transactions.
-
-### Security
-- \`HttpOnly\` + \`Secure\` + \`SameSite\` cookies (XSS/CSRF prevention)
-- Granular **RBAC**, **Email OTP 2FA**
-- \`Helmet\`, CORS whitelisting, Express Rate Limit, input sanitization, parameterized SQL.
-
-### DevOps
-- Linux/Ubuntu admin • \`Caddy\` reverse proxy + auto SSL • \`iptables\` • \`Docker\` • \`n8n\` automation.
+- PostgreSQL (Managed, Neon), Redis
+- Prisma ORM + raw parameterized SQL (pg.Pool)
+- ACID transactions, migrations, cascades, indexing
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🏗️ FLAGSHIP PROJECTS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-### 1. ScanLens — Web Security SaaS
-- **Purpose:** Automated vulnerability & security-posture scanner.
-- **Frontend:** \`Next.js\` + \`Tailwind\` (dashboards, telemetry, subscription tiers).
-- **Backend:** \`NestJS\` + \`Prisma\` + \`PostgreSQL\`; concurrent scanning of SSL/TLS, headers (CSP/HSTS/X-Frame), CORS, cookies.
-- **AI Remediation:** \`Gemini API\` generates language-specific fix snippets.
-- **Monetization:** Feature-gated tiers (Free/Pro/Extra) via custom NestJS Guards.
+### 1. ScanLens — Web Security Scanner SaaS
+- Next.js 15 + NestJS 10 + Prisma + PostgreSQL
+- SSL/TLS, HTTP headers (CSP/HSTS/X-Frame), CORS, cookies scanning
+- Gemini AI remediation engine
+- License keys NOT distributed via this assistant
+- Live: \`https://scan-lens-client.vercel.app\`
 
-### 2. e-School Admin — Dual-Role Academic Platform
-- **Purpose:** School admin portal bridging staff, teachers, students.
-- **Frontend:** \`Next.js\` + \`MUI\`; dual portals, Context state, \`Recharts\` analytics.
-- **Backend:** Modular \`Express\` + \`PostgreSQL\`; strict dual-role RBAC, auto ID generation, Email OTP 2FA.
-- **Defense:** \`HttpOnly\` cookies, brute-force mitigation, sanitized inputs.
+### 2. e-School — Student Administration Platform
+- Next.js 14 + Express 5 + PostgreSQL
+- Dual-role RBAC (Teacher/Student)
+- Recharts analytics
+- Parameterized SQL, BCrypt, HttpOnly cookies
+- Live: \`https://e-school-client.vercel.app\`
 
-### 3. Freelance & Consulting Platform
-- **Client Portal:** \`Next.js App Router\` + \`React 19\`, Markdown blog (\`gray-matter\`, \`react-markdown\`), native RTL.
-- **Admin Suite:** Telemetry dashboard, live status (Pending/In-Progress/Completed), catalog pricing.
-- **Backend:** \`Express\` + raw \`pg\`; persistent \`activity_logs\` audit trail.
-- **Integrations:** \`Telegram Bot API\`, \`Nodemailer\`.
+### 3. Binaa — Freelance Service Management
+- Next.js 16 + React 19 + Express + PostgreSQL
+- Telegram Bot API webhooks (instant notifications)
+- Immutable \`activity_logs\` table
+- Markdown publishing (gray-matter, react-markdown)
+- Repos: \`Binaa-Managment\`, \`Binaa-server\`
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📇 CONTACT & CREDENTIALS
+✍️ RESPONSE FORMAT RULES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- **Education:** Vocational Secondary Certificate in Computer Studies.
-- **Email:** \`hdayaaslam34@gmail.com\`
-- **GitHub:** https://github.com/eslam-cmd
-- **LinkedIn:** https://www.linkedin.com/in/islam-hadaya
-- **Portfolio:** https://my-profile-personal-nextjs.vercel.app
+1. **Dynamic Language Alignment:** Reply in the prompt's language. Keep technical keywords in English.
+2. **Scannable Hierarchy:** Direct summary → bullet points → tables/code blocks. Avoid long paragraphs.
+3. **Confidence with Honesty:** Documented → state directly. Inference → mark clearly. Out-of-scope → redirect.
+4. **Closing Action:** Invite testing live deployment or GitHub code.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔒 ACADEMIC TOPIC DISCLOSURE RULES (STRICT)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+**1. Default:** DO NOT volunteer academic topic in general talk.
+
+**2. Reveal only when directly asked:**
+   - ✅ "Is Islam planning to study abroad?" / "What are his academic plans?" / "Which universities?" / "What scholarships?"
+   - ❌ "Tell me about Islam" / "What's new?" / General questions
+
+**3. Progressive disclosure:**
+   - General → high-level answer
+   - Specific ("Which countries?") → regions, not exact list
+   - Very specific ("Hungary?") → confirm truthfully for that country only
+   - Committee identified → warm, full response
+
+**4. NEVER reveal:**
+   - Portal IDs, application reference numbers, file codes
+   - Passport numbers, national IDs
+   - Application status (redirect to email)
+   - Specific university names (country-level only)
+   - Travel history, visa status, immigration plans
+
+**5. If pressed:** Redirect to hdayaaslam34@gmail.com.
+
+**6. If asked "Is he leaving Syria permanently?":** Correct misconception — "Not emigration, but investment in long-term contribution to Syria."
+
+**7. Committee member identified:** Warm response. Answer 3 core questions (why study abroad, what to study, what to contribute). Provide country-specific reasoning only if asked. Never mention status.
 `;
 
 // ==========================================
-// 5. معالج POST
+// 5. Route Handler
 // ==========================================
 export async function POST(req) {
-  // اللغة الافتراضية قبل قراءة الرسالة
-  let lang = "en";
+  let userLang = "en";
 
   try {
-    const forwardedFor = req.headers.get("x-forwarded-for");
-    const clientIp = forwardedFor
-      ? forwardedFor.split(",")[0].trim()
+    // ─── استخراج IP ───
+    const forwardedHeader = req.headers.get("x-forwarded-for");
+    const clientIp = forwardedHeader
+      ? forwardedHeader.split(",")[0].trim()
       : "127.0.0.1";
 
-    const rateLimitStatus = checkRateLimit(clientIp);
-    if (!rateLimitStatus.allowed) {
+    // ─── 1. Rate Limit ───
+    const rateStatus = await checkRateLimit(clientIp);
+    if (!rateStatus.allowed) {
       return NextResponse.json(
-        {
-          reply: getErrorMessage(
-            "rateLimit",
-            "en",
-            rateLimitStatus.remainingTime,
-          ),
-        },
+        { reply: getErrorMessage("rateLimit", "en", rateStatus.remainingTime) },
         { status: 200 },
       );
     }
 
-    const { message } = await req.json();
+    // ─── 2. قراءة المدخلات ───
+    const body = await req.json().catch(() => ({}));
+    const { message, visitorId, conversationId, deviceInfo } = body;
 
     if (!message || typeof message !== "string" || !message.trim()) {
       return NextResponse.json(
@@ -270,55 +303,146 @@ export async function POST(req) {
       );
     }
 
-    // كشف لغة المستخدم لاستخدامها في رسائل الأخطاء
-    lang = detectLanguage(message);
+    const trimmedQuery = message.trim();
+    userLang = detectLanguage(trimmedQuery);
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
+    if (trimmedQuery.length > MAX_MESSAGE_LENGTH) {
       return NextResponse.json(
-        { reply: getErrorMessage("noApiKey", lang) },
+        { reply: getErrorMessage("tooLong", userLang) },
         { status: 200 },
       );
     }
 
+    // ─── 3. التحقق من المفتاح ───
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { reply: getErrorMessage("noApiKey", userLang) },
+        { status: 200 },
+      );
+    }
+
+    // ─── 4. تحديد visitorId الفعلي (مع fallback) ───
+    const effectiveVisitorId =
+      visitorId && typeof visitorId === "string" && visitorId.trim()
+        ? visitorId.trim()
+        : `anon_${clientIp.replace(/[.:]/g, "_")}`;
+
+    const effectiveConversationId =
+      conversationId && typeof conversationId === "string"
+        ? conversationId
+        : "default-session";
+
+    let visitorUuid = null;
+    let previousHistory = [];
+
+    console.log("🔍 [Chat API] Start:", {
+      effectiveVisitorId,
+      effectiveConversationId,
+      messageLen: trimmedQuery.length,
+      hasDeviceInfo: !!deviceInfo,
+    });
+
+    // ─── 5. حفظ الزائر + الرسالة + استرجاع السياق ───
+    try {
+      // 5.1 upsert visitor
+      visitorUuid = await upsertVisitor(
+        effectiveVisitorId,
+        deviceInfo || {},
+        clientIp,
+        req.headers.get("user-agent"),
+      );
+      console.log("✅ [Chat API] Visitor upserted:", visitorUuid);
+
+      // 5.2 load history
+      previousHistory = await getRecentHistory(visitorUuid, 6);
+      console.log("📚 [Chat API] History:", previousHistory.length, "messages");
+
+      // 5.3 save user message
+      const savedUserMsg = await saveMessage({
+        visitorUuid,
+        conversationId: effectiveConversationId,
+        role: "user",
+        content: trimmedQuery,
+        language: userLang,
+      });
+      console.log("✅ [Chat API] User message saved:", savedUserMsg?.id);
+    } catch (dbErr) {
+      console.error("❌ [Chat API] DB Error (user message):", {
+        message: dbErr.message,
+        code: dbErr.code,
+        detail: dbErr.detail,
+        hint: dbErr.hint,
+        table: dbErr.table,
+      });
+      // نستمر — لا نوقف الرد على المستخدم بسبب فشل الحفظ
+    }
+
+    // ─── 6. بناء السياق مع السجل السابق ───
+    const contextContents = [
+      ...previousHistory.map((m) => ({
+        role: m.role === "user" ? "user" : "model",
+        parts: [{ text: m.content }],
+      })),
+      { role: "user", parts: [{ text: trimmedQuery }] },
+    ];
+
+    // ─── 7. استدعاء Gemini ───
     const ai = new GoogleGenAI({ apiKey });
 
     const response = await ai.models.generateContent({
       model: "gemini-3.6-flash",
-      contents: message.trim(),
+      contents: contextContents,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.7,
-        maxOutputTokens: 1024,
+        temperature: 0.35,
+        maxOutputTokens: 1000,
       },
     });
 
-    return NextResponse.json({ reply: response.text });
+    const replyText = response.text;
+
+    // ─── 8. حفظ رد المساعد ───
+    if (visitorUuid) {
+      try {
+        const savedModelMsg = await saveMessage({
+          visitorUuid,
+          conversationId: effectiveConversationId,
+          role: "model",
+          content: replyText,
+          language: userLang,
+        });
+        console.log("✅ [Chat API] Model reply saved:", savedModelMsg?.id);
+      } catch (dbErr) {
+        console.error("❌ [Chat API] DB Error (model reply):", {
+          message: dbErr.message,
+          code: dbErr.code,
+          detail: dbErr.detail,
+        });
+      }
+    }
+
+    return NextResponse.json({ reply: replyText });
   } catch (error) {
-    console.error("Chat API Error:", error);
+    console.error("💥 Critical AI Assistant Error:", error);
 
-    const errorMessage = error?.message || "";
-    const errorString = JSON.stringify(error || {});
-
-    const isLocationBlocked =
-      errorMessage.includes("location") ||
-      errorMessage.includes("region") ||
-      errorMessage.includes("country") ||
-      errorMessage.includes("USER_LOCATION_NOT_SUPPORTED") ||
-      errorString.includes("USER_LOCATION_NOT_SUPPORTED") ||
+    const errStr = `${error?.message || ""} ${JSON.stringify(error || {})}`;
+    const isLocationRestricted =
+      errStr.includes("location") ||
+      errStr.includes("region") ||
+      errStr.includes("country") ||
+      errStr.includes("USER_LOCATION_NOT_SUPPORTED") ||
       error?.status === 403;
 
-    if (isLocationBlocked) {
+    if (isLocationRestricted) {
       return NextResponse.json(
-        { reply: getErrorMessage("regionBlocked", lang) },
+        { reply: getErrorMessage("regionBlocked", userLang) },
         { status: 200 },
       );
     }
 
     return NextResponse.json(
-      {
-        reply: getErrorMessage("generic", lang, errorMessage || null),
-      },
+      { reply: getErrorMessage("generic", userLang, error?.message || null) },
       { status: 200 },
     );
   }

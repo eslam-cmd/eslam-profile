@@ -21,6 +21,14 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import CheckIcon from "@mui/icons-material/Check";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import {
+  getVisitorId,
+  getDeviceInfo,
+  getConversationId,
+  isRTLText,
+} from "@/lib/visitorClient";
 
 // ============ الثوابت ============
 const INITIAL_MESSAGE = {
@@ -29,7 +37,7 @@ const INITIAL_MESSAGE = {
 
 Ask me anything about his **engineering projects**, **technical stack**, **architecture decisions**, or **professional experience**.
 
-*You can also ask in العربية, Русский, 中文, 日本語, 한국어, or any other language.*`,
+*You can also ask in العربية, Русский, 中文, 日本語, 한국어.*`,
 };
 
 const SUGGESTIONS = [
@@ -39,24 +47,10 @@ const SUGGESTIONS = [
   { label: "What databases does he use?", icon: "🗄️" },
 ];
 
-// ============ كشف اللغة ============
-const detectLang = (text) => {
-  if (/[\u0600-\u06FF]/.test(text)) return "ar";
-  if (/[\u0400-\u04FF]/.test(text)) return "ru";
-  if (/[\u4E00-\u9FFF]/.test(text)) return "zh";
-  if (/[\u3040-\u30FF]/.test(text)) return "ja";
-  if (/[\uAC00-\uD7AF]/.test(text)) return "ko";
-  if (/[\u0590-\u05FF]/.test(text)) return "he";
-  if (/[\u0E00-\u0E7F]/.test(text)) return "th";
-  return "en";
-};
-
-const isRTL = (text) => ["ar", "he"].includes(detectLang(text));
-
 // ============ مكوّن الرسالة ============
 function MessageBubble({ msg, primaryColor, isDark, onCopy }) {
   const [copied, setCopied] = useState(false);
-  const rtl = isRTL(msg.text);
+  const rtl = isRTLText(msg.text);
   const isUser = msg.role === "user";
 
   const handleCopy = async () => {
@@ -70,6 +64,7 @@ function MessageBubble({ msg, primaryColor, isDark, onCopy }) {
 
   return (
     <Box
+      dir={rtl ? "rtl" : "ltr"}
       sx={{
         alignSelf: isUser ? "flex-end" : "flex-start",
         maxWidth: "90%",
@@ -108,6 +103,8 @@ function MessageBubble({ msg, primaryColor, isDark, onCopy }) {
             fontSize: "0.68rem",
             opacity: 0.75,
             mb: 0.6,
+            direction: "ltr",
+            textAlign: isUser ? "right" : "left",
             letterSpacing: "0.3px",
             textTransform: "uppercase",
           }}
@@ -115,29 +112,115 @@ function MessageBubble({ msg, primaryColor, isDark, onCopy }) {
           {isUser ? "You" : "AI Assistant"}
         </Typography>
 
-        <Box
-          sx={{
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-            "& strong, & b": {
-              color: isUser ? "#ffffff" : primaryColor,
-              fontWeight: 700,
-            },
-            "& code": {
-              backgroundColor: isDark
-                ? "rgba(0,0,0,0.5)"
-                : "rgba(24, 110, 150, 0.1)",
-              color: isUser ? "#ffffff" : primaryColor,
-              padding: "2px 6px",
-              borderRadius: "4px",
-              fontFamily: "'Fira Code', 'Courier New', monospace",
-              fontSize: "0.82em",
-              fontWeight: 500,
-            },
-          }}
-        >
-          {msg.text}
-        </Box>
+        {isUser ? (
+          // رسائل المستخدم: نص عادي
+          <Box sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+            {msg.text}
+          </Box>
+        ) : (
+          // رسائل المساعد: Markdown منسّق
+          <Box
+            sx={{
+              "& > *:first-of-type": { mt: 0 },
+              "& > *:last-child": { mb: 0 },
+              "& p": { m: 0, mb: 1, lineHeight: 1.75, fontSize: "0.88rem" },
+              "& h1, & h2, & h3": {
+                fontSize: "1rem",
+                fontWeight: 700,
+                mt: 1.5,
+                mb: 0.8,
+                color: primaryColor,
+                borderBottom: `1px solid ${alpha(primaryColor, 0.2)}`,
+                pb: 0.4,
+              },
+              "& h4, & h5, & h6": {
+                fontSize: "0.95rem",
+                fontWeight: 700,
+                mt: 1.2,
+                mb: 0.6,
+                color: primaryColor,
+              },
+              "& ul, & ol": { m: 0, my: 0.8, pl: 2.5 },
+              "& li": { fontSize: "0.88rem", lineHeight: 1.75, mb: 0.4 },
+              "& li::marker": { color: primaryColor },
+              "& strong, & b": { fontWeight: 700, color: primaryColor },
+              "& em": { fontStyle: "italic", opacity: 0.9 },
+              "& code": {
+                backgroundColor: isDark
+                  ? "rgba(212, 175, 55, 0.12)"
+                  : "rgba(24, 110, 150, 0.1)",
+                color: primaryColor,
+                px: 0.6,
+                py: 0.2,
+                borderRadius: "4px",
+                fontFamily: "'Fira Code', 'Courier New', monospace",
+                fontSize: "0.85em",
+                fontWeight: 500,
+              },
+              "& pre": {
+                backgroundColor: isDark
+                  ? "rgba(0, 0, 0, 0.4)"
+                  : "rgba(0, 0, 0, 0.05)",
+                p: 1.5,
+                borderRadius: 1.5,
+                overflowX: "auto",
+                my: 1,
+                direction: "ltr",
+                textAlign: "left",
+                "& code": {
+                  backgroundColor: "transparent",
+                  p: 0,
+                  color: "inherit",
+                },
+              },
+              "& a": {
+                color: primaryColor,
+                textDecoration: "underline",
+                "&:hover": { opacity: 0.8 },
+              },
+              "& blockquote": {
+                borderLeft: `3px solid ${primaryColor}`,
+                pl: 1.5,
+                my: 1,
+                opacity: 0.9,
+                fontStyle: "italic",
+              },
+              "& hr": {
+                border: "none",
+                borderTop: `1px solid ${alpha(primaryColor, 0.2)}`,
+                my: 1.5,
+              },
+              "& table": {
+                width: "100%",
+                borderCollapse: "collapse",
+                my: 1,
+                fontSize: "0.85rem",
+              },
+              "& th, & td": {
+                border: `1px solid ${alpha(primaryColor, 0.2)}`,
+                p: 0.8,
+                textAlign: rtl ? "right" : "left",
+              },
+              "& th": {
+                backgroundColor: isDark
+                  ? "rgba(212, 175, 55, 0.08)"
+                  : "rgba(24, 110, 150, 0.06)",
+                fontWeight: 700,
+              },
+            }}
+          >
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                a: ({ node, ...props }) => (
+                  <a {...props} target="_blank" rel="noopener noreferrer" />
+                ),
+              }}
+            >
+              {msg.text}
+            </ReactMarkdown>
+          </Box>
+        )}
       </Box>
 
       {/* زر نسخ الرد */}
@@ -186,16 +269,57 @@ export default function ChatBot() {
   const [messages, setMessages] = useState([INITIAL_MESSAGE]);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ open: false, msg: "" });
+  const [visitorId, setVisitorId] = useState(null);
+  const [conversationId, setConversationId] = useState(null);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
   const primaryColor = isDark ? "#D4AF37" : "#186e96";
 
+  // ─── تهيئة visitorId + conversationId ───
+  useEffect(() => {
+    let mounted = true;
+    Promise.all([getVisitorId(), Promise.resolve(getConversationId())]).then(
+      ([vid, cid]) => {
+        if (mounted) {
+          setVisitorId(vid);
+          setConversationId(cid);
+        }
+      },
+    );
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // ─── استرجاع المحادثة السابقة عند أول فتح ───
+  useEffect(() => {
+    if (!open || !visitorId || historyLoaded) return;
+
+    fetch("/api/chat/history", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ visitorId, limit: 30 }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.messages?.length > 0) {
+          setMessages([INITIAL_MESSAGE, ...data.messages]);
+          setToast({
+            open: true,
+            msg: `Welcome back! ${data.messages.length} messages restored`,
+          });
+        }
+      })
+      .catch(() => {})
+      .finally(() => setHistoryLoaded(true));
+  }, [open, visitorId, historyLoaded]);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // تركيز تلقائي على حقل الإدخال عند الفتح
   useEffect(() => {
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 200);
@@ -205,21 +329,37 @@ export default function ChatBot() {
   const executeSend = async (messageText) => {
     if (!messageText.trim() || loading) return;
 
+    // ✅ إذا لم يُحمَّل visitorId بعد، اطلبه الآن
+    let vid = visitorId;
+    if (!vid) {
+      try {
+        vid = await getVisitorId();
+        setVisitorId(vid);
+      } catch (err) {
+        console.error("❌ Failed to get visitorId:", err);
+        setToast({
+          open: true,
+          msg: "⚠️ Cannot identify visitor. Please refresh.",
+        });
+        return;
+      }
+    }
+
     const userMessage = messageText.trim();
     setInput("");
     setMessages((prev) => [...prev, { role: "user", text: userMessage }]);
     setLoading(true);
 
     try {
-      const history = messages.slice(1).map((m) => ({
-        role: m.role,
-        parts: [{ text: m.text }],
-      }));
-
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage, history }),
+        body: JSON.stringify({
+          message: userMessage,
+          visitorId: vid,
+          conversationId: conversationId || "default-session",
+          deviceInfo: getDeviceInfo(),
+        }),
       });
 
       const data = await res.json();
@@ -234,7 +374,8 @@ export default function ChatBot() {
           },
         ]);
       }
-    } catch {
+    } catch (err) {
+      console.error("❌ Fetch error:", err);
       setMessages((prev) => [
         ...prev,
         {
@@ -250,6 +391,9 @@ export default function ChatBot() {
   const handleReset = () => {
     setMessages([INITIAL_MESSAGE]);
     setInput("");
+    // جلسة جديدة
+    sessionStorage.removeItem("conversation_id");
+    setConversationId(getConversationId());
     setToast({ open: true, msg: "Chat reset successfully" });
   };
 
@@ -617,7 +761,7 @@ export default function ChatBot() {
       {/* إشعار Toast */}
       <Snackbar
         open={toast.open}
-        autoHideDuration={2000}
+        autoHideDuration={2500}
         onClose={() => setToast({ open: false, msg: "" })}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >

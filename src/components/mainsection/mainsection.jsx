@@ -423,6 +423,8 @@ I can help you explore:
             <Button
               variant="contained"
               endIcon={<DownloadIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />}
+              href="/cv/Islam_Hadaya_CV.pdf"
+              download="Islam-Hadaya-CV.pdf"
               sx={{
                 width: { xs: "100%", sm: "auto" },
                 px: { xs: 1.5, sm: 2, md: 2.5 },
