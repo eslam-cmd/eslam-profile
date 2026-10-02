@@ -23,6 +23,14 @@ export const metadata = {
   },
   description:
     "إسلام هدايا، مطور ويب متخصص في بناء منصات SaaS وتطبيقات الويب باستخدام Next.js و Node.js و PostgreSQL. أقدم خدمات تطوير ويب متكاملة للشركات والأفراد في حلب، سوريا والعالم العربي.",
+
+
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
+
   keywords: [
     // الأسم والهوية
     "إسلام هدايا",
