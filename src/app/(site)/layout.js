@@ -24,7 +24,6 @@ export const metadata = {
   description:
     "إسلام هدايا، مطور ويب متخصص في بناء منصات SaaS وتطبيقات الويب باستخدام Next.js و Node.js و PostgreSQL. أقدم خدمات تطوير ويب متكاملة للشركات والأفراد في حلب، سوريا والعالم العربي.",
 
-
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
@@ -218,7 +217,7 @@ export default function RootLayout({ children }) {
               jobTitle: "Full-Stack Web Developer",
               description:
                 "مطور ويب متخصص في بناء منصات SaaS وتطبيقات الويب باستخدام Next.js و Node.js و PostgreSQL",
-              url: "https://your-domain.com",
+              url: "https://eslam-profile.vercel.app",
               sameAs: [
                 "https://github.com/eslam-cmd",
                 "https://www.linkedin.com/in/eslam-hd-60a056357",
@@ -260,8 +259,8 @@ export default function RootLayout({ children }) {
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "إسلام هدايا - مطور ويب",
-              url: "https://your-domain.com",
-              logo: "https://your-domain.com/logo.png",
+              url: "https://eslam-profile.vercel.app",
+              logo: "https://eslam-profile.vercel.app/logo.png",
               description:
                 "خدمات تطوير ويب متكاملة باستخدام Next.js و Node.js و PostgreSQL",
               address: {
