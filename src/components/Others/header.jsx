@@ -25,7 +25,7 @@ export default function Header({ toggleTheme, darkMode }) {
     { name: "SKILLS", link: "#skills" },
     { name: "WORK", link: "#Portfolio" },
     { name: "CONTACT", link: "#contact" },
-    { name: "MY BLOG", link: "https://binaa-chi.vercel.app/blog" },
+    { name: "MY BLOG", link: "https://blog-platform-nine-pi.vercel.app" },
   ];
 
   const handleOpenNavMenu = (event) => {
