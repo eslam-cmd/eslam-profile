@@ -9,12 +9,12 @@ import TwitterIcon from "@mui/icons-material/Twitter";
 import EmailIcon from "@mui/icons-material/Email";
 import { useTheme, alpha } from "@mui/material/styles";
 import { Button, Chip } from "@mui/material";
-import AndroidIcon from "@mui/icons-material/Android";
-import AppleIcon from "@mui/icons-material/Apple";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import CodeIcon from "@mui/icons-material/Code";
+
+const FONT = "'Space Grotesk', 'Inter', system-ui, sans-serif";
 
 export default function Footer() {
   const theme = useTheme();
@@ -25,38 +25,40 @@ export default function Footer() {
   const colors = {
     primary: isDark ? "#D4AF37" : "#186e96",
     onPrimary: isDark ? "#0A1F44" : "#ffffff",
-    text: isDark ? "#F5F5F5" : "#0a1929",
-    textMuted: isDark ? alpha("#F5F5F5", 0.6) : alpha("#0a1929", 0.5),
-    border: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+    text: isDark ? "#F5F5F5" : "#0A1F44",
+    textMuted: isDark ? alpha("#F5F5F5", 0.6) : alpha("#0A1F44", 0.6),
+    border: isDark ? alpha("#ffffff", 0.08) : alpha("#186e96", 0.15),
+    tagBg: isDark ? alpha("#ffffff", 0.03) : alpha("#000000", 0.03),
+    tagBorder: isDark ? alpha("#ffffff", 0.08) : alpha("#000000", 0.08),
+    dotColor: isDark ? "rgba(255,255,255,0.03)" : "rgba(24,110,150,0.06)",
   };
 
   const socials = [
     {
-      icon: <EmailIcon />,
+      icon: <EmailIcon sx={{ fontSize: 20 }} />,
       link: "mailto:hdayaaslam34@gmail.com",
-      color: "#D4AF37",
+      color: isDark ? "#F5F5F5" : "#0A1F44",
+      hoverColor: colors.primary,
     },
-    { icon: <TwitterIcon />, link: "https://twitter.com/", color: "#1DA1F2" },
+    { 
+      icon: <TwitterIcon sx={{ fontSize: 20 }} />, 
+      link: "https://twitter.com/", 
+      color: isDark ? "#F5F5F5" : "#0A1F44",
+      hoverColor: "#1DA1F2",
+    },
     {
-      icon: <LinkedInIcon />,
+      icon: <LinkedInIcon sx={{ fontSize: 20 }} />,
       link: "https://www.linkedin.com/in/Islam-hadaya",
-      color: "#0A66C2",
+      color: isDark ? "#F5F5F5" : "#0A1F44",
+      hoverColor: "#0A66C2",
     },
     {
-      icon: <GitHubIcon />,
+      icon: <GitHubIcon sx={{ fontSize: 20 }} />,
       link: "https://github.com/eslam-cmd",
-      color: isDark ? "#fff" : "#333",
+      color: isDark ? "#F5F5F5" : "#0A1F44",
+      hoverColor: colors.primary,
     },
   ];
-
-  const handleDownloadClick = (platform) => {
-    const messages = {
-      android: "Android app coming soon! 🚀",
-      ios: "iOS app coming soon! 🚀",
-    };
-    setSnackbarMessage(messages[platform]);
-    setOpenSnackbar(true);
-  };
 
   const handleCloseSnackbar = (event, reason) => {
     if (reason === "clickaway") return;
@@ -72,35 +74,20 @@ export default function Footer() {
       <Box
         component="footer"
         sx={{
-          background: isDark
-            ? "rgba(0, 0, 0, 0.6)"
-            : "rgba(255, 255, 255, 0.6)",
-          backdropFilter: "blur(30px) saturate(200%)",
-          WebkitBackdropFilter: "blur(30px) saturate(200%)",
+          fontFamily: FONT,
+          "& .MuiTypography-root, & .MuiButton-root, & .MuiChip-root": { fontFamily: FONT },
+          background: isDark ? "rgba(5, 10, 20, 0.7)" : "rgba(255, 255, 255, 0.7)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
           borderTop: `1px solid ${colors.border}`,
           color: colors.text,
-          py: { xs: 4, md: 6 },
-          px: { xs: 3, sm: 6, md: 10 },
+          py: { xs: 5, md: 6 },
+          px: { xs: 3, sm: 6, md: 8 },
           position: "relative",
           overflow: "hidden",
-          // تأثير خلفية متحركة
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: "-50%",
-            right: "-20%",
-            width: "500px",
-            height: "500px",
-            background: isDark
-              ? "radial-gradient(circle, rgba(212,175,55,0.03) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(24,110,150,0.03) 0%, transparent 70%)",
-            borderRadius: "50%",
-            animation: "float 10s ease-in-out infinite",
-          },
-          "@keyframes float": {
-            "0%, 100%": { transform: "translate(0, 0)" },
-            "50%": { transform: "translate(-30px, 20px)" },
-          },
+          // خلفية النقاط التقنية
+          backgroundImage: `radial-gradient(circle, ${colors.dotColor} 1px, transparent 1px)`,
+          backgroundSize: "24px 24px",
         }}
       >
         <Box
@@ -109,7 +96,7 @@ export default function Footer() {
             gridTemplateColumns: {
               xs: "1fr",
               sm: "1fr 1fr",
-              md: "2fr 1.5fr 1.5fr",
+              md: "2fr 1fr 1fr",
             },
             gap: { xs: 4, md: 6 },
             position: "relative",
@@ -122,31 +109,26 @@ export default function Footer() {
           <Box>
             <Typography
               sx={{
-                fontFamily: "'Inter', sans-serif",
-                fontSize: { xs: "26px", md: "32px" },
-                fontWeight: 800,
-                letterSpacing: "-0.03em",
+                fontSize: { xs: "24px", md: "28px" },
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
                 mb: 2,
-                background: `linear-gradient(135deg, ${colors.primary}, ${isDark ? "#f5d76e" : "#4a9bc7"})`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                display: "inline-block",
+                color: colors.text,
               }}
             >
-              Islam Hadaya
+              Islam Hadaya<span style={{ color: colors.primary }}>.</span>
             </Typography>
             <Typography
               sx={{
                 color: colors.textMuted,
-                lineHeight: 1.8,
-                fontSize: "0.95rem",
-                maxWidth: "400px",
-                fontFamily: "'Inter', sans-serif",
+                lineHeight: 1.7,
+                fontSize: "0.9rem",
+                maxWidth: "320px",
               }}
             >
               Building the future, one line of code at a time.
-              <span style={{ display: "block", marginTop: "8px" }}>
-                ✦ Software Engineer ✦
+              <span style={{ display: "block", marginTop: "8px", color: colors.primary, fontWeight: 500 }}>
+                Software Engineer
               </span>
             </Typography>
           </Box>
@@ -155,12 +137,12 @@ export default function Footer() {
           <Box>
             <Typography
               sx={{
-                fontSize: "11px",
+                fontSize: "0.75rem",
                 fontWeight: 700,
-                letterSpacing: "2px",
+                letterSpacing: "1.5px",
                 textTransform: "uppercase",
                 color: colors.textMuted,
-                mb: 3,
+                mb: 2.5,
               }}
             >
               Explore
@@ -174,13 +156,12 @@ export default function Footer() {
                   sx={{
                     color: colors.textMuted,
                     textDecoration: "none",
-                    fontSize: "14px",
-                    transition: "all 0.3s ease",
+                    fontSize: "0.85rem",
+                    fontWeight: 500,
+                    transition: "color 0.25s ease",
                     cursor: "pointer",
-                    fontFamily: "'Inter', sans-serif",
                     "&:hover": {
                       color: colors.primary,
-                      transform: "translateX(6px)",
                     },
                   }}
                 >
@@ -194,37 +175,35 @@ export default function Footer() {
           <Box>
             <Typography
               sx={{
-                fontSize: "11px",
+                fontSize: "0.75rem",
                 fontWeight: 700,
-                letterSpacing: "2px",
+                letterSpacing: "1.5px",
                 textTransform: "uppercase",
                 color: colors.textMuted,
-                mb: 3,
+                mb: 2.5,
               }}
             >
               Connect
             </Typography>
 
-            <Box sx={{ display: "flex", gap: 1.5, mb: 3 }}>
+            <Box sx={{ display: "flex", gap: 1.5 }}>
               {socials.map((social, idx) => (
                 <IconButton
                   key={idx}
                   href={social.link}
                   target="_blank"
+                  rel="noopener noreferrer"
                   sx={{
                     color: social.color,
                     padding: "10px",
-                    bgcolor: isDark
-                      ? "rgba(255,255,255,0.03)"
-                      : "rgba(0,0,0,0.02)",
-                    borderRadius: "12px",
-                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    bgcolor: colors.tagBg,
+                    border: `1px solid ${colors.tagBorder}`,
+                    borderRadius: "8px", // حواف مربعة ناعمة
+                    transition: "color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease",
                     "&:hover": {
-                      transform: "translateY(-4px) scale(1.05)",
-                      bgcolor: isDark
-                        ? "rgba(255,255,255,0.06)"
-                        : "rgba(0,0,0,0.04)",
-                      boxShadow: `0 4px 20px ${alpha(social.color, 0.2)}`,
+                      color: social.hoverColor,
+                      bgcolor: alpha(social.hoverColor, 0.1),
+                      borderColor: alpha(social.hoverColor, 0.3),
                     },
                   }}
                 >
@@ -253,33 +232,34 @@ export default function Footer() {
           }}
         >
           <Chip
-            icon={<CodeIcon sx={{ fontSize: 14 }} />}
+            icon={<CodeIcon sx={{ fontSize: 14, color: colors.primary }} />}
             label={
-              <Typography sx={{ fontSize: "12px", color: colors.textMuted }}>
-                Designed with ❤️ by Islam Hadaya © 2026
+              <Typography sx={{ fontSize: "11px", color: colors.textMuted, fontWeight: 500 }}>
+                Designed & Built by Islam Hadaya © 2026
               </Typography>
             }
             variant="outlined"
             sx={{
               borderColor: colors.border,
-              bgcolor: "transparent",
-              "& .MuiChip-label": {
-                px: 1,
-              },
+              bgcolor: colors.tagBg,
+              borderRadius: "6px",
+              height: 28,
+              "& .MuiChip-label": { px: 1 },
             }}
           />
 
           <Button
             onClick={scrollToTop}
-            endIcon={<KeyboardArrowUpIcon />}
+            endIcon={<KeyboardArrowUpIcon sx={{ fontSize: 16 }} />}
             sx={{
               color: colors.textMuted,
-              fontSize: "12px",
+              fontSize: "0.8rem",
+              fontWeight: 600,
               textTransform: "none",
-              transition: "all 0.3s ease",
+              transition: "color 0.25s ease",
               "&:hover": {
                 color: colors.primary,
-                transform: "translateY(-2px)",
+                bgcolor: "transparent",
               },
             }}
           >
@@ -298,12 +278,13 @@ export default function Footer() {
           onClose={handleCloseSnackbar}
           severity="info"
           sx={{
-            bgcolor: colors.primary,
-            color: colors.onPrimary,
-            borderRadius: "12px",
-            boxShadow: `0 8px 30px ${alpha(colors.primary, 0.3)}`,
+            bgcolor: colors.tagBg,
+            color: colors.primary,
+            border: `1px solid ${colors.primary}`,
+            borderRadius: "8px",
+            boxShadow: `0 8px 30px ${alpha(colors.primary, 0.15)}`,
             "& .MuiAlert-icon": {
-              color: colors.onPrimary,
+              color: colors.primary,
             },
           }}
         >

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getFullHistory } from "@/lib/db";
+import { getFullHistory } from "../../../../lib/db";
 
 export async function POST(req) {
   try {

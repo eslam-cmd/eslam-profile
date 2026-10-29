@@ -1,6 +1,6 @@
 ﻿import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
-import { upsertVisitor, saveMessage, getRecentHistory } from "@/lib/db";
+import { upsertVisitor, saveMessage, getRecentHistory } from "../../../lib/db";
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 8;

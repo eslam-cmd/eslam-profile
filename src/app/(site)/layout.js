@@ -1,28 +1,30 @@
 // src/app/layout.js
-import { Geist, Geist_Mono } from "next/font/google";
 import ClientLayout from "../../components/Others/ClientLayout.jsx";
 import VisitorTracker from "../../components/Others/VisitorTracker.jsx";
+// import localFont from 'next/font/local';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// const geistSans = localFont({
+//   src: './fonts/GeistVF.woff2', // Make sure the file name is correct
+//   variable: '--font-geist-sans',
+//   display: 'swap',
+// });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// const geistMono = localFont({
+//   src: './fonts/GeistMonoVF.woff2', // Make sure the file name is correct
+//   variable: '--font-geist-mono',
+//   display: 'swap',
+// });
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://eslam-profile.vercel.app";
 
 export const metadata = {
   title: {
-    default: "إسلام هدايا | مطور ويب فريلانسر - Next.js, Node.js, PostgreSQL",
-    template: "%s | إسلام هدايا - مطور ويب",
+    default: "Islam Hadaya | Freelance Web Developer - Next.js, Node.js, PostgreSQL",
+    template: "%s | Islam Hadaya - Web Developer",
   },
   description:
-    "إسلام هدايا، مطور ويب متخصص في بناء منصات SaaS وتطبيقات الويب باستخدام Next.js و Node.js و PostgreSQL. أقدم خدمات تطوير ويب متكاملة للشركات والأفراد في حلب، سوريا والعالم العربي.",
+    "Islam Hadaya, a web developer specialized in building SaaS platforms and web applications using Next.js, Node.js, and PostgreSQL. I provide comprehensive web development services for businesses and individuals in Aleppo, Syria, and the Arab world.",
 
   icons: {
     icon: "/favicon.ico",
@@ -31,89 +33,89 @@ export const metadata = {
   },
 
   keywords: [
-    // الأسم والهوية
-    "إسلام هدايا",
+    // Name & Identity
     "Islam Hadaya",
-    "اسلام هدايا",
+    "Islam Hadaya",
+    "Islam Hadaya",
     "Islam Profile",
-    "اسلام بروفايل",
+    "Islam Profile",
     "Islam Canada",
-    "اسلام كندا",
+    "Islam Canada",
     "Islam Syria",
-    "اسلام سوريا",
+    "Islam Syria",
     "Islam Aleppo",
-    "اسلام حلب",
+    "Islam Aleppo",
 
-    // المسمى الوظيفي
-    "مطور ويب",
+    // Job Title
+    "Web Developer",
     "Web Developer",
     "Full-Stack Developer",
-    "مطور Full-Stack",
+    "Full-Stack Developer",
     "Frontend Developer",
-    "مطور واجهات",
+    "Frontend Developer",
     "Backend Developer",
-    "مطور خلفيات",
+    "Backend Developer",
 
-    // التقنيات
+    // Technologies
     "Next.js Developer",
-    "مطور Next.js",
+    "Next.js Developer",
     "Node.js Developer",
-    "مطور Node.js",
+    "Node.js Developer",
     "React Developer",
-    "مطور React",
+    "React Developer",
     "PostgreSQL Developer",
     "TypeScript",
     "JavaScript",
 
-    // الخدمات
-    "خدمات برمجة",
+    // Services
     "Programming Services",
-    "تطوير تطبيقات",
+    "Programming Services",
     "App Development",
-    "بناء منصات",
+    "App Development",
+    "Platform Development",
     "Platform Development",
     "SaaS Development",
-    "تطوير SaaS",
+    "SaaS Development",
     "Web Development Services",
-    "خدمات تطوير ويب",
+    "Web Development Services",
     "Freelance Developer",
-    "مطور فريلانسر",
+    "Freelance Developer",
     "Freelancer Syria",
-    "فريلانسر سوريا",
+    "Freelancer Syria",
 
-    // الموقع
-    "حلب",
+    // Location
     "Aleppo",
-    "سوريا",
+    "Aleppo",
+    "Syria",
     "Syria",
     "Syrian Developer",
-    "مطور سوري",
+    "Syrian Developer",
     "Arab Developer",
-    "مطور عربي",
+    "Arab Developer",
 
-    // مجالات أخرى
-    "برمجة",
+    // Other fields
+    "Coding",
     "Coding",
     "Web Design",
-    "تصميم ويب",
+    "Web Design",
     "UI/UX",
     "API Development",
-    "تطوير APIs",
+    "API Development",
     "Database Design",
-    "تصميم قواعد بيانات",
+    "Database Design",
     "E-commerce Development",
-    "تطوير متاجر إلكترونية",
+    "E-commerce Development",
 
-    // كلمات عامة
-    "برمجة",
-    "تقنية",
+    // General words
+    "Coding",
+    "Technology",
     "Technology",
     "Software Engineer",
-    "مهندس برمجيات",
+    "Software Engineer",
     "Code",
-    "كود",
+    "Code",
     "Developer Portfolio",
-    "معرض أعمال مطور",
+    "Developer Portfolio",
   ],
   authors: [{ name: "Islam Hadaya", url: "https://github.com/eslam-cmd" }],
   creator: "Islam Hadaya",
@@ -128,11 +130,11 @@ export const metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "إسلام هدايا | مطور ويب فريلانسر - Next.js, Node.js, PostgreSQL",
+    title: "Islam Hadaya | Freelance Web Developer - Next.js, Node.js, PostgreSQL",
     description:
-      "إسلام هدايا، مطور ويب متخصص في بناء منصات SaaS وتطبيقات الويب. أقدم خدمات تطوير ويب متكاملة في حلب، سوريا والعالم العربي.",
+      "Islam Hadaya, a web developer specialized in building SaaS platforms and web applications. I provide comprehensive web development services in Aleppo, Syria, and the Arab world.",
     url: siteUrl,
-    siteName: "إسلام هدايا | مطور ويب",
+    siteName: "Islam Hadaya | Web Developer",
     locale: "ar_SY",
     type: "website",
     images: [
@@ -140,15 +142,15 @@ export const metadata = {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "إسلام هدايا - مطور ويب",
+        alt: "Islam Hadaya - Web Developer",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "إسلام هدايا | مطور ويب فريلانسر",
+    title: "Islam Hadaya | Freelance Web Developer",
     description:
-      "إسلام هدايا، مطور ويب متخصص في بناء منصات SaaS وتطبيقات الويب",
+      "Islam Hadaya, a web developer specialized in building SaaS platforms and web applications",
     images: ["/og-image.jpg"],
     creator: "@eslam_hadaya",
   },
@@ -170,9 +172,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ar" dir="ltr">
+    <html lang="en" dir="ltr">
       <head>
-        {/* إضافة الـ Meta Tags الإضافية */}
+        {/* Additional Meta Tags */}
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="theme-color" content="#0A1F44" />
@@ -183,20 +185,20 @@ export default function RootLayout({ children }) {
           content="black-translucent"
         />
 
-        {/* رابط الـ Canonical */}
+        {/* Canonical Link */}
         <link rel="canonical" href={siteUrl} />
 
-        {/* RSS Feed (اختياري) */}
+        {/* RSS Feed (Optional) */}
         <link
           rel="alternate"
           type="application/rss+xml"
-          title="إسلام هدايا"
+          title="Islam Hadaya"
           href="/feed.xml"
         />
 
-        {/* Open Graph إضافية */}
+        {/* Additional Open Graph */}
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="إسلام هدايا | مطور ويب" />
+        <meta property="og:site_name" content="Islam Hadaya | Web Developer" />
         <meta property="og:locale" content="ar_SY" />
 
         {/* Twitter Cards */}
@@ -216,7 +218,7 @@ export default function RootLayout({ children }) {
               familyName: "Hadaya",
               jobTitle: "Full-Stack Web Developer",
               description:
-                "مطور ويب متخصص في بناء منصات SaaS وتطبيقات الويب باستخدام Next.js و Node.js و PostgreSQL",
+                "Web developer specialized in building SaaS platforms and web applications using Next.js, Node.js, and PostgreSQL",
               url: "https://eslam-profile.vercel.app",
               sameAs: [
                 "https://github.com/eslam-cmd",
@@ -245,24 +247,24 @@ export default function RootLayout({ children }) {
               worksFor: {
                 "@type": "Organization",
                 name: "Freelance Web Developer",
-                description: "خدمات تطوير ويب متكاملة",
+                description: "Comprehensive web development services",
               },
             }),
           }}
         />
 
-        {/* Schema Markup للـ Organization */}
+        {/* Schema Markup for Organization */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "إسلام هدايا - مطور ويب",
+              name: "Islam Hadaya - Web Developer",
               url: "https://eslam-profile.vercel.app",
               logo: "https://eslam-profile.vercel.app/logo.png",
               description:
-                "خدمات تطوير ويب متكاملة باستخدام Next.js و Node.js و PostgreSQL",
+                "Comprehensive web development services using Next.js, Node.js, and PostgreSQL",
               address: {
                 "@type": "PostalAddress",
                 addressLocality: "Aleppo",
@@ -278,7 +280,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body >
         <ClientLayout>
           <VisitorTracker />
           {children}
