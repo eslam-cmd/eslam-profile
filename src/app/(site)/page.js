@@ -1,15 +1,13 @@
 import { Suspense } from "react";
-import MainSectionContent from "./(pages)/home/MainSectionContent";
-import MainSectionClient from "./(pages)/home/MainSectionClient";
 import HomeClient from "./HomeClient";
+import MainSection from "../../components/mainsection/mainsection";
 
 export default function Home() {
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
         <HomeClient>
-          <MainSectionContent />
-          <MainSectionClient />
+          <MainSection />
         </HomeClient>
       </Suspense>
     </>

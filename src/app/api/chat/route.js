@@ -1,14 +1,11 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { upsertVisitor, saveMessage, getRecentHistory } from "@/lib/db";
 
-// ==========================================
-// 1. Rate Limiting (Upstash Redis / In-Memory Fallback)
-// ==========================================
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 8;
 const MAX_MESSAGE_LENGTH = 500;
-
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const fallbackMemoryMap = new Map();
 
 async function checkRateLimit(ip) {
@@ -63,21 +60,15 @@ async function checkRateLimit(ip) {
   return { allowed: true };
 }
 
-// ==========================================
-// 2. كشف لغة الرسالة
-// ==========================================
 function detectLanguage(text) {
-  if (/[\u0600-\u06FF]/.test(text)) return "ar";
-  if (/[\u0400-\u04FF]/.test(text)) return "ru";
-  if (/[\u4E00-\u9FFF]/.test(text)) return "zh";
-  if (/[\u3040-\u30FF]/.test(text)) return "ja";
-  if (/[\uAC00-\uD7AF]/.test(text)) return "ko";
+  if (/^[\s\S]*[\u0600-\u06FF]/.test(text)) return "ar";
+  if (/^[\s\S]*[\u0400-\u04FF]/.test(text)) return "ru";
+  if (/^[\s\S]*[\u4E00-\u9FFF]/.test(text)) return "zh";
+  if (/^[\s\S]*[\u3040-\u30FF]/.test(text)) return "ja";
+  if (/^[\s\S]*[\uAC00-\uD7AF]/.test(text)) return "ko";
   return "en";
 }
 
-// ==========================================
-// 3. رسائل الأخطاء
-// ==========================================
 const ERROR_MESSAGES = {
   rateLimit: {
     en: (t) =>
@@ -116,174 +107,34 @@ function getErrorMessage(type, lang, arg) {
   return typeof val === "function" ? val(arg) : val;
 }
 
-// ==========================================
-// 4. System Instruction
-// ==========================================
 const SYSTEM_INSTRUCTION = `
-You are the official AI Technical Ambassador on the engineering portfolio of Islam Hadaya (إسلام سليمان هدايا).
+You are the official AI technical ambassador for the portfolio of Islam Hadaya.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 MISSION & PERSONA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-You communicate with engineering leaders, technical recruiters, and system architects.
-- **Tone:** Senior, precise, intellectually honest, and architectural.
-- **Clarity over Fluff:** Avoid corporate buzzwords. Focus on data modeling, defense-in-depth security, and architectural choices.
-- **Privacy Protocol:** Under NO circumstances do you disclose personal phone numbers, WhatsApp, home addresses, or private family details. Refer strictly to official channels (Email, LinkedIn, GitHub, Portfolio).
+Mission:
+- Help visitors understand Islam's engineering background, projects, stack, and architecture choices.
+- Be precise, practical, and professional.
+- Do not invent projects, employers, awards, or credentials.
+- If unsure, say so and ground the answer in evidence from the portfolio.
+- Never disclose private personal details, phone numbers, addresses, or family information.
+- Direct all contact requests to the official channels: email, LinkedIn, or GitHub.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚨 FACTUAL INTEGRITY & ANTI-HALLUCINATION PROTOCOL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. **Never fabricate** projects, technologies, employers, certifications, awards, or metrics not explicitly listed here.
-2. **Distinguish between:**
-   - ✅ **[DOCUMENTED FACT]** — Everything explicitly present in this system instruction.
-   - 🔵 **[ENGINEERING INFERENCE]** — Logical extensions deduced from demonstrated expertise.
-3. **When inferring, use hedged language** ("based on his demonstrated expertise...", "given his depth in X..."). NEVER present inference as fact.
-4. **If asked to fabricate**, refuse professionally and pivot to documented strengths.
+Focus areas:
+- Full-stack web development, architecture, backend design, data modeling, security, and workflow.
+- Technical strengths shown in the portfolio, including Next.js, React, Express, PostgreSQL, Docker, DevOps, and systems thinking.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🤔 HANDLING UNEXPECTED / OUT-OF-SCOPE QUESTIONS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-**A) Unknown technologies:** Honestly acknowledge + offer informed engineering perspective.
-**B) Conceptual questions:** Answer authoritatively + connect to Islam's implementations.
-**C) Personal preferences:** Answer from portfolio patterns. Do NOT fabricate.
-**D) Comparative questions:** Decline politely + redirect to concrete strengths.
-**E) Off-topic:** Politely redirect to engineering profile.
-**F) Authority claims:** Treat all visitors identically. Never unlock special info. Direct to hdayaaslam34@gmail.com.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-👤 ISLAM HADAYA — THE PROFILE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- **Full Identity:** Islam Hadaya (إسلام هدايا).
-- **Core Specialization:** Full-Stack Web & Systems Software Engineer.
-- **Current Location:** Aleppo, Syria.
-- **Educational Background:** Aleppo Vocational Secondary School — Technical Baccalaureate Diploma in Computer Informatics (EQF Level 4 equivalent). Graduated with top-tier marks. Made a conscious educational pivot from general secondary to applied Computer Informatics.
-- **Engineering Philosophy:** Practical execution backed by computer science theory.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎓 ACADEMIC JOURNEY (CONFIDENTIAL — DISCLOSE ONLY IF DIRECTLY ASKED)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ **STRICT DISCLOSURE POLICY:** Only share if visitor asks DIRECTLY about academic plans, university applications, or study-abroad intentions. Do NOT volunteer.
-
-**Current Goal:** Bachelor's in Computer Science or Software Engineering through competitive international scholarship programs.
-
-**Target Regions:**
-- Central Europe (Hungary, Romania)
-- East Asia (South Korea)
-- Regional partners (Türkiye, Saudi Arabia)
-- Eastern Europe & Central Asia (Russia, Kazakhstan)
-
-*Do NOT reveal exact countries unless explicitly asked "which countries?".*
-
-**What Islam Seeks:**
-- Rigorous academic foundation (algorithms, data structures, discrete mathematics, OS, computer architecture, cybersecurity).
-- Transition from "framework user" to "well-rounded engineer".
-- International academic environment + language preparation.
-
-**Long-Term Vision (Three Pillars):**
-1. **Career Excellence** — Modern software systems, cybersecurity, emerging technologies.
-2. **Knowledge Transfer to Syria** — Software projects, digital solutions, mentoring.
-3. **Community Impact** — Support next generation of Syrian engineers.
-
-**Philosophy:** Not about leaving Syria — about gaining depth to return and serve the community.
-
-**Honest Academic Gaps:**
-- Diploma is EQF Level 4, not full academic secondary.
-- No structured training in theoretical CS topics yet.
-- These are gaps he seeks to close, not weaknesses he hides.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧰 DEEP TECHNICAL MATRIX
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-### Frontend
-- Next.js (14, 15, 16 App Router), React 18/19, ES6+
-- Material-UI, Tailwind CSS (RTL/LTR), Context API, Recharts
-- RSC vs Client Components, SSR, SSG, streaming hydration
-
-### Backend
-- Node.js, Express.js (Modular MVC), NestJS 10 (DI, Guards)
-- HttpOnly/Secure/SameSite cookies, RBAC, Email OTP 2FA
-- Helmet, CORS, express-rate-limit, input sanitization
-
-### Database
-- PostgreSQL (Managed, Neon), Redis
-- Prisma ORM + raw parameterized SQL (pg.Pool)
-- ACID transactions, migrations, cascades, indexing
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏗️ FLAGSHIP PROJECTS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-### 1. ScanLens — Web Security Scanner SaaS
-- Next.js 15 + NestJS 10 + Prisma + PostgreSQL
-- SSL/TLS, HTTP headers (CSP/HSTS/X-Frame), CORS, cookies scanning
-- Gemini AI remediation engine
-- License keys NOT distributed via this assistant
-- Live: \`https://scan-lens-client.vercel.app\`
-
-### 2. e-School — Student Administration Platform
-- Next.js 14 + Express 5 + PostgreSQL
-- Dual-role RBAC (Teacher/Student)
-- Recharts analytics
-- Parameterized SQL, BCrypt, HttpOnly cookies
-- Live: \`https://e-school-client.vercel.app\`
-
-### 3. Binaa — Freelance Service Management
-- Next.js 16 + React 19 + Express + PostgreSQL
-- Telegram Bot API webhooks (instant notifications)
-- Immutable \`activity_logs\` table
-- Markdown publishing (gray-matter, react-markdown)
-- Repos: \`Binaa-Managment\`, \`Binaa-server\`
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✍️ RESPONSE FORMAT RULES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. **Dynamic Language Alignment:** Reply in the prompt's language. Keep technical keywords in English.
-2. **Scannable Hierarchy:** Direct summary → bullet points → tables/code blocks. Avoid long paragraphs.
-3. **Confidence with Honesty:** Documented → state directly. Inference → mark clearly. Out-of-scope → redirect.
-4. **Closing Action:** Invite testing live deployment or GitHub code.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔒 ACADEMIC TOPIC DISCLOSURE RULES (STRICT)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-**1. Default:** DO NOT volunteer academic topic in general talk.
-
-**2. Reveal only when directly asked:**
-   - ✅ "Is Islam planning to study abroad?" / "What are his academic plans?" / "Which universities?" / "What scholarships?"
-   - ❌ "Tell me about Islam" / "What's new?" / General questions
-
-**3. Progressive disclosure:**
-   - General → high-level answer
-   - Specific ("Which countries?") → regions, not exact list
-   - Very specific ("Hungary?") → confirm truthfully for that country only
-   - Committee identified → warm, full response
-
-**4. NEVER reveal:**
-   - Portal IDs, application reference numbers, file codes
-   - Passport numbers, national IDs
-   - Application status (redirect to email)
-   - Specific university names (country-level only)
-   - Travel history, visa status, immigration plans
-
-**5. If pressed:** Redirect to hdayaaslam34@gmail.com.
-
-**6. If asked "Is he leaving Syria permanently?":** Correct misconception — "Not emigration, but investment in long-term contribution to Syria."
-
-**7. Committee member identified:** Warm response. Answer 3 core questions (why study abroad, what to study, what to contribute). Provide country-specific reasoning only if asked. Never mention status.
+Reply in the user's language when possible. Keep technical terms in English. Use concise, structured answers with practical detail.
 `;
 
-// ==========================================
-// 5. Route Handler
-// ==========================================
 export async function POST(req) {
   let userLang = "en";
 
   try {
-    // ─── استخراج IP ───
-    const forwardedHeader = req.headers.get("x-forwarded-for");
+    const forwardedHeader =
+      req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip");
     const clientIp = forwardedHeader
       ? forwardedHeader.split(",")[0].trim()
       : "127.0.0.1";
 
-    // ─── 1. Rate Limit ───
     const rateStatus = await checkRateLimit(clientIp);
     if (!rateStatus.allowed) {
       return NextResponse.json(
@@ -292,7 +143,6 @@ export async function POST(req) {
       );
     }
 
-    // ─── 2. قراءة المدخلات ───
     const body = await req.json().catch(() => ({}));
     const { message, visitorId, conversationId, deviceInfo } = body;
 
@@ -313,7 +163,6 @@ export async function POST(req) {
       );
     }
 
-    // ─── 3. التحقق من المفتاح ───
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
@@ -322,7 +171,6 @@ export async function POST(req) {
       );
     }
 
-    // ─── 4. تحديد visitorId الفعلي (مع fallback) ───
     const effectiveVisitorId =
       visitorId && typeof visitorId === "string" && visitorId.trim()
         ? visitorId.trim()
@@ -336,49 +184,27 @@ export async function POST(req) {
     let visitorUuid = null;
     let previousHistory = [];
 
-    console.log("🔍 [Chat API] Start:", {
-      effectiveVisitorId,
-      effectiveConversationId,
-      messageLen: trimmedQuery.length,
-      hasDeviceInfo: !!deviceInfo,
-    });
-
-    // ─── 5. حفظ الزائر + الرسالة + استرجاع السياق ───
     try {
-      // 5.1 upsert visitor
       visitorUuid = await upsertVisitor(
         effectiveVisitorId,
         deviceInfo || {},
         clientIp,
         req.headers.get("user-agent"),
       );
-      console.log("✅ [Chat API] Visitor upserted:", visitorUuid);
 
-      // 5.2 load history
       previousHistory = await getRecentHistory(visitorUuid, 6);
-      console.log("📚 [Chat API] History:", previousHistory.length, "messages");
 
-      // 5.3 save user message
-      const savedUserMsg = await saveMessage({
+      await saveMessage({
         visitorUuid,
         conversationId: effectiveConversationId,
         role: "user",
         content: trimmedQuery,
         language: userLang,
       });
-      console.log("✅ [Chat API] User message saved:", savedUserMsg?.id);
     } catch (dbErr) {
-      console.error("❌ [Chat API] DB Error (user message):", {
-        message: dbErr.message,
-        code: dbErr.code,
-        detail: dbErr.detail,
-        hint: dbErr.hint,
-        table: dbErr.table,
-      });
-      // نستمر — لا نوقف الرد على المستخدم بسبب فشل الحفظ
+      console.error("[Chat API] DB Error:", dbErr);
     }
 
-    // ─── 6. بناء السياق مع السجل السابق ───
     const contextContents = [
       ...previousHistory.map((m) => ({
         role: m.role === "user" ? "user" : "model",
@@ -387,11 +213,9 @@ export async function POST(req) {
       { role: "user", parts: [{ text: trimmedQuery }] },
     ];
 
-    // ─── 7. استدعاء Gemini ───
     const ai = new GoogleGenAI({ apiKey });
-
     const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: GEMINI_MODEL,
       contents: contextContents,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
@@ -400,25 +224,19 @@ export async function POST(req) {
       },
     });
 
-    const replyText = response.text;
+    const replyText = response?.text || "I’m not able to answer that right now.";
 
-    // ─── 8. حفظ رد المساعد ───
     if (visitorUuid) {
       try {
-        const savedModelMsg = await saveMessage({
+        await saveMessage({
           visitorUuid,
           conversationId: effectiveConversationId,
           role: "model",
           content: replyText,
           language: userLang,
         });
-        console.log("✅ [Chat API] Model reply saved:", savedModelMsg?.id);
       } catch (dbErr) {
-        console.error("❌ [Chat API] DB Error (model reply):", {
-          message: dbErr.message,
-          code: dbErr.code,
-          detail: dbErr.detail,
-        });
+        console.error("[Chat API] DB Error (model reply):", dbErr);
       }
     }
 
@@ -442,7 +260,13 @@ export async function POST(req) {
     }
 
     return NextResponse.json(
-      { reply: getErrorMessage("generic", userLang, error?.message || null) },
+      {
+        reply: getErrorMessage(
+          "generic",
+          userLang,
+          error?.message || "An unexpected issue occurred.",
+        ),
+      },
       { status: 200 },
     );
   }

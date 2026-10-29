@@ -9,12 +9,17 @@ import {
   Menu,
   MenuItem,
   Box,
+  alpha,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
+import GitHubIcon from "@mui/icons-material/GitHub";
 import { usePathname, useRouter } from "next/navigation";
+
+const FONT = "'Space Grotesk', 'Inter', system-ui, sans-serif";
+const GITHUB_URL = "https://github.com/eslam-cmd";
 
 export default function Header({ toggleTheme, darkMode }) {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -22,19 +27,14 @@ export default function Header({ toggleTheme, darkMode }) {
   const router = useRouter();
 
   const pages = [
-    { name: "SKILLS", link: "#skills" },
     { name: "WORK", link: "#Portfolio" },
     { name: "CONTACT", link: "#contact" },
-    { name: "MY BLOG", link: "https://blog-platform-nine-pi.vercel.app" },
+    { name: "STACK", link: "/stack" },
+    { name: "BLOG", link: "https://blog-platform-nine-pi.vercel.app" },
   ];
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
+  const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
+  const handleCloseNavMenu = () => setAnchorElNav(null);
 
   const handleNavigate = (link) => {
     setAnchorElNav(null);
@@ -66,27 +66,17 @@ export default function Header({ toggleTheme, darkMode }) {
 
   const applyTheme = (mode, prefersDark) => {
     if (mode === "system") {
-      if (prefersDark && !darkMode) {
-        toggleTheme();
-      } else if (!prefersDark && darkMode) {
-        toggleTheme();
-      }
-    } else if (mode === "dark" && !darkMode) {
-      toggleTheme();
-    } else if (mode === "light" && darkMode) {
-      toggleTheme();
-    }
+      if (prefersDark && !darkMode) toggleTheme();
+      else if (!prefersDark && darkMode) toggleTheme();
+    } else if (mode === "dark" && !darkMode) toggleTheme();
+    else if (mode === "light" && darkMode) toggleTheme();
   };
 
   const handleThemeToggleClick = () => {
     let nextMode = "system";
-    if (themeMode === "system") {
-      nextMode = "light";
-    } else if (themeMode === "light") {
-      nextMode = "dark";
-    } else if (themeMode === "dark") {
-      nextMode = "system";
-    }
+    if (themeMode === "system") nextMode = "light";
+    else if (themeMode === "light") nextMode = "dark";
+    else if (themeMode === "dark") nextMode = "system";
 
     setThemeMode(nextMode);
     localStorage.setItem("user-theme-preference", nextMode);
@@ -100,14 +90,10 @@ export default function Header({ toggleTheme, darkMode }) {
     const handleChange = (e) => {
       setSystemIsDark(e.matches);
       if (themeMode === "system") {
-        if (e.matches && !darkMode) {
-          toggleTheme();
-        } else if (!e.matches && darkMode) {
-          toggleTheme();
-        }
+        if (e.matches && !darkMode) toggleTheme();
+        else if (!e.matches && darkMode) toggleTheme();
       }
     };
-
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [themeMode, darkMode, toggleTheme]);
@@ -119,16 +105,14 @@ export default function Header({ toggleTheme, darkMode }) {
   };
 
   const renderThemeIcon = () => {
-    if (themeMode === "light") {
+    if (themeMode === "light")
       return <Brightness7Icon sx={{ fontSize: 14, color: "#f5a623" }} />;
-    }
-    if (themeMode === "system") {
+    if (themeMode === "system")
       return (
         <SettingsBrightnessIcon
           sx={{ fontSize: 14, color: darkMode ? "#D4AF37" : "#186e96" }}
         />
       );
-    }
     return <Brightness4Icon sx={{ fontSize: 14, color: "#0a1929" }} />;
   };
 
@@ -137,7 +121,8 @@ export default function Header({ toggleTheme, darkMode }) {
       position="fixed"
       elevation={0}
       sx={{
-        // خلفية زجاجية شفافة مع نعومة عالية
+        fontFamily: FONT,
+        "& .MuiTypography-root": { fontFamily: FONT },
         background: darkMode
           ? "rgba(3, 13, 29, 0.65)"
           : "rgba(255, 255, 255, 0.55)",
@@ -157,6 +142,7 @@ export default function Header({ toggleTheme, darkMode }) {
         right: 0,
         width: "fit-content",
         minWidth: { xs: "94%", sm: "92%", md: "85%" },
+        zIndex: (theme) => theme.zIndex.appBar,
       }}
     >
       <Toolbar
@@ -167,11 +153,10 @@ export default function Header({ toggleTheme, darkMode }) {
           minHeight: { xs: "54px", sm: "68px" },
         }}
       >
-        {/* اللوجو - تصميم عصري Minimal */}
+        {/* ═══ اللوجو ═══ */}
         <Typography
           variant="h6"
           sx={{
-            fontFamily: "'Inter', -apple-system, sans-serif",
             fontWeight: 700,
             fontSize: { xs: "17px", sm: "24px", md: "28px" },
             letterSpacing: "-0.02em",
@@ -195,7 +180,7 @@ export default function Header({ toggleTheme, darkMode }) {
           Islam Hadaya
         </Typography>
 
-        {/* روابط الشاشات الكبيرة - تصميم أنيق */}
+        {/* ═══ روابط الديسكتوب ═══ */}
         <Box
           sx={{
             display: { xs: "none", md: "flex" },
@@ -203,7 +188,7 @@ export default function Header({ toggleTheme, darkMode }) {
             gap: 0.5,
           }}
         >
-          {pages.map((page, index) => (
+          {pages.map((page) => (
             <Typography
               key={page.name}
               onClick={() => handleNavigate(page.link)}
@@ -212,8 +197,7 @@ export default function Header({ toggleTheme, darkMode }) {
                 color: darkMode ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
                 padding: "8px 16px",
                 borderRadius: "12px",
-                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                fontFamily: "'Inter', sans-serif",
+                transition: "background-color 0.25s ease, color 0.25s ease",
                 fontWeight: 500,
                 fontSize: "0.85rem",
                 letterSpacing: "0.3px",
@@ -226,7 +210,7 @@ export default function Header({ toggleTheme, darkMode }) {
                   width: "0%",
                   height: "2px",
                   background: darkMode ? "#D4AF37" : "#186e96",
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  transition: "width 0.25s ease",
                   transform: "translateX(-50%)",
                 },
                 "&:hover": {
@@ -234,10 +218,7 @@ export default function Header({ toggleTheme, darkMode }) {
                   backgroundColor: darkMode
                     ? "rgba(212, 175, 55, 0.06)"
                     : "rgba(24, 110, 150, 0.06)",
-                  transform: "translateY(-1px)",
-                  "&::before": {
-                    width: "60%",
-                  },
+                  "&::before": { width: "60%" },
                 },
               }}
             >
@@ -246,7 +227,7 @@ export default function Header({ toggleTheme, darkMode }) {
           ))}
         </Box>
 
-        {/* الأزرار الجانبية */}
+        {/* ═══ الأزرار الجانبية ═══ */}
         <Box
           sx={{
             display: "flex",
@@ -254,7 +235,39 @@ export default function Header({ toggleTheme, darkMode }) {
             gap: { xs: 1, sm: 1.5 },
           }}
         >
-          {/* وضع النظام - تصميم أنيق */}
+          {/* ✅ زر GitHub — ثابت دائمًا بجانب اليمين */}
+          <IconButton
+            component="a"
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            sx={{
+              color: darkMode ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.6)",
+              border: darkMode
+                ? "1px solid rgba(212, 175, 55, 0.15)"
+                : "1px solid rgba(0, 0, 0, 0.08)",
+              backgroundColor: darkMode
+                ? "rgba(212, 175, 55, 0.05)"
+                : "rgba(255, 255, 255, 0.3)",
+              width: { xs: 32, sm: 36 },
+              height: { xs: 32, sm: 36 },
+              borderRadius: "10px",
+              transition:
+                "background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease",
+              "&:hover": {
+                color: darkMode ? "#D4AF37" : "#186e96",
+                bgcolor: darkMode
+                  ? "rgba(212, 175, 55, 0.12)"
+                  : "rgba(24, 110, 150, 0.08)",
+                borderColor: darkMode ? "#D4AF37" : "#186e96",
+              },
+            }}
+          >
+            <GitHubIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
+          </IconButton>
+
+          {/* شارة Auto */}
           {themeMode === "system" && (
             <Box
               sx={{
@@ -291,7 +304,7 @@ export default function Header({ toggleTheme, darkMode }) {
             </Box>
           )}
 
-          {/* زر التبديل العصري */}
+          {/* زر تبديل الثيم */}
           <Box
             onClick={handleThemeToggleClick}
             role="button"
@@ -311,10 +324,9 @@ export default function Header({ toggleTheme, darkMode }) {
               border: darkMode
                 ? "1px solid rgba(212, 175, 55, 0.2)"
                 : "1px solid rgba(0, 0, 0, 0.08)",
-              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              transition: "background-color 0.25s ease",
               flexShrink: 0,
               "&:hover": {
-                transform: "scale(1.02)",
                 bgcolor: darkMode
                   ? "rgba(212, 175, 55, 0.18)"
                   : "rgba(0, 0, 0, 0.1)",
@@ -334,18 +346,14 @@ export default function Header({ toggleTheme, darkMode }) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                transition:
-                  "left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.3s ease",
-                "&:hover": {
-                  transform: "scale(1.05)",
-                },
+                transition: "left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
               }}
             >
               {renderThemeIcon()}
             </Box>
           </Box>
 
-          {/* زر القائمة للموبايل */}
+          {/* زر الموبايل */}
           <IconButton
             onClick={handleOpenNavMenu}
             sx={{
@@ -353,7 +361,7 @@ export default function Header({ toggleTheme, darkMode }) {
               p: 0.6,
               color: darkMode ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.6)",
               borderRadius: "10px",
-              transition: "all 0.3s ease",
+              transition: "background-color 0.25s ease",
               "&:hover": {
                 backgroundColor: darkMode
                   ? "rgba(212, 175, 55, 0.08)"
@@ -365,7 +373,7 @@ export default function Header({ toggleTheme, darkMode }) {
           </IconButton>
         </Box>
 
-        {/* قائمة الموبايل - تصميم أنيق */}
+        {/* ═══ قائمة الموبايل ═══ */}
         <Menu
           anchorEl={anchorElNav}
           open={Boolean(anchorElNav)}
@@ -399,7 +407,7 @@ export default function Header({ toggleTheme, darkMode }) {
               sx={{
                 py: 1.5,
                 px: 3,
-                transition: "all 0.2s ease",
+                transition: "background-color 0.25s ease",
                 "&:hover": {
                   backgroundColor: darkMode
                     ? "rgba(212, 175, 55, 0.06)"
@@ -410,7 +418,6 @@ export default function Header({ toggleTheme, darkMode }) {
               <Typography
                 sx={{
                   fontWeight: 500,
-                  fontFamily: "'Inter', sans-serif",
                   fontSize: "0.9rem",
                   letterSpacing: "0.3px",
                   color: darkMode ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.7)",

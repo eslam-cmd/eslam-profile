@@ -11,6 +11,8 @@ import {
   Button,
   Divider,
   Stack,
+  alpha,
+  Fade,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import LaunchIcon from "@mui/icons-material/Launch";
@@ -18,6 +20,8 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+
+const FONT = "'Space Grotesk', 'Inter', system-ui, sans-serif";
 
 export default function ProjectDetailsDialog({
   open,
@@ -33,23 +37,27 @@ export default function ProjectDetailsDialog({
 
   if (!project) return null;
 
+  // ───── نفس نظام الألوان الموحّد والتقني ─────
   const colors = {
+    bg: darkMode ? "#050a14" : "#ffffff",
     accent: darkMode ? "#D4AF37" : "#186e96",
-    textPrimary: darkMode ? "#ffffff" : "#0A1F44",
-    textSecondary: darkMode ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
-    bg: darkMode ? "#0c1932" : "#ffffff",
-    border: darkMode ? "rgba(212, 175, 55, 0.2)" : "rgba(24, 110, 150, 0.2)",
+    accentHover: darkMode ? "#FFD700" : "#0f4d68",
+    textPrimary: darkMode ? "#F5F5F5" : "#0A1F44",
+    textMuted: darkMode ? alpha("#F5F5F5", 0.6) : alpha("#0A1F44", 0.6),
+    border: darkMode ? alpha("#ffffff", 0.08) : alpha("#186e96", 0.15),
+    borderHover: darkMode ? alpha("#D4AF37", 0.4) : alpha("#186e96", 0.4),
+    tagBg: darkMode ? alpha("#ffffff", 0.03) : alpha("#000000", 0.03),
+    tagBorder: darkMode ? alpha("#ffffff", 0.08) : alpha("#000000", 0.08),
+    dotColor: darkMode ? "rgba(255,255,255,0.03)" : "rgba(24,110,150,0.06)",
+    iconBg: darkMode ? alpha("#ffffff", 0.05) : alpha("#000000", 0.04),
   };
 
   const photos = project.photos || [];
   const hasMultiple = photos.length > 1;
 
-  const handlePrev = () => {
+  const handlePrev = () =>
     setCurrentPhoto((p) => (p - 1 + photos.length) % photos.length);
-  };
-  const handleNext = () => {
-    setCurrentPhoto((p) => (p + 1) % photos.length);
-  };
+  const handleNext = () => setCurrentPhoto((p) => (p + 1) % photos.length);
 
   return (
     <Dialog
@@ -57,74 +65,116 @@ export default function ProjectDetailsDialog({
       onClose={onClose}
       maxWidth="md"
       fullWidth
+      TransitionComponent={Fade}
+      transitionDuration={300}
+      slotProps={{
+        backdrop: {
+          sx: {
+            backgroundColor: alpha("#020a1a", 0.7),
+            backdropFilter: "blur(10px)",
+          },
+        },
+      }}
       PaperProps={{
         sx: {
-          background: colors.bg,
+          fontFamily: FONT,
+          "& .MuiTypography-root, & .MuiButton-root, & .MuiChip-root": {
+            fontFamily: FONT,
+          },
+          // خلفية النقاط التقنية
+          backgroundImage: `radial-gradient(circle, ${colors.dotColor} 1px, transparent 1px)`,
+          backgroundSize: "24px 24px",
+          bgcolor: colors.bg,
           border: `1px solid ${colors.border}`,
-          borderRadius: { xs: 2, sm: 3 },
+          borderRadius: "24px", // حواف ناعمة
           overflow: "hidden",
           maxHeight: { xs: "95vh", sm: "90vh" },
+          boxShadow: darkMode
+            ? "0 24px 70px rgba(0,0,0,0.6)"
+            : "0 24px 70px rgba(24,110,150,0.15)",
+          position: "relative",
+          m: { xs: 1.5, sm: 3 },
+          // إزالة تأثير التدرج القديم
+          background: "none",
         },
       }}
     >
-      {/* شريط علوي بلون التمييز */}
+      {/* شريط علوي متوهج */}
       <Box
         sx={{
-          height: 4,
-          background: `linear-gradient(90deg, ${colors.accent}, #FFD700, ${colors.accent})`,
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "2px",
+          background: `linear-gradient(90deg, transparent, ${colors.accent}, transparent)`,
+          opacity: 0.85,
+          zIndex: 6,
         }}
       />
 
       {/* زر الإغلاق */}
       <IconButton
         onClick={onClose}
+        aria-label="Close"
         sx={{
           position: "absolute",
-          top: 16,
-          right: 16,
+          top: 14,
+          right: 14,
           zIndex: 10,
-          color: colors.accent,
-          bgcolor: darkMode ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.9)",
-          border: `1px solid ${colors.border}`,
+          color: colors.textPrimary,
+          bgcolor: colors.tagBg,
+          border: `1px solid ${colors.tagBorder}`,
+          p: "6px",
+          borderRadius: "8px", // حواف مربعة
+          transition:
+            "background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease",
           "&:hover": {
-            bgcolor: darkMode ? "rgba(0,0,0,0.8)" : "#fff",
-            transform: "rotate(90deg)",
+            bgcolor: colors.iconBg,
+            borderColor: colors.accent,
+            color: colors.accent,
           },
-          transition: "all 0.3s",
         }}
       >
-        <CloseIcon />
+        <CloseIcon sx={{ fontSize: 18 }} />
       </IconButton>
 
+      {/* العنوان */}
       <DialogTitle
         sx={{
-          pt: 3.5,
+          pt: { xs: 4, sm: 4.5 },
           px: { xs: 2.5, sm: 4 },
           pb: 1,
           pr: { xs: 7, sm: 8 },
         }}
       >
         <Typography
+          component="h2"
           sx={{
-            fontSize: { xs: "1.1rem", sm: "1.5rem" },
+            fontSize: { xs: "1.15rem", sm: "1.5rem" },
             fontWeight: 700,
-            color: colors.accent,
-            lineHeight: 1.3,
+            color: colors.textPrimary,
+            lineHeight: 1.25,
             letterSpacing: "-0.01em",
           }}
         >
           {project.title}
         </Typography>
-        <Typography
-          sx={{
-            fontSize: { xs: "0.78rem", sm: "0.85rem" },
-            color: colors.textSecondary,
-            fontStyle: "italic",
-            mt: 0.5,
-          }}
-        >
-          {project.tagline}
-        </Typography>
+        {project.tagline && (
+          <Typography
+            sx={{
+              fontSize: { xs: "0.8rem", sm: "0.9rem" },
+              color: colors.accent,
+              fontStyle: "italic",
+              fontWeight: 500,
+              mt: 0.8,
+              pl: 1.2,
+              borderLeft: `2px solid ${colors.accent}`,
+            }}
+          >
+            {project.tagline}
+          </Typography>
+        )}
       </DialogTitle>
 
       <Divider sx={{ borderColor: colors.border, mx: { xs: 2, sm: 3 } }} />
@@ -133,24 +183,25 @@ export default function ProjectDetailsDialog({
         sx={{
           px: { xs: 2.5, sm: 4 },
           py: { xs: 2.5, sm: 3 },
-          "&::-webkit-scrollbar": { width: 6 },
+          "&::-webkit-scrollbar": { width: "4px" },
+          "&::-webkit-scrollbar-track": { background: "transparent" },
           "&::-webkit-scrollbar-thumb": {
-            bgcolor: colors.accent,
-            borderRadius: 3,
+            background: colors.border,
+            borderRadius: "2px",
           },
         }}
       >
-        {/* معرض الصور */}
+        {/* ═══ معرض الصور ═══ */}
         {photos.length > 0 && (
           <Box sx={{ mb: 3 }}>
             <Box
               sx={{
                 position: "relative",
                 width: "100%",
-                borderRadius: 2,
+                borderRadius: "16px",
                 overflow: "hidden",
                 border: `1px solid ${colors.border}`,
-                bgcolor: darkMode ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.05)",
+                bgcolor: colors.tagBg,
               }}
             >
               <Box
@@ -171,51 +222,58 @@ export default function ProjectDetailsDialog({
                 <>
                   <IconButton
                     onClick={handlePrev}
+                    aria-label="Previous photo"
                     sx={{
                       position: "absolute",
-                      left: 8,
+                      left: 10,
                       top: "50%",
                       transform: "translateY(-50%)",
-                      bgcolor: "rgba(0,0,0,0.55)",
+                      bgcolor: alpha("#020a1a", 0.7),
                       color: "#fff",
                       backdropFilter: "blur(10px)",
+                      width: { xs: 32, sm: 36 },
+                      height: { xs: 32, sm: 36 },
+                      borderRadius: "8px",
+                      transition:
+                        "background-color 0.25s ease, color 0.25s ease",
                       "&:hover": {
                         bgcolor: colors.accent,
-                        color: "#000",
+                        color: darkMode ? "#050a14" : "#fff",
                       },
-                      width: { xs: 36, sm: 42 },
-                      height: { xs: 36, sm: 42 },
                     }}
                   >
                     <ArrowBackIosNewIcon
-                      sx={{ fontSize: { xs: 16, sm: 18 } }}
+                      sx={{ fontSize: { xs: 14, sm: 16 } }}
                     />
                   </IconButton>
 
                   <IconButton
                     onClick={handleNext}
+                    aria-label="Next photo"
                     sx={{
                       position: "absolute",
-                      right: 8,
+                      right: 10,
                       top: "50%",
                       transform: "translateY(-50%)",
-                      bgcolor: "rgba(0,0,0,0.55)",
+                      bgcolor: alpha("#020a1a", 0.7),
                       color: "#fff",
                       backdropFilter: "blur(10px)",
+                      width: { xs: 32, sm: 36 },
+                      height: { xs: 32, sm: 36 },
+                      borderRadius: "8px",
+                      transition:
+                        "background-color 0.25s ease, color 0.25s ease",
                       "&:hover": {
                         bgcolor: colors.accent,
-                        color: "#000",
+                        color: darkMode ? "#050a14" : "#fff",
                       },
-                      width: { xs: 36, sm: 42 },
-                      height: { xs: 36, sm: 42 },
                     }}
                   >
                     <ArrowForwardIosIcon
-                      sx={{ fontSize: { xs: 16, sm: 18 } }}
+                      sx={{ fontSize: { xs: 14, sm: 16 } }}
                     />
                   </IconButton>
 
-                  {/* عدّاد الصور */}
                   <Box
                     sx={{
                       position: "absolute",
@@ -224,12 +282,13 @@ export default function ProjectDetailsDialog({
                       px: 1.2,
                       py: 0.4,
                       borderRadius: "6px",
-                      bgcolor: "rgba(0,0,0,0.7)",
+                      bgcolor: alpha("#020a1a", 0.8),
                       backdropFilter: "blur(10px)",
+                      border: `1px solid ${colors.tagBorder}`,
                     }}
                   >
                     <Typography
-                      sx={{ fontSize: "11px", color: "#fff", fontWeight: 600 }}
+                      sx={{ fontSize: "10px", color: "#fff", fontWeight: 700 }}
                     >
                       {currentPhoto + 1} / {photos.length}
                     </Typography>
@@ -247,10 +306,10 @@ export default function ProjectDetailsDialog({
                   mt: 1.5,
                   overflowX: "auto",
                   pb: 0.5,
-                  "&::-webkit-scrollbar": { height: 4 },
+                  "&::-webkit-scrollbar": { height: "4px" },
                   "&::-webkit-scrollbar-thumb": {
                     bgcolor: colors.border,
-                    borderRadius: 3,
+                    borderRadius: "2px",
                   },
                 }}
               >
@@ -260,28 +319,23 @@ export default function ProjectDetailsDialog({
                     onClick={() => setCurrentPhoto(idx)}
                     sx={{
                       flexShrink: 0,
-                      width: { xs: 56, sm: 70 },
-                      height: { xs: 40, sm: 50 },
-                      borderRadius: 1,
+                      width: { xs: 50, sm: 60 },
+                      height: { xs: 36, sm: 44 },
+                      borderRadius: "8px",
                       overflow: "hidden",
                       cursor: "pointer",
                       border: `2px solid ${
                         idx === currentPhoto ? colors.accent : "transparent"
                       }`,
-                      opacity: idx === currentPhoto ? 1 : 0.55,
-                      transition: "all 0.25s ease",
-                      "&:hover": { opacity: 1 },
+                      opacity: idx === currentPhoto ? 1 : 0.5,
+                      transition: "opacity 0.25s ease, border-color 0.25s ease",
                     }}
                   >
                     <Box
                       component="img"
                       src={p}
                       alt={`thumb-${idx + 1}`}
-                      sx={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
+                      sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   </Box>
                 ))}
@@ -293,9 +347,9 @@ export default function ProjectDetailsDialog({
         {/* الوصف */}
         <Typography
           sx={{
-            color: colors.textPrimary,
-            fontSize: { xs: "0.88rem", sm: "0.98rem" },
-            lineHeight: 1.8,
+            color: colors.textMuted,
+            fontSize: { xs: "0.9rem", sm: "0.95rem" },
+            lineHeight: 1.7,
             mb: 3,
           }}
         >
@@ -311,15 +365,18 @@ export default function ProjectDetailsDialog({
               gap: 1.5,
               p: 2,
               mb: 3,
-              borderRadius: 2,
-              bgcolor: darkMode
-                ? "rgba(212, 175, 55, 0.05)"
-                : "rgba(24, 110, 150, 0.05)",
-              border: `1px solid ${colors.border}`,
+              borderRadius: "12px",
+              bgcolor: colors.tagBg,
+              border: `1px solid ${colors.tagBorder}`,
             }}
           >
             <AutoAwesomeIcon
-              sx={{ color: colors.accent, fontSize: 20, mt: 0.2 }}
+              sx={{
+                color: colors.accent,
+                fontSize: 18,
+                mt: 0.2,
+                flexShrink: 0,
+              }}
             />
             <Box>
               <Typography
@@ -336,9 +393,10 @@ export default function ProjectDetailsDialog({
               </Typography>
               <Typography
                 sx={{
-                  fontSize: { xs: "0.82rem", sm: "0.9rem" },
+                  fontSize: { xs: "0.85rem", sm: "0.9rem" },
                   color: colors.textPrimary,
                   fontWeight: 500,
+                  lineHeight: 1.6,
                 }}
               >
                 {project.focus}
@@ -354,8 +412,8 @@ export default function ProjectDetailsDialog({
               sx={{
                 fontSize: "0.7rem",
                 fontWeight: 700,
-                color: colors.accent,
-                letterSpacing: "1.5px",
+                color: colors.textMuted,
+                letterSpacing: "1px",
                 textTransform: "uppercase",
                 mb: 1.2,
               }}
@@ -369,20 +427,13 @@ export default function ProjectDetailsDialog({
                   label={t}
                   size="small"
                   sx={{
-                    bgcolor: darkMode
-                      ? "rgba(212, 175, 55, 0.08)"
-                      : "rgba(24, 110, 150, 0.08)",
-                    color: colors.accent,
-                    border: `1px solid ${colors.border}`,
+                    bgcolor: colors.tagBg,
+                    color: colors.textPrimary,
+                    border: `1px solid ${colors.tagBorder}`,
+                    borderRadius: "6px", // حواف مربعة ناعمة
                     fontSize: { xs: "0.72rem", sm: "0.78rem" },
-                    fontWeight: 500,
-                    "&:hover": {
-                      bgcolor: darkMode
-                        ? "rgba(212, 175, 55, 0.18)"
-                        : "rgba(24, 110, 150, 0.15)",
-                      transform: "translateY(-2px)",
-                    },
-                    transition: "all 0.25s ease",
+                    fontWeight: 600,
+                    "& .MuiChip-label": { px: 1 },
                   }}
                 />
               ))}
@@ -390,39 +441,40 @@ export default function ProjectDetailsDialog({
           </Box>
         )}
 
-        {/* الأزرار */}
+        {/* ═══ الأزرار ═══ */}
         <Box
           sx={{
             display: "flex",
             flexWrap: "wrap",
             gap: 1.5,
-            pt: 2,
+            pt: 2.5,
             borderTop: `1px solid ${colors.border}`,
           }}
         >
           {project.linkview && (
             <Button
               variant="contained"
-              startIcon={<LaunchIcon />}
+              startIcon={<LaunchIcon sx={{ fontSize: 16 }} />}
               href={project.linkview}
               target="_blank"
               rel="noopener noreferrer"
               sx={{
-                bgcolor: colors.accent,
-                color: darkMode ? "#000" : "#fff",
-                fontWeight: 700,
+                bgcolor: colors.textPrimary,
+                color: darkMode ? "#050a14" : "#fff",
+                fontWeight: 600,
+                fontSize: "0.85rem",
                 textTransform: "none",
-                px: 3,
-                py: 1,
-                borderRadius: "10px",
+                px: 2.5,
+                py: 0.8,
+                borderRadius: "8px", // حواف ناعمة
+                boxShadow: "none",
+                transition:
+                  "background-color 0.25s ease, border-color 0.25s ease",
                 "&:hover": {
-                  bgcolor: darkMode ? "#FFD700" : "#0f4d68",
-                  transform: "translateY(-3px)",
-                  boxShadow: darkMode
-                    ? "0 8px 25px rgba(212, 175, 55, 0.3)"
-                    : "0 8px 25px rgba(24, 110, 150, 0.3)",
+                  bgcolor: colors.accent,
+                  color: darkMode ? "#050a14" : "#fff",
+                  boxShadow: "none",
                 },
-                transition: "all 0.3s ease",
               }}
             >
               Live Demo
@@ -432,28 +484,28 @@ export default function ProjectDetailsDialog({
           {project.linkgithub && (
             <Button
               variant="outlined"
-              startIcon={<GitHubIcon />}
+              startIcon={<GitHubIcon sx={{ fontSize: 16 }} />}
               href={project.linkgithub}
               target="_blank"
               rel="noopener noreferrer"
               sx={{
-                borderColor: colors.accent,
-                color: colors.accent,
-                fontWeight: 700,
+                borderColor: colors.border,
+                color: colors.textPrimary,
+                fontWeight: 600,
+                fontSize: "0.85rem",
                 textTransform: "none",
-                px: 3,
-                py: 1,
-                borderRadius: "10px",
-                borderWidth: "1.5px",
+                px: 2.5,
+                py: 0.8,
+                borderRadius: "8px",
+                borderWidth: "1px",
+                transition:
+                  "background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease",
                 "&:hover": {
-                  borderWidth: "1.5px",
+                  borderWidth: "1px",
                   borderColor: colors.accent,
-                  bgcolor: darkMode
-                    ? "rgba(212, 175, 55, 0.08)"
-                    : "rgba(24, 110, 150, 0.08)",
-                  transform: "translateY(-3px)",
+                  bgcolor: colors.tagBg,
+                  color: colors.accent,
                 },
-                transition: "all 0.3s ease",
               }}
             >
               Source Code

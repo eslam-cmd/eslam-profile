@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import Header from "@/components/Others/header";
-import Footer from "@/components/Others/footer";
-import MainSection from "@/components/mainsection/mainsection";
-import ToolsSection from "@/components/toolsSection/toolsSection";
-import AboutPage from "@/components/aboutme/aboutMe";
-import SelectedProjects from "@/components/SelectedProjects/SelectedProjects";
+import Header from "../../../../components/Others/header";
+import Footer from "../../../../components/Others/footer";
+import MainSection from "../../../../components/mainsection/mainsection";
+import ToolsSection from "../../../../components/toolsSection/toolsSection";
+import AboutPage from "../../../../components/aboutme/aboutMe";
+import SelectedProjects from "../../../../components/SelectedProjects/SelectedProjects";
 
 export default function HomePage({
   toggleTheme,

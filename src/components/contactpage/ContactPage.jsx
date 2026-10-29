@@ -16,8 +16,6 @@ import {
   Alert,
   Box,
   Button,
-  CardActions,
-  CardContent,
   Dialog,
   IconButton,
   Link,
@@ -26,32 +24,14 @@ import {
   Typography,
   useTheme,
   alpha,
-  Chip,
   Fade,
   Grow,
   Stack,
-  Paper,
-  Slide,
 } from "@mui/material";
 import emailjs from "emailjs-com";
 import { useRef, useState, useEffect } from "react";
-import { keyframes } from "@mui/system";
 
-// تأثيرات حركية
-const pulseGlow = keyframes`
-  0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.05); }
-  50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.1); }
-`;
-
-const shimmer = keyframes`
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-`;
-
-const bounce = keyframes`
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-`;
+const FONT = "'Space Grotesk', 'Inter', system-ui, sans-serif";
 
 export default function ContactPage({ open, onClose }) {
   const theme = useTheme();
@@ -62,19 +42,19 @@ export default function ContactPage({ open, onClose }) {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [sending, setSending] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
 
   const colors = {
     primary: isDark ? "#D4AF37" : "#186e96",
     onPrimary: isDark ? "#0A1F44" : "#ffffff",
-    cardBg: isDark
-      ? "linear-gradient(145deg, rgba(10, 31, 68, 0.98), rgba(20, 20, 40, 0.98))"
-      : "linear-gradient(145deg, #ffffff, #f0f4f8)",
-    text: isDark ? "#F5F5F5" : "#1A1A2E",
-    textMuted: isDark ? alpha("#F5F5F5", 0.75) : alpha("#1A1A2E", 0.65),
-    border: alpha(isDark ? "#D4AF37" : "#186e96", 0.3),
-    fieldText: isDark ? "#F5F5F5" : "#1A1A2E",
-    fieldBg: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.02)",
+    paperBg: isDark
+      ? "linear-gradient(160deg, #0d2552 0%, #0A1F44 60%, #081a3a 100%)"
+      : "linear-gradient(160deg, #ffffff 0%, #eef5fa 100%)",
+    dots: isDark ? "rgba(212,175,55,0.08)" : "rgba(24,110,150,0.10)",
+    text: isDark ? "#F5F5F5" : "#0A1F44",
+    textMuted: isDark ? alpha("#F5F5F5", 0.72) : alpha("#0A1F44", 0.68),
+    border: alpha(isDark ? "#D4AF37" : "#186e96", 0.28),
+    borderSoft: alpha(isDark ? "#D4AF37" : "#186e96", 0.16),
+    fieldBg: isDark ? "rgba(255,255,255,0.05)" : "rgba(10,31,68,0.03)",
   };
 
   const iconColors = {
@@ -87,24 +67,20 @@ export default function ContactPage({ open, onClose }) {
   const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
   const PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 
-  // Auto focus on open
   useEffect(() => {
     if (open) {
-      setTimeout(() => {
-        const nameInput = document.querySelector('input[name="name"]');
-        if (nameInput) nameInput.focus();
+      const t = setTimeout(() => {
+        document.querySelector('input[name="name"]')?.focus();
       }, 300);
+      return () => clearTimeout(t);
     }
   }, [open]);
 
-  // دالة التمرير للأسفل
   const scrollToBottom = () => {
-    if (contentRef.current) {
-      contentRef.current.scrollTo({
-        top: contentRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }
+    contentRef.current?.scrollTo({
+      top: contentRef.current.scrollHeight,
+      behavior: "smooth",
+    });
   };
 
   const sendEmail = (e) => {
@@ -123,16 +99,16 @@ export default function ContactPage({ open, onClose }) {
 
     emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, formRef.current, PUBLIC_KEY).then(
       () => {
-        setSnackbarMessage("✨ Message sent successfully!");
+        setSnackbarMessage("Message sent successfully!");
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
         setSending(false);
         formRef.current?.reset();
         setTimeout(() => onClose?.(), 1500);
       },
-      (error) => {
+      () => {
         setSnackbarMessage(
-          "❌ Failed to send. Please try again or use social links.",
+          "Failed to send. Please try again or use the social links.",
         );
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
@@ -141,18 +117,53 @@ export default function ContactPage({ open, onClose }) {
     );
   };
 
-  const getFieldIcon = (field) => {
-    switch (field) {
-      case "name":
-        return <PersonIcon sx={{ fontSize: 16, color: colors.primary }} />;
-      case "email":
-        return <AlternateEmailIcon sx={{ fontSize: 16, color: colors.primary }} />;
-      case "message":
-        return <MessageIcon sx={{ fontSize: 16, color: colors.primary }} />;
-      default:
-        return null;
-    }
+  // أسماء الحقول (name) يجب أن تبقى كما هي لأن قالب EmailJS يعتمد عليها
+  const fields = [
+    { name: "name", label: "Name", Icon: PersonIcon },
+    { name: "email", label: "Email", Icon: AlternateEmailIcon, type: "email" },
+    {
+      name: "message",
+      label: "Your message",
+      Icon: MessageIcon,
+      multiline: true,
+    },
+  ];
+
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "14px",
+      backgroundColor: colors.fieldBg,
+      color: colors.text,
+      fontSize: "0.92rem",
+      transition: "all 0.2s ease",
+      "& fieldset": { borderColor: colors.border },
+      "&:hover fieldset": { borderColor: colors.primary },
+      "&.Mui-focused fieldset": { borderColor: colors.primary, borderWidth: 1.5 },
+    },
+    "& .MuiInputLabel-root": { color: colors.textMuted, fontSize: "0.9rem" },
+    "& .MuiInputLabel-root.Mui-focused": { color: colors.primary },
   };
+
+  const socials = [
+    {
+      label: "Email",
+      href: "mailto:hdayaaslam34@gmail.com",
+      Icon: EmailIcon,
+      color: iconColors.email,
+    },
+    {
+      label: "GitHub",
+      href: "https://github.com/eslam-cmd",
+      Icon: GitHubIcon,
+      color: iconColors.github,
+    },
+    {
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/eslam-hd-60a056357",
+      Icon: LinkedInIcon,
+      color: iconColors.linkedin,
+    },
+  ];
 
   return (
     <>
@@ -162,25 +173,29 @@ export default function ContactPage({ open, onClose }) {
         maxWidth="sm"
         fullWidth
         TransitionComponent={Fade}
-        transitionDuration={400}
+        transitionDuration={300}
         slotProps={{
           backdrop: {
             sx: {
-              backgroundColor: alpha("#000000", 0.7),
+              backgroundColor: alpha("#020a1a", 0.65),
               backdropFilter: "blur(8px)",
             },
           },
         }}
         PaperProps={{
           sx: {
-            background: colors.cardBg,
-            borderRadius: 4,
+            fontFamily: FONT,
+            "& .MuiTypography-root, & .MuiInputBase-root, & .MuiButton-root, & .MuiInputLabel-root":
+              { fontFamily: FONT },
+            backgroundImage: `radial-gradient(circle, ${colors.dots} 1px, transparent 1.6px), ${colors.paperBg}`,
+            backgroundSize: "26px 26px, auto",
+            borderRadius: "28px",
             border: `1px solid ${colors.border}`,
-            backdropFilter: "blur(10px)",
-            boxShadow: "0 30px 80px rgba(0,0,0,0.6)",
+            boxShadow: "0 24px 70px rgba(0,0,0,0.45)",
             position: "relative",
             overflow: "hidden",
             maxHeight: "90vh",
+            m: { xs: 1.5, sm: 3 },
             "&::before": {
               content: '""',
               position: "absolute",
@@ -188,451 +203,290 @@ export default function ContactPage({ open, onClose }) {
               left: 0,
               right: 0,
               height: "2px",
-              background: "linear-gradient(90deg, #D4AF37, #FFD700, #f5d76e, #D4AF37)",
-              backgroundSize: "200% 100%",
-              animation: `${shimmer} 2s linear infinite`,
+              background: `linear-gradient(90deg, transparent, ${colors.primary}, transparent)`,
+              opacity: 0.8,
             },
           },
         }}
       >
-        {/* زر الإغلاق - أصغر */}
         <IconButton
           onClick={onClose}
+          aria-label="Close"
           sx={{
             position: "absolute",
-            top: 10,
-            right: 10,
+            top: 14,
+            right: 14,
             zIndex: 10,
             color: colors.textMuted,
-            bgcolor: alpha(colors.primary, 0.05),
-            border: `1px solid ${alpha(colors.primary, 0.1)}`,
+            bgcolor: alpha(colors.primary, 0.06),
+            border: `1px solid ${colors.borderSoft}`,
+            p: "7px",
+            transition: "all 0.25s ease",
             "&:hover": {
-              bgcolor: alpha(colors.primary, 0.15),
-              transform: "rotate(90deg) scale(1.05)",
+              bgcolor: alpha(colors.primary, 0.14),
               color: colors.primary,
             },
-            transition: "all 0.3s ease",
-            padding: "6px",
           }}
         >
-          <CloseIcon sx={{ fontSize: "18px" }} />
+          <CloseIcon sx={{ fontSize: 18 }} />
         </IconButton>
 
-        {/* محتوى قابل للتمرير */}
         <Box
           ref={contentRef}
           sx={{
-            maxHeight: "80vh",
+            maxHeight: "86vh",
             overflowY: "auto",
-            px: { xs: 2, sm: 3 },
-            py: { xs: 1, sm: 1.5 },
-            "&::-webkit-scrollbar": {
-              width: "4px",
-            },
-            "&::-webkit-scrollbar-track": {
-              background: "transparent",
-            },
+            px: { xs: 2.5, sm: 4 },
+            pt: { xs: 4, sm: 4.5 },
+            pb: { xs: 3, sm: 3.5 },
+            "&::-webkit-scrollbar": { width: "4px" },
+            "&::-webkit-scrollbar-track": { background: "transparent" },
             "&::-webkit-scrollbar-thumb": {
               background: colors.border,
               borderRadius: "2px",
             },
           }}
         >
-          <CardContent sx={{ p: { xs: 1.5, sm: 2 }, pt: { xs: 2, sm: 2.5 } }}>
-            {/* العنوان - أصغر */}
-            <Box sx={{ textAlign: "center", mb: 2 }}>
-              <Chip
-                label="📬 CONTACT"
-                sx={{
-                  bgcolor: "rgba(212, 175, 55, 0.08)",
-                  color: colors.primary,
-                  border: `1px solid ${colors.border}`,
-                  fontWeight: 500,
-                  letterSpacing: "1.5px",
-                  fontSize: "9px",
-                  height: 22,
-                  mb: 1.5,
-                }}
-              />
-              <Typography
-                variant="h5"
-                sx={{
-                  color: colors.primary,
-                  fontWeight: 600,
-                  textAlign: "center",
-                  fontSize: { xs: "1.3rem", sm: "1.5rem" },
-                  fontFamily: "'Inter', sans-serif",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                Let's Work Together
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  mt: 0.5,
-                  color: colors.textMuted,
-                  textAlign: "center",
-                  fontSize: "0.8rem",
-                  maxWidth: "350px",
-                  mx: "auto",
-                }}
-              >
-                Send your inquiry and I'll respond as soon as possible.
-              </Typography>
-            </Box>
-
-            {/* قسم العمل الحر - أصغر */}
-            <Paper
-              elevation={0}
+          {/* العنوان */}
+          <Box sx={{ textAlign: "center", mb: 3 }}>
+            <Typography
+              component="h2"
               sx={{
-                p: { xs: 1.5, sm: 2 },
-                mb: 2,
-                borderRadius: "12px",
-                background: `linear-gradient(135deg, ${alpha(colors.primary, 0.04)}, ${alpha(colors.primary, 0.01)})`,
-                border: `1px solid ${alpha(colors.primary, 0.1)}`,
+                color: colors.primary,
+                fontWeight: 600,
+                fontSize: { xs: "1.5rem", sm: "1.75rem" },
+                letterSpacing: "-0.02em",
+                lineHeight: 1.2,
               }}
             >
-              <Stack direction="row" alignItems="center" spacing={1.5} flexWrap="wrap">
-                <Box
+              Let's work together
+            </Typography>
+            <Typography
+              sx={{
+                mt: 1,
+                color: colors.textMuted,
+                fontSize: "0.95rem",
+                lineHeight: 1.6,
+                maxWidth: 380,
+                mx: "auto",
+              }}
+            >
+              Send your inquiry and I'll respond as soon as possible.
+            </Typography>
+          </Box>
+
+          {/* العمل الحر */}
+          <Box
+            sx={{
+              p: 2,
+              mb: 3,
+              borderRadius: "18px",
+              background: alpha(colors.primary, 0.06),
+              border: `1px solid ${colors.borderSoft}`,
+            }}
+          >
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 40,
+                  height: 40,
+                  flexShrink: 0,
+                  borderRadius: "12px",
+                  background: alpha(colors.primary, 0.12),
+                }}
+              >
+                <BusinessCenterIcon sx={{ color: colors.primary, fontSize: 22 }} />
+              </Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography
                   sx={{
+                    color: colors.text,
+                    fontWeight: 600,
+                    fontSize: "0.95rem",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    width: 36,
-                    height: 36,
-                    borderRadius: "10px",
-                    background: `linear-gradient(135deg, ${alpha(colors.primary, 0.12)}, ${alpha(colors.primary, 0.04)})`,
-                    border: `1px solid ${alpha(colors.primary, 0.15)}`,
+                    gap: 1,
+                    flexWrap: "wrap",
                   }}
                 >
-                  <BusinessCenterIcon sx={{ color: colors.primary, fontSize: 20 }} />
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Typography
-                    variant="caption"
+                  Open for freelance work
+                  <Box
+                    component="span"
                     sx={{
-                      color: colors.primary,
-                      fontWeight: 600,
-                      fontSize: "0.75rem",
-                      display: "flex",
+                      display: "inline-flex",
                       alignItems: "center",
-                      gap: 0.5,
+                      gap: 0.6,
+                      fontSize: "0.75rem",
+                      fontWeight: 500,
+                      color: "#22c55e",
                     }}
                   >
-                    🚀 Open for Freelance Work
-                    <Chip
-                      label="Available"
-                      size="small"
+                    <Box
                       sx={{
-                        ml: 0.5,
+                        width: 7,
+                        height: 7,
+                        borderRadius: "50%",
                         bgcolor: "#22c55e",
-                        color: "#fff",
-                        fontSize: "0.55rem",
-                        fontWeight: 600,
-                        height: 18,
-                        "& .MuiChip-label": { px: 0.8, py: 0 },
                       }}
                     />
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: colors.textMuted,
-                      fontSize: "0.75rem",
-                      mt: 0.3,
-                    }}
-                  >
-                    👉 <Link
-                      href="https://binaa-chi.vercel.app"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      sx={{
-                        color: colors.primary,
-                        fontWeight: 500,
-                        textDecoration: "none",
-                        "&:hover": {
-                          textDecoration: "underline",
-                          color: "#FFD700",
-                        },
-                        transition: "color 0.3s ease",
-                      }}
-                    >
-                      Visit my portfolio
-                    </Link>
-                  </Typography>
-                </Box>
-              </Stack>
-            </Paper>
-
-            {/* نموذج التواصل - أصغر */}
-            <form ref={formRef} onSubmit={sendEmail}>
-              <Box display="flex" flexDirection="column" gap={1.8}>
-                <TextField
-                  name="name"
-                  label="Name"
-                  variant="outlined"
-                  required
-                  size="small"
-                  disabled={sending}
-                  onFocus={() => setFocusedField("name")}
-                  onBlur={() => setFocusedField(null)}
-                  InputProps={{
-                    startAdornment: (
-                      <Box sx={{ mr: 0.5, display: "flex", alignItems: "center" }}>
-                        {getFieldIcon("name")}
-                      </Box>
-                    ),
-                    style: { color: colors.fieldText, fontSize: "0.85rem" },
-                  }}
-                  InputLabelProps={{ 
-                    style: { color: colors.primary, fontSize: "0.75rem" } 
-                  }}
+                    Available
+                  </Box>
+                </Typography>
+                <Link
+                  href="https://binaa-chi.vercel.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "10px",
-                      backgroundColor: colors.fieldBg,
-                      fontSize: "0.85rem",
-                      minHeight: 38,
-                      "& fieldset": {
-                        borderColor: focusedField === "name" ? colors.primary : colors.border,
-                        borderWidth: focusedField === "name" ? 1.5 : 1,
-                      },
-                      "&:hover fieldset": {
-                        borderColor: colors.primary,
-                      },
-                    },
-                  }}
-                />
-                <TextField
-                  name="email"
-                  label="Email"
-                  type="email"
-                  variant="outlined"
-                  required
-                  size="small"
-                  disabled={sending}
-                  onFocus={() => setFocusedField("email")}
-                  onBlur={() => setFocusedField(null)}
-                  InputProps={{
-                    startAdornment: (
-                      <Box sx={{ mr: 0.5, display: "flex", alignItems: "center" }}>
-                        {getFieldIcon("email")}
-                      </Box>
-                    ),
-                    style: { color: colors.fieldText, fontSize: "0.85rem" },
-                  }}
-                  InputLabelProps={{ 
-                    style: { color: colors.primary, fontSize: "0.75rem" } 
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "10px",
-                      backgroundColor: colors.fieldBg,
-                      fontSize: "0.85rem",
-                      minHeight: 38,
-                      "& fieldset": {
-                        borderColor: focusedField === "email" ? colors.primary : colors.border,
-                        borderWidth: focusedField === "email" ? 1.5 : 1,
-                      },
-                      "&:hover fieldset": {
-                        borderColor: colors.primary,
-                      },
-                    },
-                  }}
-                />
-                <TextField
-                  name="message"
-                  label="Your message..."
-                  variant="outlined"
-                  required
-                  multiline
-                  rows={3}
-                  size="small"
-                  disabled={sending}
-                  onFocus={() => setFocusedField("message")}
-                  onBlur={() => setFocusedField(null)}
-                  InputProps={{
-                    startAdornment: (
-                      <Box sx={{ mr: 0.5, display: "flex", alignItems: "center", alignSelf: "flex-start", mt: 1 }}>
-                        {getFieldIcon("message")}
-                      </Box>
-                    ),
-                    style: { color: colors.fieldText, fontSize: "0.85rem" },
-                  }}
-                  InputLabelProps={{ 
-                    style: { color: colors.primary, fontSize: "0.75rem" } 
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "10px",
-                      backgroundColor: colors.fieldBg,
-                      fontSize: "0.85rem",
-                      "& fieldset": {
-                        borderColor: focusedField === "message" ? colors.primary : colors.border,
-                        borderWidth: focusedField === "message" ? 1.5 : 1,
-                      },
-                      "&:hover fieldset": {
-                        borderColor: colors.primary,
-                      },
-                    },
-                  }}
-                />
-              </Box>
-
-              <CardActions sx={{ justifyContent: "space-between", mt: 2, px: 0, flexWrap: "wrap", gap: 0.5 }}>
-                <Box sx={{ display: "flex", gap: 0.8 }}>
-                  <Typography sx={{ color: colors.textMuted, fontSize: "0.6rem", display: "flex", alignItems: "center" }}>
-                    🔒 Secure
-                  </Typography>
-                  <Typography sx={{ color: colors.textMuted, fontSize: "0.6rem", display: "flex", alignItems: "center" }}>
-                    ⚡ Fast
-                  </Typography>
-                </Box>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={sending}
-                  endIcon={<SendIcon sx={{ fontSize: 16 }} />}
-                  size="small"
-                  sx={{
-                    px: 3,
-                    py: 0.8,
-                    backgroundColor: colors.primary,
-                    color: colors.onPrimary,
-                    fontWeight: 600,
-                    borderRadius: "30px",
-                    textTransform: "none",
-                    fontSize: "0.8rem",
-                    minWidth: "120px",
-                    "&:hover": {
-                      backgroundColor: colors.primary,
-                      opacity: 0.85,
-                      transform: "translateY(-1px) scale(1.02)",
-                      boxShadow: `0 4px 20px ${alpha(colors.primary, 0.3)}`,
-                    },
-                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                    "&:disabled": {
-                      opacity: 0.6,
-                    },
+                    color: colors.primary,
+                    fontSize: "0.85rem",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    "&:hover": { textDecoration: "underline" },
                   }}
                 >
-                  {sending ? "Sending..." : "Send"}
-                </Button>
-              </CardActions>
-            </form>
+                  Visit my portfolio
+                </Link>
+              </Box>
+            </Stack>
+          </Box>
 
-            {/* الروابط الاجتماعية - أصغر */}
-            <Box
-              sx={{
-                display: "flex",
-                gap: 1.5,
-                mt: 2,
-                pt: 2,
-                justifyContent: "center",
-                borderTop: `1px solid ${colors.border}`,
-              }}
-            >
-              <Link
-                href="mailto:hdayaaslam34@gmail.com"
-                target="_blank"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 36,
-                  height: 36,
-                  borderRadius: "10px",
-                  bgcolor: alpha(iconColors.email, 0.05),
-                  border: `1px solid ${alpha(iconColors.email, 0.1)}`,
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  "&:hover": {
-                    transform: "translateY(-3px) scale(1.05)",
-                    bgcolor: alpha(iconColors.email, 0.1),
-                    boxShadow: `0 4px 15px ${alpha(iconColors.email, 0.15)}`,
-                  },
-                }}
-              >
-                <EmailIcon sx={{ color: iconColors.email, fontSize: 18 }} />
-              </Link>
-              <Link
-                href="https://github.com/eslam-cmd"
-                target="_blank"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 36,
-                  height: 36,
-                  borderRadius: "10px",
-                  bgcolor: alpha(iconColors.github, 0.05),
-                  border: `1px solid ${alpha(iconColors.github, 0.1)}`,
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  "&:hover": {
-                    transform: "translateY(-3px) scale(1.05)",
-                    bgcolor: alpha(iconColors.github, 0.1),
-                    boxShadow: `0 4px 15px ${alpha(iconColors.github, 0.15)}`,
-                  },
-                }}
-              >
-                <GitHubIcon sx={{ color: iconColors.github, fontSize: 18 }} />
-              </Link>
-              <Link
-                href="https://www.linkedin.com/in/eslam-hd-60a056357"
-                target="_blank"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 36,
-                  height: 36,
-                  borderRadius: "10px",
-                  bgcolor: alpha(iconColors.linkedin, 0.05),
-                  border: `1px solid ${alpha(iconColors.linkedin, 0.1)}`,
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  "&:hover": {
-                    transform: "translateY(-3px) scale(1.05)",
-                    bgcolor: alpha(iconColors.linkedin, 0.1),
-                    boxShadow: `0 4px 15px ${alpha(iconColors.linkedin, 0.15)}`,
-                  },
-                }}
-              >
-                <LinkedInIcon sx={{ color: iconColors.linkedin, fontSize: 18 }} />
-              </Link>
+          {/* النموذج */}
+          <form ref={formRef} onSubmit={sendEmail}>
+            <Box display="flex" flexDirection="column" gap={2}>
+              {fields.map(({ name, label, Icon, type, multiline }) => (
+                <TextField
+                  key={name}
+                  name={name}
+                  label={label}
+                  type={type}
+                  variant="outlined"
+                  required
+                  size="small"
+                  multiline={multiline}
+                  rows={multiline ? 4 : undefined}
+                  disabled={sending}
+                  InputProps={{
+                    startAdornment: (
+                      <Box
+                        sx={{
+                          mr: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          alignSelf: multiline ? "flex-start" : "center",
+                          mt: multiline ? 0.4 : 0,
+                        }}
+                      >
+                        <Icon sx={{ fontSize: 18, color: colors.primary }} />
+                      </Box>
+                    ),
+                  }}
+                  sx={fieldSx}
+                />
+              ))}
             </Box>
-          </CardContent>
+
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2.5 }}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={sending}
+                endIcon={<SendIcon sx={{ fontSize: 17 }} />}
+                sx={{
+                  px: 3.5,
+                  py: 1.1,
+                  backgroundColor: colors.primary,
+                  color: colors.onPrimary,
+                  fontWeight: 600,
+                  borderRadius: "999px",
+                  textTransform: "none",
+                  fontSize: "0.95rem",
+                  minWidth: 140,
+                  boxShadow: "none",
+                  transition: "all 0.25s ease",
+                  "&:hover": {
+                    backgroundColor: colors.primary,
+                    opacity: 0.9,
+                    boxShadow: `0 6px 22px ${alpha(colors.primary, 0.3)}`,
+                  },
+                  "&.Mui-disabled": {
+                    backgroundColor: colors.primary,
+                    color: colors.onPrimary,
+                    opacity: 0.6,
+                  },
+                }}
+              >
+                {sending ? "Sending..." : "Send message"}
+              </Button>
+            </Box>
+          </form>
+
+          {/* الروابط */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1.5,
+              mt: 3,
+              pt: 3,
+              justifyContent: "center",
+              borderTop: `1px solid ${colors.borderSoft}`,
+            }}
+          >
+            {socials.map(({ label, href, Icon, color }) => (
+              <Link
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 42,
+                  height: 42,
+                  borderRadius: "14px",
+                  bgcolor: alpha(color, 0.07),
+                  border: `1px solid ${alpha(color, 0.18)}`,
+                  transition: "all 0.25s ease",
+                  "&:hover": {
+                    bgcolor: alpha(color, 0.14),
+                    borderColor: alpha(color, 0.4),
+                  },
+                }}
+              >
+                <Icon sx={{ color, fontSize: 20 }} />
+              </Link>
+            ))}
+          </Box>
         </Box>
 
-        {/* ✅ سهم التمرير للأسفل */}
+        {/* سهم التمرير للأسفل */}
         <Box
           sx={{
             position: "sticky",
             bottom: 0,
-            left: 0,
-            right: 0,
             display: "flex",
             justifyContent: "center",
-            py: 1,
-            background: `linear-gradient(to top, ${isDark ? 'rgba(10,31,68,0.95)' : 'rgba(255,255,255,0.95)'}, transparent)`,
+            py: 0.8,
             zIndex: 5,
             pointerEvents: "none",
           }}
         >
           <IconButton
             onClick={scrollToBottom}
+            aria-label="Scroll down"
             sx={{
               pointerEvents: "auto",
               color: colors.primary,
               bgcolor: alpha(colors.primary, 0.1),
-              border: `1px solid ${alpha(colors.primary, 0.2)}`,
+              border: `1px solid ${colors.borderSoft}`,
               width: 32,
               height: 32,
-              animation: `${bounce} 2s ease-in-out infinite`,
-              "&:hover": {
-                bgcolor: alpha(colors.primary, 0.2),
-                transform: "scale(1.1)",
-              },
-              transition: "all 0.3s ease",
+              transition: "all 0.25s ease",
+              "&:hover": { bgcolor: alpha(colors.primary, 0.2) },
             }}
           >
             <KeyboardArrowDownIcon sx={{ fontSize: 20 }} />
@@ -651,12 +505,10 @@ export default function ContactPage({ open, onClose }) {
           severity={snackbarSeverity}
           onClose={() => setOpenSnackbar(false)}
           sx={{
-            borderRadius: "12px",
-            boxShadow: `0 8px 30px ${alpha(colors.primary, 0.15)}`,
-            "& .MuiAlert-icon": {
-              fontSize: "18px",
-            },
-            fontSize: "0.85rem",
+            borderRadius: "14px",
+            fontFamily: FONT,
+            fontSize: "0.9rem",
+            boxShadow: `0 8px 30px ${alpha(colors.primary, 0.18)}`,
           }}
         >
           {snackbarMessage}

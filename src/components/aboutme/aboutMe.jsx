@@ -5,934 +5,296 @@ import {
   Box,
   Container,
   Typography,
-  Grid,
-  Paper,
   useTheme,
   Fade,
   Button,
-  Divider,
   alpha,
-  Chip,
 } from "@mui/material";
-
-import { School, Person, EmojiEmotions } from "@mui/icons-material";
-
-import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
+import { School, Code, Shield } from "@mui/icons-material";
 import ContactPage from "../contactpage/ContactPage";
-import { keyframes } from "@mui/system";
 
-// ============================================================
-// Animations
-// ============================================================
+const FONT = "'Space Grotesk', 'Inter', system-ui, sans-serif";
 
-const float = keyframes`
-  0%, 100% {
-    transform: translateY(0px);
-  }
+// ───── مكون الظهور عند التمرير ─────
+function Reveal({ children, delay = 0 }) {
+  const ref = React.useRef(null);
+  const [visible, setVisible] = React.useState(false);
 
-  50% {
-    transform: translateY(-6px);
-  }
-`;
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
-const fadeInUp = keyframes`
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
-  }
+  return (
+    <Box ref={ref}>
+      <Fade in={visible} timeout={700} style={{ transitionDelay: `${delay}ms` }}>
+        <Box>{children}</Box>
+      </Fade>
+    </Box>
+  );
+}
 
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
+const education = [
+  {
+    degree: "Vocational High School Diploma in Computer Studies",
+    institution: "Directorate of Education — Vocational & Technical Education",
+    period: "2023 – 2026",
+    description:
+      "Studied core computer science concepts and practical computing, with a focus on programming fundamentals, databases, networking, and software development.",
+  },
+];
 
-// ============================================================
-// Page
-// ============================================================
+const aboutParagraphs = [
+  "I’m a Full-Stack Developer focused on building modern web applications with a strong interest in backend engineering, application security, and reliable system architecture.",
+  "My work spans the full development lifecycle, from designing responsive interfaces with React, Next.js, and TypeScript to developing structured backend systems with Node.js, Express, NestJS, PostgreSQL, and Prisma.",
+  "I pay particular attention to authentication, authorization, database design, session security, rate limiting, OTP/MFA flows, and defensive application design. My goal is to build software that is not only functional, but also maintainable, secure, and dependable in real-world use.",
+];
 
 export default function AboutPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
-
   const [contactOpen, setContactOpen] = React.useState(false);
 
-  const [visibleSections, setVisibleSections] = React.useState({
-    about: false,
-    education: false,
-    contact: false,
-  });
-
-  const sectionRefs = {
-    about: React.useRef(null),
-    education: React.useRef(null),
-    contact: React.useRef(null),
-  };
-
-  // ==========================================================
-  // Theme colors
-  // ==========================================================
-
+  // ───── الألوان الخاصة بالعناصر فقط (بدون لون خلفية) ─────
   const colors = {
     primary: isDark ? "#D4AF37" : "#186E96",
-
-    text: isDark ? "#F5F5F5" : "#1A1A2E",
-
-    textMuted: isDark ? alpha("#F5F5F5", 0.7) : alpha("#1A1A2E", 0.7),
-
-    cardBg: isDark
-      ? "linear-gradient(145deg, rgba(26, 43, 77, 0.8), rgba(10, 31, 68, 0.8))"
-      : "linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(230, 240, 246, 0.85))",
-
-    sectionBg: isDark
-      ? "linear-gradient(145deg, rgba(10, 31, 68, 0.7), rgba(26, 26, 46, 0.7))"
-      : "linear-gradient(145deg, rgba(240, 246, 250, 0.8), rgba(220, 235, 245, 0.8))",
-
-    border: isDark ? alpha("#D4AF37", 0.2) : alpha("#186E96", 0.2),
+    text: isDark ? "#F5F5F5" : "#0A1F44",
+    textMuted: isDark ? alpha("#F5F5F5", 0.6) : alpha("#0A1F44", 0.6),
+    cardBg: isDark ? alpha("#ffffff", 0.02) : alpha("#ffffff", 0.7),
+    cardBorder: isDark ? alpha("#ffffff", 0.08) : alpha("#186e96", 0.15),
+    tagBg: isDark ? alpha("#ffffff", 0.03) : alpha("#000000", 0.03),
+    tagBorder: isDark ? alpha("#ffffff", 0.08) : alpha("#000000", 0.08),
+    onPrimary: isDark ? "#0A1F44" : "#ffffff",
   };
 
-  // ==========================================================
-  // Education
-  // ==========================================================
+  const cardStyle = {
+    borderRadius: "20px",
+    background: colors.cardBg,
+    backdropFilter: "blur(10px)",
+    border: `1px solid ${colors.cardBorder}`,
+    boxShadow: isDark ? "0 8px 32px rgba(0,0,0,0.2)" : "0 8px 32px rgba(24,110,150,0.05)",
+    transition: "border-color 0.3s ease",
+    "&:hover": { borderColor: alpha(colors.primary, 0.3) },
+    position: "relative",
+    overflow: "hidden",
+  };
 
-  const education = [
-    {
-      degree: "Vocational High School Diploma in Computer Studies",
-
-      institution:
-        "Directorate of Education — Vocational & Technical Education",
-
-      period: "2023 – 2026",
-
-      description:
-        "Studied core computer science concepts and practical computing, with a focus on programming fundamentals, databases, networking, and software development.",
-
-      icon: <School />,
-    },
-  ];
-
-  // ==========================================================
-  // Intersection Observer
-  // ==========================================================
-
-  React.useEffect(() => {
-    const observers = Object.entries(sectionRefs).map(([key, ref]) => {
-      if (!ref.current) return null;
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setVisibleSections((prev) => ({
-                ...prev,
-                [key]: true,
-              }));
-            }
-          });
-        },
-        {
-          threshold: 0.15,
-          rootMargin: "0px 0px -50px 0px",
-        },
-      );
-
-      observer.observe(ref.current);
-
-      return observer;
-    });
-
-    return () => {
-      observers.forEach((observer) => {
-        if (observer) observer.disconnect();
-      });
-    };
-  }, []);
-
-  // ==========================================================
-  // Render
-  // ==========================================================
+  const heading = {
+    fontFamily: FONT,
+    color: colors.text,
+    fontWeight: 700,
+    letterSpacing: "-0.01em",
+    lineHeight: 1.2,
+  };
 
   return (
     <Box
       id="about"
       sx={{
-        minHeight: "100vh",
-        pt: { xs: 8, md: 12 },
-        pb: 8,
+        py: { xs: 8, md: 10 },
+        fontFamily: FONT,
+        // ✅ تم إزالة bgcolor و backgroundImage تماماً ليأخذ خلفية الموقع
+        "& .MuiTypography-root, & .MuiButton-root": { fontFamily: FONT },
       }}
     >
-      <Container
-        maxWidth="xl"
-        sx={{
-          px: { xs: 2, sm: 3, md: 4 },
-        }}
-      >
-        {/* ==================================================
-            ABOUT
-        ================================================== */}
+      <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 }, position: "relative", zIndex: 1 }}>
+        
+        {/* ───── 1. About Me (Bento Style) ───── */}
+        <Reveal>
+          <Box sx={{ ...cardStyle, p: { xs: 3, sm: 4, md: 5 }, mb: 4 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}>
+              <Code sx={{ color: colors.primary, fontSize: 20 }} />
+              <Typography sx={{ color: colors.primary, fontSize: "0.8rem", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase" }}>
+                About Me
+              </Typography>
+            </Box>
 
-        <Box ref={sectionRefs.about}>
-          <Fade
-            in={visibleSections.about}
-            timeout={800}
-            style={{
-              transitionDelay: "0ms",
-            }}
-          >
-            <Paper
-              elevation={0}
-              sx={{
-                p: {
-                  xs: 3,
-                  sm: 4,
-                  md: 6,
-                },
+            <Box sx={{ maxWidth: 800 }}>
+              {aboutParagraphs.map((text, i) => (
+                <Typography
+                  key={i}
+                  sx={{
+                    color: i === 0 ? colors.text : colors.textMuted,
+                    fontSize: { xs: "0.95rem", md: "1rem" },
+                    lineHeight: 1.8,
+                    mb: i === aboutParagraphs.length - 1 ? 0 : 2,
+                  }}
+                >
+                  {text}
+                </Typography>
+              ))}
+            </Box>
+          </Box>
+        </Reveal>
 
-                mb: {
-                  xs: 6,
-                  md: 10,
-                },
+        {/* ───── 2. Education (Terminal/Timeline Style) ───── */}
+        <Reveal delay={100}>
+          <Box sx={{ ...cardStyle, p: { xs: 3, sm: 4, md: 5 }, mb: 4 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 4 }}>
+              <School sx={{ color: colors.primary, fontSize: 20 }} />
+              <Typography sx={{ color: colors.primary, fontSize: "0.8rem", fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase" }}>
+                Education
+              </Typography>
+            </Box>
 
-                borderRadius: 4,
-
-                background: colors.sectionBg,
-
-                backdropFilter: "blur(12px)",
-
-                border: `1px solid ${colors.border}`,
-
-                position: "relative",
-
-                overflow: "hidden",
-
-                transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
-
-                "&:hover": {
-                  borderColor: alpha(colors.primary, 0.4),
-                },
-              }}
-            >
-              {/* Decorative element */}
-
+            <Box sx={{ position: "relative", pl: { xs: 3, sm: 4 } }}>
+              {/* الخط الجانبي */}
               <Box
                 sx={{
                   position: "absolute",
-
-                  top: -60,
-                  right: -60,
-
-                  width: 120,
-                  height: 120,
-
-                  borderRadius: "50%",
-
-                  background: `radial-gradient(
-                    circle,
-                    ${alpha(colors.primary, 0.1)} 0%,
-                    transparent 70%
-                  )`,
-
-                  zIndex: 0,
-
-                  animation: `${float} 8s ease-in-out infinite`,
+                  left: 6,
+                  top: 10,
+                  bottom: 0,
+                  width: 2,
+                  background: `linear-gradient(to bottom, ${alpha(colors.primary, 0.5)}, transparent)`,
                 }}
               />
 
-              <Box position="relative" zIndex={1}>
-                {/* Heading */}
-
-                <Box
-                  sx={{
-                    textAlign: "center",
-                    mb: {
-                      xs: 3,
-                      md: 4,
-                    },
-                  }}
-                >
-                  <Chip
-                    icon={
-                      <Person
-                        sx={{
-                          fontSize: 16,
-                          color: colors.primary,
-                        }}
-                      />
-                    }
-                    label="ABOUT ME"
+              {education.map((edu) => (
+                <Box key={edu.degree} sx={{ position: "relative", mb: 2 }}>
+                  {/* النقطة على الخط */}
+                  <Box
                     sx={{
-                      bgcolor: alpha(colors.primary, 0.08),
-
-                      color: colors.primary,
-
-                      border: `1px solid ${alpha(colors.primary, 0.15)}`,
-
-                      fontWeight: 600,
-
-                      letterSpacing: "2px",
-
-                      fontSize: "10px",
-
-                      mb: {
-                        xs: 1.5,
-                        md: 2,
-                      },
+                      position: "absolute",
+                      left: -32,
+                      top: 4,
+                      width: 16,
+                      height: 16,
+                      borderRadius: "50%",
+                      // نستخدم لون البطاقة أو الشفافية ليعطي تأثير الثقب
+                      bgcolor: isDark ? "#0A1F44" : "#ffffff", 
+                      border: `3px solid ${colors.primary}`,
+                      zIndex: 1,
                     }}
                   />
 
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      fontWeight: 700,
-
-                      color: colors.primary,
-
-                      fontSize: {
-                        xs: "1.8rem",
-                        sm: "2.2rem",
-                        md: "2.8rem",
-                      },
-
-                      fontFamily: "'Inter', sans-serif",
-
-                      letterSpacing: "-0.02em",
-                    }}
-                  >
-                    About Me
-                  </Typography>
-                </Box>
-
-                {/* Content */}
-
-                <Grid container justifyContent="center">
-                  <Grid item xs={12} md={10} lg={9}>
-                    <Box
-                      sx={{
-                        maxWidth: "900px",
-                        mx: "auto",
-                      }}
-                    >
-                      {/* Main professional introduction */}
-
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontSize: {
-                            xs: "0.95rem",
-                            sm: "1rem",
-                            md: "1.05rem",
-                          },
-
-                          lineHeight: {
-                            xs: 1.8,
-                            md: 1.9,
-                          },
-
-                          color: colors.text,
-
-                          textAlign: "left",
-
-                          fontFamily: "'Inter', sans-serif",
-
-                          mb: 2,
-
-                          px: {
-                            xs: 0,
-                            sm: 2,
-                          },
-                        }}
-                      >
-                        I’m a Full-Stack Developer focused on building modern
-                        web applications with a strong interest in backend
-                        engineering, application security, and reliable system
-                        architecture.
-                      </Typography>
-
-                      {/* Technical profile */}
-
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontSize: {
-                            xs: "0.95rem",
-                            sm: "1rem",
-                            md: "1.05rem",
-                          },
-
-                          lineHeight: {
-                            xs: 1.8,
-                            md: 1.9,
-                          },
-
-                          color: colors.textMuted,
-
-                          textAlign: "left",
-
-                          fontFamily: "'Inter', sans-serif",
-
-                          mb: 2,
-
-                          px: {
-                            xs: 0,
-                            sm: 2,
-                          },
-                        }}
-                      >
-                        My work spans the full development lifecycle, from
-                        designing responsive interfaces with React, Next.js, and
-                        TypeScript to developing structured backend systems with
-                        Node.js, Express, NestJS, PostgreSQL, and Prisma.
-                      </Typography>
-
-                      {/* Security / engineering approach */}
-
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontSize: {
-                            xs: "0.95rem",
-                            sm: "1rem",
-                            md: "1.05rem",
-                          },
-
-                          lineHeight: {
-                            xs: 1.8,
-                            md: 1.9,
-                          },
-
-                          color: colors.textMuted,
-
-                          textAlign: "left",
-
-                          fontFamily: "'Inter', sans-serif",
-
-                          px: {
-                            xs: 0,
-                            sm: 2,
-                          },
-                        }}
-                      >
-                        I pay particular attention to authentication,
-                        authorization, database design, session security, rate
-                        limiting, OTP/MFA flows, and defensive application
-                        design. My goal is to build software that is not only
-                        functional, but also maintainable, secure, and
-                        dependable in real-world use.
-                      </Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Paper>
-          </Fade>
-        </Box>
-
-        {/* ==================================================
-            DIVIDER
-        ================================================== */}
-
-        <Divider
-          sx={{
-            borderColor: colors.border,
-
-            my: {
-              xs: 4,
-              md: 5,
-            },
-          }}
-        />
-
-        {/* ==================================================
-            EDUCATION
-        ================================================== */}
-
-        <Grid
-          container
-          spacing={6}
-          sx={{
-            mb: {
-              xs: 6,
-              md: 10,
-            },
-          }}
-        >
-          <Grid item xs={12} lg={6}>
-            <Box ref={sectionRefs.education}>
-              <Fade
-                in={visibleSections.education}
-                timeout={800}
-                style={{
-                  transitionDelay: "200ms",
-                }}
-              >
-                <Box>
-                  {/* Section heading */}
-
                   <Box
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
-                      mb: 4,
+                      p: { xs: 2.5, sm: 3 },
+                      borderRadius: "12px",
+                      bgcolor: colors.tagBg,
+                      border: `1px solid ${colors.tagBorder}`,
                     }}
                   >
-                    <School
-                      sx={{
-                        color: colors.primary,
-                        fontSize: 32,
-                      }}
-                    />
-
                     <Typography
-                      variant="h3"
                       sx={{
-                        color: colors.primary,
-
-                        fontWeight: 700,
-
-                        fontSize: {
-                          xs: "1.6rem",
-                          sm: "1.8rem",
-                          md: "2.2rem",
-                        },
-
-                        fontFamily: "'Inter', sans-serif",
-
-                        letterSpacing: "-0.02em",
+                        color: colors.text,
+                        fontWeight: 600,
+                        fontSize: { xs: "1rem", sm: "1.1rem" },
+                        mb: 0.5,
                       }}
                     >
-                      Education
+                      {edu.degree}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        color: colors.primary,
+                        fontSize: "0.85rem",
+                        fontWeight: 500,
+                        mb: 1.5,
+                      }}
+                    >
+                      {edu.institution} <span style={{ color: colors.textMuted }}>• {edu.period}</span>
+                    </Typography>
+                    <Typography
+                      sx={{
+                        color: colors.textMuted,
+                        fontSize: "0.9rem",
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {edu.description}
                     </Typography>
                   </Box>
-
-                  {/* Timeline */}
-
-                  <Box
-                    sx={{
-                      position: "relative",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        position: "absolute",
-
-                        left: 20,
-
-                        top: 0,
-                        bottom: 0,
-
-                        width: 2,
-
-                        background: `linear-gradient(
-                          to bottom,
-                          ${colors.primary}44,
-                          transparent
-                        )`,
-
-                        zIndex: 0,
-                      }}
-                    />
-
-                    {education.map((edu, index) => (
-                      <Box
-                        key={index}
-                        sx={{
-                          position: "relative",
-
-                          pl: 6,
-
-                          mb: 4,
-
-                          zIndex: 1,
-
-                          animation: visibleSections.education
-                            ? `${fadeInUp} 0.8s ease ${
-                                index * 0.15 + 0.15
-                              }s both`
-                            : "none",
-                        }}
-                      >
-                        {/* Timeline icon */}
-
-                        <Box
-                          sx={{
-                            position: "absolute",
-
-                            left: 0,
-
-                            top: 8,
-
-                            width: 40,
-                            height: 40,
-
-                            borderRadius: "50%",
-
-                            backgroundColor: alpha(colors.primary, 0.08),
-
-                            border: `2px solid ${colors.primary}`,
-
-                            display: "flex",
-
-                            alignItems: "center",
-
-                            justifyContent: "center",
-
-                            color: colors.primary,
-
-                            transition: "all 0.3s ease",
-
-                            "&:hover": {
-                              transform: "scale(1.1)",
-
-                              backgroundColor: alpha(colors.primary, 0.15),
-                            },
-                          }}
-                        >
-                          {edu.icon}
-                        </Box>
-
-                        {/* Education card */}
-
-                        <Paper
-                          elevation={0}
-                          sx={{
-                            p: {
-                              xs: 2.5,
-                              sm: 3,
-                            },
-
-                            borderRadius: 3,
-
-                            background: colors.cardBg,
-
-                            backdropFilter: "blur(10px)",
-
-                            border: `1px solid ${colors.border}`,
-
-                            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-
-                            "&:hover": {
-                              transform: "translateX(4px)",
-
-                              borderColor: alpha(colors.primary, 0.4),
-
-                              boxShadow: `0 8px 30px ${alpha(
-                                colors.primary,
-                                0.05,
-                              )}`,
-                            },
-                          }}
-                        >
-                          <Typography
-                            variant="h6"
-                            sx={{
-                              color: colors.primary,
-
-                              fontWeight: 700,
-
-                              mb: 0.5,
-
-                              fontSize: {
-                                xs: "1rem",
-                                sm: "1.1rem",
-                              },
-                            }}
-                          >
-                            {edu.degree}
-                          </Typography>
-
-                          <Typography
-                            variant="subtitle1"
-                            sx={{
-                              color: colors.textMuted,
-
-                              mb: 1.5,
-
-                              fontWeight: 500,
-
-                              fontSize: "0.85rem",
-                            }}
-                          >
-                            {edu.institution} • {edu.period}
-                          </Typography>
-
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              color: colors.textMuted,
-
-                              lineHeight: 1.8,
-
-                              fontSize: "0.9rem",
-                            }}
-                          >
-                            {edu.description}
-                          </Typography>
-                        </Paper>
-                      </Box>
-                    ))}
-                  </Box>
                 </Box>
-              </Fade>
+              ))}
             </Box>
-          </Grid>
-        </Grid>
+          </Box>
+        </Reveal>
 
-        {/* ==================================================
-            DIVIDER
-        ================================================== */}
-
-        <Divider
-          sx={{
-            borderColor: colors.border,
-
-            my: {
-              xs: 4,
-              md: 5,
-            },
-          }}
-        />
-
-        {/* ==================================================
-            CONTACT
-        ================================================== */}
-
-        <Box ref={sectionRefs.contact}>
-          <Fade
-            in={visibleSections.contact}
-            timeout={800}
-            style={{
-              transitionDelay: "300ms",
+        {/* ───── 3. Contact ───── */}
+        <Reveal delay={150}>
+          <Box
+            id="contact-section"
+            sx={{
+              ...cardStyle,
+              p: { xs: 4, sm: 5, md: 6 },
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
           >
-            <Box id="contact-section">
-              {/* Heading */}
-
-              <Box
-                sx={{
-                  textAlign: "center",
-
-                  mb: {
-                    xs: 3,
-                    md: 4,
-                  },
-                }}
-              >
-                <Chip
-                  icon={
-                    <EmojiEmotions
-                      sx={{
-                        fontSize: 16,
-                        color: colors.primary,
-                      }}
-                    />
-                  }
-                  label="GET IN TOUCH"
-                  sx={{
-                    bgcolor: alpha(colors.primary, 0.08),
-
-                    color: colors.primary,
-
-                    border: `1px solid ${alpha(colors.primary, 0.15)}`,
-
-                    fontWeight: 600,
-
-                    letterSpacing: "2px",
-
-                    fontSize: "10px",
-
-                    mb: {
-                      xs: 1.5,
-                      md: 2,
-                    },
-                  }}
-                />
-
-                <Typography
-                  variant="h2"
-                  sx={{
-                    fontWeight: 700,
-
-                    color: colors.primary,
-
-                    fontSize: {
-                      xs: "1.8rem",
-                      sm: "2.2rem",
-                      md: "2.8rem",
-                    },
-
-                    fontFamily: "'Inter', sans-serif",
-
-                    letterSpacing: "-0.02em",
-                  }}
-                >
-                  Let's Work Together{" "}
-                  <LocalPhoneIcon
-                    sx={{
-                      fontSize: {
-                        xs: 26,
-                        md: 36,
-                      },
-                    }}
-                  />
-                </Typography>
-              </Box>
-
-              {/* Contact card */}
-
-              <Paper
-                elevation={0}
-                sx={{
-                  p: {
-                    xs: 3,
-                    sm: 4,
-                    md: 7,
-                  },
-
-                  borderRadius: 4,
-
-                  background: colors.sectionBg,
-
-                  backdropFilter: "blur(12px)",
-
-                  border: `1px solid ${colors.border}`,
-
-                  textAlign: "center",
-
-                  transition: "all 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
-
-                  "&:hover": {
-                    borderColor: alpha(colors.primary, 0.4),
-                  },
-                }}
-              >
-                <Typography
-                  variant="h5"
-                  sx={{
-                    mb: 2,
-
-                    color: colors.primary,
-
-                    fontWeight: 700,
-
-                    fontSize: {
-                      xs: "1.2rem",
-                      sm: "1.4rem",
-                      md: "1.6rem",
-                    },
-                  }}
-                >
-                  Have a project in mind?
-                </Typography>
-
-                <Typography
-                  variant="body1"
-                  sx={{
-                    mb: 4,
-
-                    color: colors.text,
-
-                    fontSize: {
-                      xs: "0.95rem",
-                      sm: "1rem",
-                      md: "1.1rem",
-                    },
-
-                    maxWidth: "650px",
-
-                    mx: "auto",
-
-                    lineHeight: 1.8,
-
-                    px: {
-                      xs: 1,
-                      sm: 2,
-                    },
-                  }}
-                >
-                  I’m open to discussing software projects, development
-                  opportunities, and ideas that can be turned into practical
-                  digital products.
-                </Typography>
-
-                <Button
-                  variant="contained"
-                  onClick={() => setContactOpen(true)}
-                  sx={{
-                    px: {
-                      xs: 5,
-                      sm: 6,
-                      md: 7,
-                    },
-
-                    py: {
-                      xs: 1.6,
-                      sm: 1.8,
-                      md: 2.2,
-                    },
-
-                    minHeight: {
-                      xs: 52,
-                      sm: 56,
-                      md: 62,
-                    },
-
-                    minWidth: {
-                      xs: 220,
-                      sm: 240,
-                      md: 260,
-                    },
-
-                    borderRadius: "30px",
-
-                    background: colors.primary,
-
-                    color: isDark ? "#0A1F44" : "#ffffff",
-
-                    fontSize: {
-                      xs: "1rem",
-                      sm: "1.05rem",
-                      md: "1.15rem",
-                    },
-
-                    fontWeight: 700,
-
-                    textTransform: "none",
-
-                    letterSpacing: "-0.01em",
-
-                    boxShadow: `0 4px 20px ${alpha(colors.primary, 0.25)}`,
-
-                    transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-
-                    "&:hover": {
-                      background: colors.primary,
-
-                      transform: "translateY(-3px) scale(1.02)",
-
-                      boxShadow: `0 8px 35px ${alpha(colors.primary, 0.35)}`,
-                    },
-
-                    "@media (max-width: 390px)": {
-                      minWidth: 200,
-
-                      width: "100%",
-
-                      maxWidth: 260,
-                    },
-                  }}
-                >
-                  Get In Touch
-                </Button>
-              </Paper>
+            {/* أيقونة خلفية خفيفة */}
+            <Box sx={{ position: "absolute", top: -20, right: -20, opacity: 0.05 }}>
+              <Shield sx={{ fontSize: 150, color: colors.primary }} />
             </Box>
-          </Fade>
-        </Box>
-      </Container>
 
-      {/* ====================================================
-          Contact Modal
-      ==================================================== */}
+            <Typography
+              component="h2"
+              sx={{
+                ...heading,
+                fontSize: { xs: "1.6rem", sm: "2rem", md: "2.4rem" },
+                mb: 2,
+                position: "relative",
+              }}
+            >
+              Let's work together
+            </Typography>
+
+            <Typography
+              sx={{
+                color: colors.textMuted,
+                fontSize: { xs: "0.95rem", md: "1.05rem" },
+                maxWidth: 600,
+                mx: "auto",
+                lineHeight: 1.7,
+                mb: 4,
+                position: "relative",
+              }}
+            >
+              I’m open to discussing software projects, development opportunities, and ideas that can be turned into practical digital products.
+            </Typography>
+
+            <Button
+              variant="contained"
+              onClick={() => setContactOpen(true)}
+              sx={{
+                px: 4,
+                py: 1.2,
+                borderRadius: "8px", 
+                bgcolor: colors.primary,
+                color: colors.onPrimary,
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                textTransform: "none",
+                boxShadow: "none",
+                transition: "background-color 0.25s ease, box-shadow 0.25s ease",
+                position: "relative",
+                "&:hover": {
+                  bgcolor: colors.primary,
+                  opacity: 0.9,
+                  boxShadow: `0 6px 20px ${alpha(colors.primary, 0.2)}`,
+                },
+              }}
+            >
+              Get in touch
+            </Button>
+          </Box>
+        </Reveal>
+
+      </Container>
 
       <ContactPage open={contactOpen} onClose={() => setContactOpen(false)} />
     </Box>

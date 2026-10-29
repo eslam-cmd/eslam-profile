@@ -11,6 +11,7 @@ import {
   IconButton,
   Stack,
   Tooltip,
+  alpha,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import GitHubIcon from "@mui/icons-material/GitHub";
@@ -21,10 +22,7 @@ import CodeIcon from "@mui/icons-material/Code";
 import FlagIcon from "@mui/icons-material/Flag";
 import { keyframes } from "@mui/system";
 
-const shimmer = keyframes`
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-`;
+const FONT = "'Space Grotesk', 'Inter', system-ui, sans-serif";
 
 const fadeInUp = keyframes`
   0% { opacity: 0; transform: translateY(10px); }
@@ -41,24 +39,23 @@ export default function FeaturedProjectCard({
   const [currentPhoto, setCurrentPhoto] = React.useState(0);
 
   const colors = {
-    cardBg: darkMode ? "rgba(10, 31, 68, 0.85)" : "rgba(255, 255, 255, 0.98)",
-    border: darkMode ? "rgba(212, 175, 55, 0.2)" : "rgba(24, 110, 150, 0.2)",
+    cardBg: darkMode ? alpha("#050a14", 0.85) : alpha("#ffffff", 0.9),
+    border: darkMode ? alpha("#D4AF37", 0.15) : alpha("#186e96", 0.15),
+    borderHover: darkMode ? alpha("#D4AF37", 0.4) : alpha("#186e96", 0.4),
     accent: darkMode ? "#D4AF37" : "#186e96",
     accentHover: darkMode ? "#FFD700" : "#0f4d68",
-    textPrimary: darkMode ? "#ffffff" : "#0A1F44",
-    textSecondary: darkMode ? "#b8b8b8" : "#555",
-    chipBg: darkMode ? "rgba(212, 175, 55, 0.1)" : "rgba(24, 110, 150, 0.08)",
-    chipBorder: darkMode
-      ? "rgba(212, 175, 55, 0.25)"
-      : "rgba(24, 110, 150, 0.2)",
-    imageBg: darkMode ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.05)",
+    textPrimary: darkMode ? "#F5F5F5" : "#0A1F44",
+    textMuted: darkMode ? alpha("#F5F5F5", 0.6) : alpha("#0A1F44", 0.6),
+    tagBg: darkMode ? alpha("#ffffff", 0.03) : alpha("#000000", 0.03),
+    tagBorder: darkMode ? alpha("#ffffff", 0.08) : alpha("#000000", 0.08),
+    dotColor: darkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
+    iconBg: darkMode ? alpha("#ffffff", 0.05) : alpha("#000000", 0.04),
+    iconHover: darkMode ? alpha("#D4AF37", 0.15) : alpha("#186e96", 0.1),
   };
 
-  const photos = project.photos?.length > 0 ? project.photos : [null];
-  const mainPhoto = photos[currentPhoto];
+  const photos = project?.photos?.length > 0 ? project.photos : [null];
   const hasMultiple = photos.length > 1;
 
-  // تبديل الصور تلقائياً كل 4 ثواني
   React.useEffect(() => {
     if (!hasMultiple) return;
     const interval = setInterval(() => {
@@ -67,32 +64,41 @@ export default function FeaturedProjectCard({
     return () => clearInterval(interval);
   }, [hasMultiple, photos.length]);
 
+  if (!project) return null;
+
+  const mainPhoto = photos[currentPhoto];
+
   return (
     <Card
       sx={{
+        fontFamily: FONT,
+        "& .MuiTypography-root, & .MuiButton-root, & .MuiChip-root": {
+          fontFamily: FONT,
+        },
         position: "relative",
         width: "100%",
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        borderRadius: { xs: 3, sm: 4 },
+        borderRadius: "24px",
         overflow: "hidden",
         background: colors.cardBg,
         backdropFilter: "blur(20px) saturate(180%)",
         WebkitBackdropFilter: "blur(20px) saturate(180%)",
         border: `1px solid ${colors.border}`,
         boxShadow: darkMode
-          ? "0 8px 40px rgba(0,0,0,0.5)"
-          : "0 8px 40px rgba(24, 110, 150, 0.12)",
-        transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+          ? "0 8px 32px rgba(0,0,0,0.3)"
+          : "0 8px 32px rgba(24,110,150,0.06)",
+        transition: "border-color 0.3s ease, box-shadow 0.3s ease",
+        // خلفية تقنية بنقاط ناعمة جداً
+        backgroundImage: `radial-gradient(circle, ${colors.dotColor} 1px, transparent 1px)`,
+        backgroundSize: "24px 24px",
         "&:hover": {
-          transform: "translateY(-10px) scale(1.01)",
-          borderColor: colors.accent,
+          borderColor: colors.borderHover,
           boxShadow: darkMode
-            ? `0 24px 70px rgba(212, 175, 55, 0.25)`
-            : `0 24px 70px rgba(24, 110, 150, 0.28)`,
+            ? `0 12px 40px ${alpha("#000", 0.4)}`
+            : `0 12px 40px ${alpha("#186e96", 0.12)}`,
         },
-        // شريط علوي مميز للمشاريع Featured
         ...(featured && {
           "&::before": {
             content: '""',
@@ -100,233 +106,225 @@ export default function FeaturedProjectCard({
             top: 0,
             left: 0,
             right: 0,
-            height: "3px",
-            background: `linear-gradient(90deg, ${colors.accent}, #FFD700, ${colors.accent})`,
-            backgroundSize: "200% 100%",
-            animation: `${shimmer} 3s linear infinite`,
+            height: "2px",
+            background: `linear-gradient(90deg, transparent, ${colors.accent}, transparent)`,
+            opacity: 0.85,
             zIndex: 5,
           },
         }),
       }}
     >
-      {/* ═══════════════════════════════════════
-          صورة المشروع
-      ═══════════════════════════════════════ */}
+      {/* ═══ الصورة ═══ */}
       <Box
         sx={{
           position: "relative",
           width: "100%",
           aspectRatio: { xs: "16/10", sm: "16/9" },
           overflow: "hidden",
-          backgroundColor: colors.imageBg,
+          p: 2, // إضافة مساحة لكي تبدو الصورة كأنها داخل إطار
         }}
       >
-        {/* شارة Featured */}
-        {featured && (
-          <Box
-            sx={{
-              position: "absolute",
-              top: 14,
-              left: 14,
-              zIndex: 4,
-              display: "flex",
-              alignItems: "center",
-              gap: 0.6,
-              px: 1.4,
-              py: 0.6,
-              borderRadius: "8px",
-              bgcolor: "rgba(0,0,0,0.7)",
-              backdropFilter: "blur(10px)",
-              border: `1px solid ${colors.accent}`,
-              boxShadow: `0 4px 15px rgba(212, 175, 55, 0.3)`,
-            }}
-          >
-            <AutoAwesomeIcon sx={{ fontSize: 14, color: colors.accent }} />
-            <Typography
-              sx={{
-                fontSize: "10px",
-                fontWeight: 800,
-                color: colors.accent,
-                letterSpacing: "1.5px",
-                textTransform: "uppercase",
-              }}
-            >
-              Featured
-            </Typography>
-          </Box>
-        )}
-
-        {/* شارة الفئة */}
-        {project.category && (
-          <Box
-            sx={{
-              position: "absolute",
-              top: 14,
-              right: 14,
-              zIndex: 4,
-              px: 1.4,
-              py: 0.6,
-              borderRadius: "8px",
-              bgcolor: "rgba(0,0,0,0.7)",
-              backdropFilter: "blur(10px)",
-              border: "1px solid rgba(255,255,255,0.15)",
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: "10px",
-                fontWeight: 700,
-                color: "#fff",
-                letterSpacing: "1px",
-                textTransform: "uppercase",
-              }}
-            >
-              {project.category}
-            </Typography>
-          </Box>
-        )}
-
-        {/* الصورة */}
-        {!imgError && mainPhoto ? (
-          <Box
-            component="img"
-            src={mainPhoto}
-            alt={project.title}
-            onError={() => setImgError(true)}
-            loading="lazy"
-            sx={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              display: "block",
-              transition: "transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)",
-              ".MuiCard-root:hover &": {
-                transform: "scale(1.08)",
-              },
-            }}
-          />
-        ) : (
-          <Box
-            sx={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: colors.textSecondary,
-              fontSize: "0.85rem",
-            }}
-          >
-            Image unavailable
-          </Box>
-        )}
-
-        {/* تدرج سفلي */}
         <Box
           sx={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(180deg, transparent 45%, rgba(0,0,0,0.75) 100%)",
-            pointerEvents: "none",
+            position: "relative",
+            width: "100%",
+            height: "100%",
+            borderRadius: "16px",
+            overflow: "hidden",
+            border: `1px solid ${colors.tagBorder}`,
           }}
-        />
-
-        {/* عدّاد الصور + نقاط التنقل */}
-        {hasMultiple && (
-          <>
-            {/* النقاط */}
+        >
+          {featured && (
             <Box
               sx={{
                 position: "absolute",
-                bottom: 14,
-                left: "50%",
-                transform: "translateX(-50%)",
+                top: 12,
+                left: 12,
+                zIndex: 4,
                 display: "flex",
+                alignItems: "center",
                 gap: 0.6,
-                zIndex: 3,
-              }}
-            >
-              {photos.map((_, idx) => (
-                <Box
-                  key={idx}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentPhoto(idx);
-                  }}
-                  sx={{
-                    width: idx === currentPhoto ? 22 : 7,
-                    height: 7,
-                    borderRadius: "4px",
-                    backgroundColor:
-                      idx === currentPhoto
-                        ? colors.accent
-                        : "rgba(255,255,255,0.5)",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: colors.accent,
-                    },
-                  }}
-                />
-              ))}
-            </Box>
-
-            {/* عدّاد */}
-            <Box
-              sx={{
-                position: "absolute",
-                bottom: 14,
-                right: 14,
-                zIndex: 3,
                 px: 1.2,
                 py: 0.5,
                 borderRadius: "8px",
-                bgcolor: "rgba(0,0,0,0.75)",
+                bgcolor: alpha("#020a1a", 0.8),
                 backdropFilter: "blur(10px)",
-                display: "flex",
-                alignItems: "center",
-                gap: 0.5,
-                border: "1px solid rgba(255,255,255,0.1)",
+                border: `1px solid ${colors.border}`,
               }}
             >
-              <CameraAltIcon sx={{ fontSize: 12, color: "#fff" }} />
+              <AutoAwesomeIcon sx={{ fontSize: 12, color: colors.accent }} />
               <Typography
                 sx={{
-                  fontSize: "10px",
-                  color: "#fff",
+                  fontSize: "9px",
                   fontWeight: 700,
-                  letterSpacing: "0.5px",
+                  color: colors.accent,
+                  letterSpacing: "1px",
+                  textTransform: "uppercase",
                 }}
               >
-                {currentPhoto + 1}/{photos.length}
+                Featured
               </Typography>
             </Box>
-          </>
-        )}
+          )}
+
+          {project.category && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 12,
+                right: 12,
+                zIndex: 4,
+                px: 1.2,
+                py: 0.5,
+                borderRadius: "8px",
+                bgcolor: alpha("#020a1a", 0.8),
+                backdropFilter: "blur(10px)",
+                border: `1px solid ${colors.tagBorder}`,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: "9px",
+                  fontWeight: 700,
+                  color: "#fff",
+                  letterSpacing: "1px",
+                  textTransform: "uppercase",
+                }}
+              >
+                {project.category}
+              </Typography>
+            </Box>
+          )}
+
+          {!imgError && mainPhoto ? (
+            <Box
+              component="img"
+              src={mainPhoto}
+              alt={project.title}
+              onError={() => setImgError(true)}
+              loading="lazy"
+              sx={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+                transition: "transform 0.6s ease",
+                ".MuiCard-root:hover &": { transform: "scale(1.04)" },
+                "@media (prefers-reduced-motion: reduce)": {
+                  transition: "none",
+                },
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: colors.textMuted,
+                fontSize: "0.85rem",
+              }}
+            >
+              Image unavailable
+            </Box>
+          )}
+
+          <Box
+            sx={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.8) 100%)",
+              pointerEvents: "none",
+            }}
+          />
+
+          {hasMultiple && (
+            <>
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 12,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  display: "flex",
+                  gap: 0.6,
+                  zIndex: 3,
+                }}
+              >
+                {photos.map((_, idx) => (
+                  <Box
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentPhoto(idx);
+                    }}
+                    sx={{
+                      width: idx === currentPhoto ? 18 : 6,
+                      height: 6,
+                      borderRadius: "999px",
+                      backgroundColor:
+                        idx === currentPhoto
+                          ? colors.accent
+                          : alpha("#ffffff", 0.5),
+                      cursor: "pointer",
+                      transition:
+                        "background-color 0.25s ease, width 0.25s ease",
+                    }}
+                  />
+                ))}
+              </Box>
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 12,
+                  right: 12,
+                  zIndex: 3,
+                  px: 1,
+                  py: 0.4,
+                  borderRadius: "6px",
+                  bgcolor: alpha("#020a1a", 0.8),
+                  backdropFilter: "blur(10px)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  border: `1px solid ${colors.tagBorder}`,
+                }}
+              >
+                <CameraAltIcon sx={{ fontSize: 11, color: "#fff" }} />
+                <Typography
+                  sx={{ fontSize: "9px", color: "#fff", fontWeight: 700 }}
+                >
+                  {currentPhoto + 1}/{photos.length}
+                </Typography>
+              </Box>
+            </>
+          )}
+        </Box>
       </Box>
 
-      {/* ═══════════════════════════════════════
-          المحتوى
-      ═══════════════════════════════════════ */}
+      {/* ═══ المحتوى ═══ */}
       <CardContent
         sx={{
           flex: 1,
-          p: { xs: 2.5, sm: 3 },
+          p: { xs: 2, sm: 2.5 },
+          pt: 0,
           display: "flex",
           flexDirection: "column",
           gap: 1.5,
           animation: `${fadeInUp} 0.6s ease-out`,
+          "@media (prefers-reduced-motion: reduce)": { animation: "none" },
         }}
       >
-        {/* العنوان */}
         <Typography
           sx={{
             color: colors.textPrimary,
-            fontWeight: 800,
-            fontSize: { xs: "1.1rem", sm: "1.3rem" },
-            lineHeight: 1.25,
-            letterSpacing: "-0.02em",
+            fontWeight: 700,
+            fontSize: { xs: "1.1rem", sm: "1.25rem" },
+            lineHeight: 1.3,
+            letterSpacing: "-0.01em",
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
@@ -336,33 +334,31 @@ export default function FeaturedProjectCard({
           {project.title}
         </Typography>
 
-        {/* Tagline */}
         {project.tagline && (
           <Typography
             sx={{
               color: colors.accent,
-              fontSize: { xs: "0.82rem", sm: "0.9rem" },
-              fontWeight: 600,
+              fontSize: "0.8rem",
+              fontWeight: 500,
               fontStyle: "italic",
               lineHeight: 1.5,
               display: "-webkit-box",
               WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
-              pl: 1.5,
-              borderLeft: `3px solid ${colors.accent}`,
+              pl: 1.2,
+              borderLeft: `2px solid ${colors.accent}`,
             }}
           >
             {project.tagline}
           </Typography>
         )}
 
-        {/* الوصف */}
         <Typography
           sx={{
-            color: colors.textSecondary,
-            fontSize: { xs: "0.83rem", sm: "0.9rem" },
-            lineHeight: 1.7,
+            color: colors.textMuted,
+            fontSize: "0.85rem",
+            lineHeight: 1.6,
             display: "-webkit-box",
             WebkitLineClamp: 3,
             WebkitBoxOrient: "vertical",
@@ -372,24 +368,21 @@ export default function FeaturedProjectCard({
           {project.subtitle}
         </Typography>
 
-        {/* Focus — إن وُجد */}
         {project.focus && (
           <Box
             sx={{
               display: "flex",
               alignItems: "flex-start",
               gap: 1,
-              p: 1.4,
-              borderRadius: 1.5,
-              bgcolor: darkMode
-                ? "rgba(212, 175, 55, 0.05)"
-                : "rgba(24, 110, 150, 0.05)",
-              border: `1px solid ${colors.border}`,
+              p: 1.2,
+              borderRadius: "10px",
+              bgcolor: colors.tagBg,
+              border: `1px solid ${colors.tagBorder}`,
             }}
           >
             <FlagIcon
               sx={{
-                fontSize: 16,
+                fontSize: 14,
                 color: colors.accent,
                 mt: 0.2,
                 flexShrink: 0,
@@ -397,8 +390,8 @@ export default function FeaturedProjectCard({
             />
             <Typography
               sx={{
-                fontSize: { xs: "0.75rem", sm: "0.8rem" },
-                fontWeight: 600,
+                fontSize: "0.75rem",
+                fontWeight: 500,
                 color: colors.textPrimary,
                 lineHeight: 1.5,
                 display: "-webkit-box",
@@ -412,24 +405,19 @@ export default function FeaturedProjectCard({
           </Box>
         )}
 
-        {/* التقنيات — عرض كامل مع Tooltip */}
+        {/* Tech Stack - مُصمم كأزرار لوحة مفاتيح ناعمة */}
         {project.techStack?.length > 0 && (
           <Box sx={{ mt: 0.5 }}>
             <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 0.6,
-                mb: 1,
-              }}
+              sx={{ display: "flex", alignItems: "center", gap: 0.6, mb: 1 }}
             >
-              <CodeIcon sx={{ fontSize: 14, color: colors.accent }} />
+              <CodeIcon sx={{ fontSize: 14, color: colors.textMuted }} />
               <Typography
                 sx={{
-                  fontSize: "10px",
-                  fontWeight: 800,
-                  color: colors.accent,
-                  letterSpacing: "1.5px",
+                  fontSize: "9px",
+                  fontWeight: 700,
+                  color: colors.textMuted,
+                  letterSpacing: "1px",
                   textTransform: "uppercase",
                 }}
               >
@@ -437,7 +425,7 @@ export default function FeaturedProjectCard({
               </Typography>
             </Box>
 
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.7 }}>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.8 }}>
               {project.techStack.slice(0, 5).map((tech, i) => (
                 <Chip
                   key={i}
@@ -445,19 +433,13 @@ export default function FeaturedProjectCard({
                   size="small"
                   sx={{
                     height: 24,
-                    fontSize: "10.5px",
+                    fontSize: "10px",
                     fontWeight: 600,
-                    bgcolor: colors.chipBg,
-                    color: colors.accent,
-                    border: `1px solid ${colors.chipBorder}`,
-                    transition: "all 0.25s ease",
-                    "&:hover": {
-                      bgcolor: darkMode
-                        ? "rgba(212, 175, 55, 0.2)"
-                        : "rgba(24, 110, 150, 0.15)",
-                      transform: "translateY(-2px)",
-                      boxShadow: `0 4px 10px rgba(212, 175, 55, 0.15)`,
-                    },
+                    bgcolor: colors.tagBg,
+                    color: colors.textPrimary,
+                    border: `1px solid ${colors.tagBorder}`,
+                    borderRadius: "6px", // حواف مربعة ناعمة (مثل لوحة المفاتيح)
+                    "& .MuiChip-label": { px: 1 },
                   }}
                 />
               ))}
@@ -480,24 +462,17 @@ export default function FeaturedProjectCard({
                   placement="top"
                 >
                   <Chip
-                    label={`+${project.techStack.length - 5} more`}
+                    label={`+${project.techStack.length - 5}`}
                     size="small"
                     sx={{
                       height: 24,
-                      fontSize: "10.5px",
+                      fontSize: "10px",
                       fontWeight: 700,
                       bgcolor: "transparent",
-                      color: colors.textSecondary,
-                      border: `1px dashed ${
-                        darkMode ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"
-                      }`,
+                      color: colors.textMuted,
+                      border: `1px dashed ${colors.tagBorder}`,
+                      borderRadius: "6px",
                       cursor: "help",
-                      transition: "all 0.25s ease",
-                      "&:hover": {
-                        borderColor: colors.accent,
-                        color: colors.accent,
-                        bgcolor: colors.chipBg,
-                      },
                     }}
                   />
                 </Tooltip>
@@ -507,13 +482,11 @@ export default function FeaturedProjectCard({
         )}
       </CardContent>
 
-      {/* ═══════════════════════════════════════
-          الأزرار
-      ═══════════════════════════════════════ */}
+      {/* ═══ الأزرار ═══ */}
       <CardActions
         sx={{
-          px: { xs: 2.5, sm: 3 },
-          pb: { xs: 2.5, sm: 3 },
+          px: { xs: 2, sm: 2.5 },
+          pb: { xs: 2, sm: 2.5 },
           pt: 0,
           display: "flex",
           justifyContent: "space-between",
@@ -521,52 +494,38 @@ export default function FeaturedProjectCard({
           gap: 1,
         }}
       >
-        {/* زر Details الرئيسي */}
         <Button
           onClick={() => onOpenDetails(project)}
           endIcon={
             <ArrowForwardIcon
-              sx={{
-                fontSize: 16,
-                transition: "transform 0.3s ease",
-              }}
+              sx={{ fontSize: 14, transition: "transform 0.25s ease" }}
             />
           }
           sx={{
-            color: colors.accent,
-            fontWeight: 700,
-            fontSize: { xs: "0.82rem", sm: "0.88rem" },
+            color: colors.textPrimary,
+            fontWeight: 600,
+            fontSize: "0.8rem",
             textTransform: "none",
             px: 2,
-            py: 0.9,
-            borderRadius: "10px",
-            border: `1.5px solid ${colors.accent}`,
-            bgcolor: "transparent",
-            letterSpacing: "0.3px",
+            py: 0.8,
+            borderRadius: "8px",
+            border: `1px solid ${colors.tagBorder}`,
+            bgcolor: colors.tagBg,
+            transition:
+              "background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease",
             "&:hover": {
-              bgcolor: darkMode
-                ? "rgba(212, 175, 55, 0.12)"
-                : "rgba(24, 110, 150, 0.1)",
-              borderColor: colors.accentHover,
-              color: colors.accentHover,
-              transform: "translateY(-2px)",
-              boxShadow: darkMode
-                ? "0 6px 20px rgba(212, 175, 55, 0.2)"
-                : "0 6px 20px rgba(24, 110, 150, 0.2)",
-              "& .MuiSvgIcon-root": {
-                transform: "translateX(4px)",
-              },
+              bgcolor: colors.iconHover,
+              borderColor: colors.accent,
+              color: colors.accent,
             },
-            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
           }}
         >
           View Details
         </Button>
 
-        {/* أزرار GitHub + Live */}
-        <Stack direction="row" spacing={0.7}>
+        <Stack direction="row" spacing={1}>
           {project.linkgithub && (
-            <Tooltip title="View Source Code" arrow>
+            <Tooltip title="Source Code" arrow>
               <IconButton
                 component="a"
                 href={project.linkgithub}
@@ -575,27 +534,21 @@ export default function FeaturedProjectCard({
                 size="small"
                 sx={{
                   color: colors.textPrimary,
-                  bgcolor: darkMode
-                    ? "rgba(255,255,255,0.05)"
-                    : "rgba(0,0,0,0.04)",
-                  border: `1px solid ${
-                    darkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"
-                  }`,
-                  width: 38,
-                  height: 38,
-                  transition: "all 0.3s ease",
+                  bgcolor: colors.tagBg,
+                  border: `1px solid ${colors.tagBorder}`,
+                  width: 34,
+                  height: 34,
+                  borderRadius: "8px",
+                  transition:
+                    "background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease",
                   "&:hover": {
                     color: colors.accent,
-                    bgcolor: darkMode
-                      ? "rgba(212, 175, 55, 0.12)"
-                      : "rgba(24, 110, 150, 0.1)",
+                    bgcolor: colors.iconHover,
                     borderColor: colors.accent,
-                    transform: "translateY(-3px) scale(1.05)",
-                    boxShadow: `0 6px 18px rgba(212, 175, 55, 0.2)`,
                   },
                 }}
               >
-                <GitHubIcon sx={{ fontSize: 18 }} />
+                <GitHubIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </Tooltip>
           )}
@@ -609,21 +562,21 @@ export default function FeaturedProjectCard({
                 rel="noopener noreferrer"
                 size="small"
                 sx={{
-                  color: darkMode ? "#000" : "#fff",
-                  bgcolor: colors.accent,
-                  border: `1px solid ${colors.accent}`,
-                  width: 38,
-                  height: 38,
-                  transition: "all 0.3s ease",
+                  color: darkMode ? "#050a14" : "#fff",
+                  bgcolor: colors.textPrimary,
+                  border: `1px solid ${colors.textPrimary}`,
+                  width: 34,
+                  height: 34,
+                  borderRadius: "8px",
+                  transition: "background-color 0.25s ease, color 0.25s ease",
                   "&:hover": {
-                    bgcolor: colors.accentHover,
-                    borderColor: colors.accentHover,
-                    transform: "translateY(-3px) scale(1.05)",
-                    boxShadow: `0 6px 20px rgba(212, 175, 55, 0.4)`,
+                    bgcolor: colors.accent,
+                    borderColor: colors.accent,
+                    color: darkMode ? "#050a14" : "#fff",
                   },
                 }}
               >
-                <LaunchIcon sx={{ fontSize: 18 }} />
+                <LaunchIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </Tooltip>
           )}

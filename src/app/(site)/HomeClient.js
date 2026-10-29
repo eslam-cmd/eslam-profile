@@ -240,7 +240,9 @@ export default function HomeClient({ children }) {
                 toggleTheme={handleToggleTheme}
                 darkMode={darkMode}
                 showMainSection={false}
-              />
+              >
+                {children}
+              </Homepage>
             </Suspense>
           </Box>
         </Box>
