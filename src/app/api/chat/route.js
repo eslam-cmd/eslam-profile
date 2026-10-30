@@ -5,7 +5,7 @@ import { upsertVisitor, saveMessage, getRecentHistory } from "../../../lib/db";
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 8;
 const MAX_MESSAGE_LENGTH = 500;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 const fallbackMemoryMap = new Map();
 
 async function checkRateLimit(ip) {
