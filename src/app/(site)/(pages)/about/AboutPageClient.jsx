@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Box, Button } from "@mui/material";
-import ContactPage from "../../../../components/ContactPage/ContactPage";
+import ContactPage from "../../../../components/contactpage/Contactpage";
 
 export default function AboutPageClient() {
   const [contactOpen, setContactOpen] = React.useState(false);

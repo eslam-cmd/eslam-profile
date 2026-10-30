@@ -11,7 +11,7 @@ import {
   alpha,
 } from "@mui/material";
 import { School, Code, Shield } from "@mui/icons-material";
-import ContactPage from "../contactpage/ContactPage";
+import ContactPage from "../contactpage/Contactpage";
 
 const FONT = "'Space Grotesk', 'Inter', system-ui, sans-serif";
 
@@ -109,7 +109,7 @@ export default function AboutPage() {
       }}
     >
       <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3, md: 4 }, position: "relative", zIndex: 1 }}>
-        
+
         {/* ───── 1. About Me (Bento Style) ───── */}
         <Reveal>
           <Box sx={{ ...cardStyle, p: { xs: 3, sm: 4, md: 5 }, mb: 4 }}>
@@ -173,7 +173,7 @@ export default function AboutPage() {
                       height: 16,
                       borderRadius: "50%",
                       // نستخدم لون البطاقة أو الشفافية ليعطي تأثير الثقب
-                      bgcolor: isDark ? "#0A1F44" : "#ffffff", 
+                      bgcolor: isDark ? "#0A1F44" : "#ffffff",
                       border: `3px solid ${colors.primary}`,
                       zIndex: 1,
                     }}
@@ -273,7 +273,7 @@ export default function AboutPage() {
               sx={{
                 px: 4,
                 py: 1.2,
-                borderRadius: "8px", 
+                borderRadius: "8px",
                 bgcolor: colors.primary,
                 color: colors.onPrimary,
                 fontSize: "0.95rem",
