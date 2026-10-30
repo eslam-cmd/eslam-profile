@@ -11,7 +11,7 @@ import {
   alpha,
 } from "@mui/material";
 import { School, Code, Shield } from "@mui/icons-material";
-import ContactPage from "../contactpage/Contactpage";
+import ContactPage from "../contactpage/ContactPage";
 
 const FONT = "'Space Grotesk', 'Inter', system-ui, sans-serif";
 
