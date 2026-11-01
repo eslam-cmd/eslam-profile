@@ -353,6 +353,7 @@ I can help you explore:
             width: "100%",
           }}
         >
+    {/* 1. العنوان الرئيسي H1 مع نص مخفي بصرياً غني بالكلمات المفتاحية لجوجل */}
           <Typography
             variant="h1"
             sx={{
@@ -375,7 +376,9 @@ I can help you explore:
             </Box>
           </Typography>
 
+          {/* 2. تحويل المسمى الوظيفي إلى H2 حقيقي وإضافة التقنيات الأساسية */}
           <Typography
+            component="h2"
             sx={{
               fontSize: { xs: "1.1rem", sm: "1.3rem", md: "1.5rem" },
               fontWeight: 500,
@@ -383,7 +386,7 @@ I can help you explore:
               mb: 3,
             }}
           >
-            Full-Stack Developer
+            Full-Stack Software Engineer (Next.js, NestJS & Laravel)
           </Typography>
 
           <Box
@@ -396,6 +399,7 @@ I can help you explore:
             }}
           />
 
+          {/* 3. نص ثابت لعناكب البحث + بقاء TypeAnimation للزوار كما هو */}
           <Typography
             component="div"
             sx={{
@@ -408,13 +412,31 @@ I can help you explore:
               minHeight: "4.5rem",
             }}
           >
+            {/* هذا النص يقرؤه Google فوراً في السيرفر ولا يغير شكل التصميم */}
+            <Box
+              component="p"
+              sx={{
+                position: "absolute",
+                width: "1px",
+                height: "1px",
+                padding: 0,
+                margin: "-1px",
+                overflow: "hidden",
+                clip: "rect(0, 0, 0, 0)",
+                whiteSpace: "nowrap",
+                border: 0,
+              }}
+            >
+              إسلام هدايا (Islam Hadaya) مطور ويب فل ستاك ومهندس برمجيات متخصص في بناء تطبيقات الويب ومنصات SaaS وتصميم REST APIs باستخدام Next.js, NestJS, Laravel, Node.js, React, PostgreSQL, Prisma, وأتمتة الأنظمة.
+            </Box>
+
             <TypeAnimation
               sequence={[
                 "Full-stack developer turning ideas into impact.",
                 2000,
                 "Building scalable, secure, and beautiful applications.",
                 2000,
-                "React • Next.js • Node.js — clean code, clear vision.",
+                "Next.js • NestJS • Laravel • PostgreSQL.",
                 2000,
                 "From concept to deployment, I deliver excellence.",
                 2000,

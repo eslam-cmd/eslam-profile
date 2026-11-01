@@ -1,112 +1,23 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import CssBaseline from "@mui/material/CssBaseline";
-import {
-  Box,
-  CircularProgress,
-  Typography,
-  Stack,
-  Button,
-} from "@mui/material";
-import LoadingScreen from "../../components/Others/loading.jsx";
+import { Box } from "@mui/material";
 import { useDarkMode } from "../../components/Others/ClientLayout.jsx";
-
-const Homepage = lazy(() => import("./(pages)/home/page.js"));
-
-const LoadingFallback = () => (
-  <Box
-    sx={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      minHeight: "100vh",
-      gap: 3,
-    }}
-  >
-    <CircularProgress
-      size={60}
-      sx={{ color: "#D4AF37", animationDuration: "550ms" }}
-    />
-    <Typography
-      sx={{
-        color: "rgba(255,255,255,0.6)",
-        fontSize: "14px",
-        letterSpacing: "1px",
-        fontFamily: "'Inter', sans-serif",
-      }}
-    >
-      Loading your experience...
-    </Typography>
-    <Typography
-      sx={{
-        color: "rgba(255,255,255,0.2)",
-        fontSize: "11px",
-        letterSpacing: "2px",
-        fontFamily: "monospace",
-      }}
-    >
-      ✦ Please wait ✦
-    </Typography>
-  </Box>
-);
-
-const ErrorFallback = ({ onRetry }) => (
-  <Box
-    sx={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      minHeight: "100vh",
-      gap: 2,
-      p: 3,
-      textAlign: "center",
-    }}
-  >
-    <Typography variant="h6" color="error" sx={{ fontWeight: 600 }}>
-      ⚠️ Connection Issue
-    </Typography>
-    <Typography sx={{ color: "rgba(255,255,255,0.6)", maxWidth: 400 }}>
-      We&apos;re having trouble loading the page. This might be due to a slow
-      internet connection.
-    </Typography>
-    <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-      <Button
-        variant="contained"
-        onClick={onRetry}
-        sx={{
-          bgcolor: "#D4AF37",
-          color: "#000",
-          fontWeight: 600,
-          "&:hover": { bgcolor: "#b8941f" },
-        }}
-      >
-        Try Again
-      </Button>
-      <Button
-        variant="outlined"
-        onClick={() => window.location.reload()}
-        sx={{
-          borderColor: "rgba(255,255,255,0.2)",
-          color: "rgba(255,255,255,0.6)",
-        }}
-      >
-        Refresh Page
-      </Button>
-    </Stack>
-  </Box>
-);
+import Homepage from "./(pages)/home/page.js";
 
 export default function HomeClient({ children }) {
   const { darkMode, toggleTheme: handleToggleTheme } = useDarkMode();
-  const [loading, setLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
   const isMobile = useMediaQuery("(max-width:600px)");
+  const [isIOS, setIsIOS] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined") {
+      setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
+    }
+  }, []);
 
   const theme = useMemo(
     () =>
@@ -137,48 +48,11 @@ export default function HomeClient({ children }) {
           MuiButton: { styleOverrides: { root: { textTransform: "none" } } },
         },
       }),
-    [darkMode],
+    [darkMode]
   );
 
-  useEffect(() => {
-    const connection =
-      navigator.connection ||
-      navigator.mozConnection ||
-      navigator.webkitConnection;
-    const slowConnection =
-      connection?.saveData ||
-      ["slow-2g", "2g", "3g"].includes(connection?.effectiveType);
-    const timer = setTimeout(
-      () => setLoading(false),
-      slowConnection ? 80 : 200,
-    );
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleRetry = React.useCallback(() => {
-    setHasError(false);
-    setRetryCount((prev) => prev + 1);
-    window.location.reload();
-  }, []);
-
-  useEffect(() => {
-    if (retryCount > 3) setHasError(true);
-  }, [retryCount]);
-
-  useEffect(() => {
-    const handleOnline = () => loading && setLoading(false);
-    const handleOffline = () => setHasError(true);
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, [loading]);
-
-  const backgroundStyle = useMemo(() => {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    return {
+  const backgroundStyle = useMemo(
+    () => ({
       background: darkMode
         ? "linear-gradient(135deg, #000000 0%, #0a1929 50%, #001e3c 100%)"
         : "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%)",
@@ -189,12 +63,14 @@ export default function HomeClient({ children }) {
       color: theme.palette.text.primary,
       WebkitOverflowScrolling: "touch",
       overflow: "auto",
-    };
-  }, [darkMode, theme, isMobile]);
+    }),
+    [darkMode, theme, isMobile, isIOS]
+  );
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      {/* 1. القسم الأساسي (MainSection) يظهر هنا فوراً */}
       <Box
         sx={{
           "--hero-name-color": darkMode ? "#D4AF37" : "#186e96",
@@ -226,27 +102,17 @@ export default function HomeClient({ children }) {
       >
         {children}
       </Box>
-      {hasError ? (
+
+      {/* 2. باقي أقسام الموقع تظهر مباشرة تحته بدون حجب عن محركات البحث */}
+      <Box sx={{ position: "relative", minHeight: "100vh" }}>
         <Box sx={backgroundStyle}>
-          <ErrorFallback onRetry={handleRetry} />
+          <Homepage
+            toggleTheme={handleToggleTheme}
+            darkMode={darkMode}
+            showMainSection={false}
+          />
         </Box>
-      ) : loading ? (
-        <LoadingScreen />
-      ) : (
-        <Box sx={{ position: "relative", minHeight: "100vh" }}>
-          <Box sx={backgroundStyle}>
-            <Suspense fallback={<LoadingFallback />}>
-              <Homepage
-                toggleTheme={handleToggleTheme}
-                darkMode={darkMode}
-                showMainSection={false}
-              >
-                {children}
-              </Homepage>
-            </Suspense>
-          </Box>
-        </Box>
-      )}
+      </Box>
     </ThemeProvider>
   );
 }

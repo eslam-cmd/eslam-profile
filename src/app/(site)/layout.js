@@ -1,30 +1,25 @@
 // src/app/layout.js
 import ClientLayout from "../../components/Others/ClientLayout.jsx";
 import VisitorTracker from "../../components/Others/VisitorTracker.jsx";
-// import localFont from 'next/font/local';
-
-// const geistSans = localFont({
-//   src: './fonts/GeistVF.woff2', // Make sure the file name is correct
-//   variable: '--font-geist-sans',
-//   display: 'swap',
-// });
-
-// const geistMono = localFont({
-//   src: './fonts/GeistMonoVF.woff2', // Make sure the file name is correct
-//   variable: '--font-geist-mono',
-//   display: 'swap',
-// });
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://eslam-profile.vercel.app";
 
+export const viewport = {
+  themeColor: "#0A1F44",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    default: "Islam Hadaya | Freelance Web Developer - Next.js, Node.js, PostgreSQL",
-    template: "%s | Islam Hadaya - Web Developer",
+    default:
+      "Islam Hadaya (إسلام هدايا) | Full-Stack Web Developer - Next.js, NestJS, Laravel",
+    template: "%s | Islam Hadaya (إسلام هدايا)",
   },
   description:
-    "Islam Hadaya, a web developer specialized in building SaaS platforms and web applications using Next.js, Node.js, and PostgreSQL. I provide comprehensive web development services for businesses and individuals in Aleppo, Syria, and the Arab world.",
+    "Islam Hadaya (إسلام هدايا) - Full-Stack Software Developer & Backend Engineer specialized in SaaS platforms, REST APIs, and workflow automation using Next.js, NestJS, Laravel, Node.js, and PostgreSQL. تطوير مواقع ومنصات ويب متكاملة.",
 
   icons: {
     icon: "/favicon.ico",
@@ -33,90 +28,46 @@ export const metadata = {
   },
 
   keywords: [
-    // Name & Identity
+    // Identity (EN & AR - No duplicates)
     "Islam Hadaya",
-    "Islam Hadaya",
-    "Islam Hadaya",
-    "Islam Profile",
-    "Islam Profile",
-    "Islam Canada",
-    "Islam Canada",
-    "Islam Syria",
-    "Islam Syria",
-    "Islam Aleppo",
-    "Islam Aleppo",
+    "إسلام هدايا",
+    "اسلام هدايا",
+    "Eslam Hadaya",
 
-    // Job Title
-    "Web Developer",
-    "Web Developer",
+    // Job Titles (EN & AR)
     "Full-Stack Developer",
-    "Full-Stack Developer",
-    "Frontend Developer",
-    "Frontend Developer",
-    "Backend Developer",
-    "Backend Developer",
+    "Backend Engineer",
+    "Software Engineer",
+    "Freelance Web Developer",
+    "مطور ويب",
+    "مطور فل ستاك",
+    "مبرمج مواقع",
+    "مهندس برمجيات",
+    "مبرمج باك اند",
 
-    // Technologies
+    // Tech Stack
     "Next.js Developer",
-    "Next.js Developer",
-    "Node.js Developer",
+    "NestJS Developer",
+    "Laravel Developer",
     "Node.js Developer",
     "React Developer",
-    "React Developer",
-    "PostgreSQL Developer",
+    "PostgreSQL",
+    "Prisma ORM",
     "TypeScript",
-    "JavaScript",
+    "n8n Automation",
 
-    // Services
-    "Programming Services",
-    "Programming Services",
-    "App Development",
-    "App Development",
-    "Platform Development",
-    "Platform Development",
+    // Services & Location
     "SaaS Development",
-    "SaaS Development",
-    "Web Development Services",
-    "Web Development Services",
-    "Freelance Developer",
-    "Freelance Developer",
-    "Freelancer Syria",
-    "Freelancer Syria",
-
-    // Location
-    "Aleppo",
-    "Aleppo",
-    "Syria",
-    "Syria",
-    "Syrian Developer",
-    "Syrian Developer",
-    "Arab Developer",
-    "Arab Developer",
-
-    // Other fields
-    "Coding",
-    "Coding",
-    "Web Design",
-    "Web Design",
-    "UI/UX",
     "API Development",
-    "API Development",
-    "Database Design",
-    "Database Design",
     "E-commerce Development",
-    "E-commerce Development",
-
-    // General words
-    "Coding",
-    "Technology",
-    "Technology",
-    "Software Engineer",
-    "Software Engineer",
-    "Code",
-    "Code",
-    "Developer Portfolio",
-    "Developer Portfolio",
+    "Web Security Auditing",
+    "تطوير متاجر إلكترونية",
+    "برمجة تطبيقات ويب",
+    "Syrian Developer",
+    "مبرمج في سوريا",
+    "مبرمج في حلب",
   ],
+
   authors: [{ name: "Islam Hadaya", url: "https://github.com/eslam-cmd" }],
   creator: "Islam Hadaya",
   publisher: "Islam Hadaya",
@@ -125,32 +76,33 @@ export const metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(siteUrl),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Islam Hadaya | Freelance Web Developer - Next.js, Node.js, PostgreSQL",
+    title:
+      "Islam Hadaya (إسلام هدايا) | Full-Stack Developer (Next.js, NestJS, Laravel)",
     description:
-      "Islam Hadaya, a web developer specialized in building SaaS platforms and web applications. I provide comprehensive web development services in Aleppo, Syria, and the Arab world.",
+      "Full-Stack Software Engineer building scalable SaaS platforms, secure APIs, and modern web apps using Next.js, NestJS, Laravel, and PostgreSQL.",
     url: siteUrl,
-    siteName: "Islam Hadaya | Web Developer",
-    locale: "ar_SY",
+    siteName: "Islam Hadaya | إسلام هدايا",
+    locale: "en_US",
+    alternateLocale: ["ar_SY"],
     type: "website",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Islam Hadaya - Web Developer",
+        alt: "Islam Hadaya - Full-Stack Web Developer",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Islam Hadaya | Freelance Web Developer",
+    title: "Islam Hadaya (إسلام هدايا) | Full-Stack Web Developer",
     description:
-      "Islam Hadaya, a web developer specialized in building SaaS platforms and web applications",
+      "Building SaaS platforms, REST APIs, and modern web applications with Next.js, NestJS, Laravel, and PostgreSQL.",
     images: ["/og-image.jpg"],
     creator: "@eslam_hadaya",
   },
@@ -170,117 +122,83 @@ export const metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": `${siteUrl}/#person`,
+      name: "Islam Hadaya",
+      alternateName: ["إسلام هدايا", "اسلام هدايا", "Eslam Hadaya"],
+      givenName: "Islam",
+      familyName: "Hadaya",
+      jobTitle: "Full-Stack Web Developer & Backend Engineer",
+      description:
+        "Full-Stack Software Developer specialized in building SaaS platforms, REST APIs, and web applications using Next.js, NestJS, Laravel, Node.js, and PostgreSQL.",
+      url: siteUrl,
+      sameAs: [
+        "https://github.com/eslam-cmd",
+        "https://www.linkedin.com/in/eslam-hd-60a056357",
+        "https://www.facebook.com/islam.hadaya.2025",
+        "https://x.com/eslam_hadaya",
+      ],
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Aleppo",
+        addressCountry: "SY",
+      },
+      knowsAbout: [
+        "Full-Stack Web Development",
+        "Next.js",
+        "NestJS",
+        "Laravel",
+        "React",
+        "Node.js",
+        "Express.js",
+        "PostgreSQL",
+        "Prisma ORM",
+        "Redis",
+        "BullMQ",
+        "TypeScript",
+        "Tailwind CSS",
+        "n8n Workflow Automation",
+        "Web Security Auditing",
+      ],
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": `${siteUrl}/#service`,
+      name: "Islam Hadaya - Web Development Services",
+      alternateName: "إسلام هدايا لتطوير الويب والبرمجيات",
+      url: siteUrl,
+      logo: `${siteUrl}/logo.png`,
+      image: `${siteUrl}/og-image.jpg`,
+      founder: { "@id": `${siteUrl}/#person` },
+      description:
+        "Comprehensive Full-Stack web development, SaaS architecture, and backend API engineering using Next.js, NestJS, Laravel, and PostgreSQL.",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Aleppo",
+        addressCountry: "SY",
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: "hdayaaslam34@gmail.com",
+        contactType: "customer support",
+        availableLanguage: ["Arabic", "English"],
+      },
+    },
+  ],
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" dir="ltr">
-      <head>
-        {/* Additional Meta Tags */}
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#0A1F44" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-          name="apple-mobile-web-app-status-bar-style"
-          content="black-translucent"
-        />
-
-        {/* Canonical Link */}
-        <link rel="canonical" href={siteUrl} />
-
-        {/* RSS Feed (Optional) */}
-        <link
-          rel="alternate"
-          type="application/rss+xml"
-          title="Islam Hadaya"
-          href="/feed.xml"
-        />
-
-        {/* Additional Open Graph */}
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Islam Hadaya | Web Developer" />
-        <meta property="og:locale" content="ar_SY" />
-
-        {/* Twitter Cards */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@eslam_hadaya" />
-        <meta name="twitter:creator" content="@eslam_hadaya" />
-
-        {/* Schema Markup (JSON-LD) */}
+      <body>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Person",
-              name: "Islam Hadaya",
-              givenName: "Islam",
-              familyName: "Hadaya",
-              jobTitle: "Full-Stack Web Developer",
-              description:
-                "Web developer specialized in building SaaS platforms and web applications using Next.js, Node.js, and PostgreSQL",
-              url: "https://eslam-profile.vercel.app",
-              sameAs: [
-                "https://github.com/eslam-cmd",
-                "https://www.linkedin.com/in/eslam-hd-60a056357",
-                "https://www.facebook.com/islam.hadaya.2025",
-                "https://x.com/eslam_hadaya",
-              ],
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Aleppo",
-                addressCountry: "Syria",
-              },
-              knowsAbout: [
-                "Next.js",
-                "React",
-                "Node.js",
-                "Express",
-                "PostgreSQL",
-                "TypeScript",
-                "JavaScript",
-                "Docker",
-                "AWS",
-                "MUI",
-                "Tailwind CSS",
-              ],
-              worksFor: {
-                "@type": "Organization",
-                name: "Freelance Web Developer",
-                description: "Comprehensive web development services",
-              },
-            }),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-
-        {/* Schema Markup for Organization */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Islam Hadaya - Web Developer",
-              url: "https://eslam-profile.vercel.app",
-              logo: "https://eslam-profile.vercel.app/logo.png",
-              description:
-                "Comprehensive web development services using Next.js, Node.js, and PostgreSQL",
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Aleppo",
-                addressCountry: "Syria",
-              },
-              contactPoint: {
-                "@type": "ContactPoint",
-                email: "hdayaaslam34@gmail.com",
-                contactType: "sales",
-                availableLanguage: ["Arabic", "English"],
-              },
-            }),
-          }}
-        />
-      </head>
-      <body >
         <ClientLayout>
           <VisitorTracker />
           {children}
